@@ -10,6 +10,7 @@ const Documentation = memo(({ profile }) => {
   const [readme, setReadme] = useState('');
   const [activeTab, setActiveTab] = useState('explanation');
   const docs = profile?.documentation || {};
+  const logs = docs.engineeringObjective?.systemMetricsConfig?.logTemplates || [];
 
   useEffect(() => {
     fetch('/docs/PROJECT_EXPLANATION.md')
@@ -26,8 +27,8 @@ const Documentation = memo(({ profile }) => {
   return (
     <Box sx={{ minHeight: '100vh', pt: 20, pb: 15, bgcolor: '#050507' }}>
       <SEO
-        title="Documentation | Technical Architecture"
-        description="Deep-dive into the architecture and engineering philosophy of this MERN stack application."
+        title="Documentation | Project Details"
+        description="Deep-dive into the architecture and engineering of this MERN stack application."
       />
 
       <Container maxWidth="lg">
@@ -42,7 +43,7 @@ const Documentation = memo(({ profile }) => {
               variant="overline"
               sx={{ color: 'primary.main', fontWeight: 900, letterSpacing: 4 }}
             >
-              DOCUMENTATION
+              PROJECT DETAILS
             </Typography>
             <Typography
               variant="h1"
@@ -53,14 +54,14 @@ const Documentation = memo(({ profile }) => {
                 letterSpacing: -2,
               }}
             >
-              Project{' '}
+              Technical{' '}
               <Box component="span" sx={{ color: 'primary.main' }}>
-                Architecture.
+                Analysis.
               </Box>
             </Typography>
-            <Typography sx={{ color: '#475569', fontSize: '1.2rem', maxWidth: 700 }}>
-              An in-depth technical analysis of the architecture, security, and performance
-              protocols governing this MERN stack application.
+            <Typography sx={{ color: '#64748b', fontSize: '1.2rem', maxWidth: 700, lineHeight: 1.6 }}>
+              {docs.engineeringObjective?.description || 
+              "An in-depth analysis of the project's architecture, security, and performance."}
             </Typography>
           </Stack>
 
@@ -83,7 +84,7 @@ const Documentation = memo(({ profile }) => {
                     transition: 'all 0.3s ease'
                   }}
                 >
-                  Project Explanation
+                  Architecture
                 </Button>
                 <Button
                   onClick={() => setActiveTab('readme')}
@@ -100,11 +101,20 @@ const Documentation = memo(({ profile }) => {
                     transition: 'all 0.3s ease'
                   }}
                 >
-                  README.md
+                  README
                 </Button>
               </Stack>
 
-              <Box className="glass-card" sx={{ p: { xs: 4, md: 8 } }}>
+              <Box 
+                className="glass-card" 
+                sx={{ 
+                  p: { xs: 4, md: 8 },
+                  border: '1px solid rgba(255,255,255,0.03)',
+                  background: 'rgba(10,10,15,0.4)',
+                  backdropFilter: 'blur(40px)',
+                  borderRadius: '30px'
+                }}
+              >
                 <Box
                   className="markdown-content"
                   sx={{
@@ -112,14 +122,24 @@ const Documentation = memo(({ profile }) => {
                     lineHeight: 1.8,
                     fontSize: '1.1rem',
                     '& h1, & h2, & h3': { color: 'white', fontWeight: 800, mt: 4, mb: 2 },
-                    '& h1': { fontSize: '2rem' },
-                    '& h2': { fontSize: '1.7rem' },
+                    '& h1': { fontSize: '2.2rem', letterSpacing: -1 },
+                    '& h2': { fontSize: '1.8rem', borderBottom: '1px solid rgba(255,255,255,0.05)', pb: 1 },
                     '& h3': { fontSize: '1.4rem' },
                     '& strong': { color: 'white', fontWeight: 700 },
                     '& p': { mb: 3 },
-                    '& pre': { background: '#0f172a', padding: 2, borderRadius: 2, overflowX: 'auto', mt: 2, mb: 2 },
-                    '& code': { background: '#0f172a', padding: '2px 6px', borderRadius: 1, color: '#38bdf8' },
-                    '& a': { color: '#e11d48' },
+                    '& ul': { mb: 3, pl: 3 },
+                    '& li': { mb: 1 },
+                    '& blockquote': { 
+                      borderLeft: '4px solid #e11d48', 
+                      bgcolor: 'rgba(225, 29, 72, 0.05)', 
+                      p: 3, 
+                      borderRadius: 2, 
+                      my: 4,
+                      '& p': { mb: 0, color: 'white', fontWeight: 600 }
+                    },
+                    '& pre': { background: '#0f172a', padding: 3, borderRadius: 3, overflowX: 'auto', mt: 3, mb: 3, border: '1px solid rgba(255,255,255,0.05)' },
+                    '& code': { background: '#1e293b', padding: '3px 8px', borderRadius: 1.5, color: '#e11d48', fontSize: '0.9em' },
+                    '& a': { color: '#e11d48', textDecoration: 'none', '&:hover': { textDecoration: 'underline' } },
                   }}
                 >
                   {activeTab === 'explanation' ? (
@@ -138,16 +158,17 @@ const Documentation = memo(({ profile }) => {
                 <Box className="glass-card" sx={{ p: 4 }}>
                   <Typography
                     sx={{
-                      color: 'primary.main',
+                      color: '#64748b',
                       fontWeight: 900,
                       fontSize: '0.7rem',
-                      letterSpacing: 2,
+                      letterSpacing: 3,
                       mb: 3,
+                      textTransform: 'uppercase'
                     }}
                   >
-                    PROJECT DETAILS
+                    System Components
                   </Typography>
-                  <Stack spacing={2}>
+                  <Stack spacing={2.5}>
                     {docs.coreArchitecture?.map((dna, i) => (
                       <Box
                         key={i}
@@ -155,21 +176,25 @@ const Documentation = memo(({ profile }) => {
                           display: 'flex',
                           justifyContent: 'space-between',
                           alignItems: 'center',
-                          p: 2,
-                          bgcolor: 'rgba(255,255,255,0.02)',
-                          borderRadius: 2,
-                          border: '1px solid rgba(255,255,255,0.05)',
+                          p: 2.5,
+                          bgcolor: 'rgba(255,255,255,0.01)',
+                          borderRadius: '16px',
+                          border: '1px solid rgba(255,255,255,0.04)',
                         }}
                       >
-                        <Typography sx={{ color: 'white', fontWeight: 700, fontSize: '0.85rem' }}>
+                        <Typography sx={{ color: '#94a3b8', fontWeight: 700, fontSize: '0.8rem' }}>
                           {dna.title}
                         </Typography>
                         <Typography
                           sx={{
                             color: dna.color || 'primary.main',
-                            fontWeight: 800,
+                            fontWeight: 900,
                             fontSize: '0.75rem',
                             fontFamily: 'monospace',
+                            bgcolor: `${dna.color || '#e11d48'}11`,
+                            px: 1.5,
+                            py: 0.5,
+                            borderRadius: '6px'
                           }}
                         >
                           {dna.val}
@@ -179,18 +204,51 @@ const Documentation = memo(({ profile }) => {
                   </Stack>
                 </Box>
 
+                {/* Status Logs (Interactive feel) */}
+                <Box className="glass-card" sx={{ p: 4, background: '#08080a' }}>
+                  <Typography
+                    sx={{
+                      color: '#64748b',
+                      fontWeight: 900,
+                      fontSize: '0.7rem',
+                      letterSpacing: 3,
+                      mb: 3,
+                      textTransform: 'uppercase'
+                    }}
+                  >
+                    Environment Status
+                  </Typography>
+                  <Stack spacing={2}>
+                    {logs.map((log, i) => (
+                      <Box key={i} sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: log.color, boxShadow: `0 0 10px ${log.color}` }} />
+                        <Typography sx={{ color: '#475569', fontSize: '0.75rem', fontFamily: 'monospace', fontWeight: 600 }}>
+                          [{log.type}] <span style={{ color: '#94a3b8' }}>{log.message}</span>
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Stack>
+                </Box>
+
                 {/* Security Status */}
-                <Box className="glass-card" sx={{ p: 4, borderLeft: '4px solid #00ffcc' }}>
+                <Box 
+                  className="glass-card" 
+                  sx={{ 
+                    p: 4, 
+                    borderLeft: '4px solid #00ffcc',
+                    background: 'linear-gradient(90deg, rgba(0, 255, 204, 0.05) 0%, transparent 100%)'
+                  }}
+                >
                   <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
                     <Shield size={20} color="#00ffcc" />
                     <Typography sx={{ color: 'white', fontWeight: 800 }}>
-                      Security Protocols
+                      Security Status
                     </Typography>
                   </Stack>
-                  <Typography sx={{ color: '#475569', fontSize: '0.85rem', lineHeight: 1.6 }}>
-                    Advanced security protocols active. Industry-standard encryption applied to all
-                    data streams. Strict CORS and CSP policies enforced to ensure secure global
-                    access.
+                  <Typography sx={{ color: '#64748b', fontSize: '0.85rem', lineHeight: 1.7 }}>
+                    All security protocols are active. The system uses strict CORS policies, 
+                    environment variable sanitization, and REST API best practices to ensure 
+                    data integrity and secure access.
                   </Typography>
                 </Box>
 
@@ -198,24 +256,30 @@ const Documentation = memo(({ profile }) => {
                 <Box className="glass-card" sx={{ p: 4 }}>
                   <Typography
                     sx={{
-                      color: 'primary.main',
+                      color: '#64748b',
                       fontWeight: 900,
                       fontSize: '0.7rem',
-                      letterSpacing: 2,
-                      mb: 3,
+                      letterSpacing: 3,
+                      mb: 4,
+                      textTransform: 'uppercase'
                     }}
                   >
-                    PERFORMANCE METRICS
+                    Optimization Results
                   </Typography>
-                  <Grid container spacing={2}>
+                  <Grid container spacing={4}>
                     {docs.performanceMetrics?.map((m, i) => (
                       <Grid item xs={4} key={i}>
                         <Typography
-                          sx={{ color: m.color || 'white', fontWeight: 900, fontSize: '1.2rem' }}
+                          sx={{ 
+                            color: m.color || 'white', 
+                            fontWeight: 900, 
+                            fontSize: '1.4rem',
+                            letterSpacing: -1
+                          }}
                         >
                           {m.val}
                         </Typography>
-                        <Typography sx={{ color: '#334155', fontSize: '0.55rem', fontWeight: 800 }}>
+                        <Typography sx={{ color: '#475569', fontSize: '0.6rem', fontWeight: 900, letterSpacing: 1 }}>
                           {m.label}
                         </Typography>
                       </Grid>

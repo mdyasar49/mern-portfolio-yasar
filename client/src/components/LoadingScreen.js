@@ -4,42 +4,41 @@
 
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Stack } from '@mui/material';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const LoadingScreen = ({ onComplete }) => {
   const [progress, setProgress] = useState(0);
-  const [status, setStatus] = useState('INITIALIZING');
+  const [statusIndex, setStatusIndex] = useState(0);
+
+  const statuses = [
+    'INITIALIZING SYSTEM',
+    'FETCHING PROFILE DATA',
+    'LOADING PROJECT FRAGMENTS',
+    'PREPARING UI COMPONENTS',
+    'STARTING UP',
+  ];
 
   useEffect(() => {
-    // Increment progress over time
     const timer = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(timer);
-          setTimeout(onComplete, 800);
+          setTimeout(onComplete, 500);
           return 100;
         }
         return prev + 1;
       });
-    }, 20);
+    }, 25);
 
-    // Cycle through professional status messages
-    const statusTimer = setInterval(() => {
-      const statuses = [
-        'GETTING THINGS READY',
-        'LOADING CONTENT',
-        'PREPARING UI',
-        'ALMOST THERE',
-        'WELCOME',
-      ];
-      setStatus(statuses[Math.floor(Math.random() * statuses.length)]);
-    }, 500);
-
-    return () => {
-      clearInterval(timer);
-      clearInterval(statusTimer);
-    };
+    return () => clearInterval(timer);
   }, [onComplete]);
+
+  useEffect(() => {
+    const statusTimer = setInterval(() => {
+      setStatusIndex((prev) => (prev < statuses.length - 1 ? prev + 1 : prev));
+    }, 800);
+    return () => clearInterval(statusTimer);
+  }, [statuses.length]);
 
   return (
     <Box
@@ -54,30 +53,33 @@ const LoadingScreen = ({ onComplete }) => {
         justifyContent: 'center',
       }}
     >
-      {/* Main Scanner Circle - A focal point for the loading experience */}
       <Box sx={{ position: 'relative', mb: 8 }}>
+        {/* Ambient Glow */}
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+          style={{
+            position: 'absolute',
+            inset: -50,
+            background: 'radial-gradient(circle, #e11d48 0%, transparent 70%)',
+            borderRadius: '50%',
+            filter: 'blur(40px)',
+            zIndex: -1,
+          }}
+        />
+
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
           style={{
-            width: 180,
-            height: 180,
-            border: '2px solid rgba(225, 29, 72, 0.05)',
+            width: 160,
+            height: 160,
+            border: '2px solid rgba(255,255,255,0.03)',
             borderTop: '2px solid #e11d48',
             borderRadius: '50%',
           }}
         />
-        {/* Secondary counter-rotating ring */}
-        <motion.div
-          animate={{ rotate: -360 }}
-          transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-          style={{
-            position: 'absolute',
-            inset: 15,
-            border: '1px dashed rgba(225, 29, 72, 0.2)',
-            borderRadius: '50%',
-          }}
-        />
+        
         <Typography
           sx={{
             position: 'absolute',
@@ -89,38 +91,45 @@ const LoadingScreen = ({ onComplete }) => {
             fontFamily: 'Outfit',
             fontSize: '1.8rem',
             letterSpacing: -1,
-            textShadow: '0 0 40px rgba(225, 29, 72, 0.4)',
+            textShadow: '0 0 30px rgba(225, 29, 72, 0.3)',
           }}
         >
           {progress}%
         </Typography>
       </Box>
 
-      {/* Status & Progress Bar Module */}
-      <Stack spacing={3} alignItems="center" sx={{ width: 320 }}>
-        <Typography
-          variant="caption"
-          sx={{
-            color: '#e11d48',
-            fontFamily: 'Outfit',
-            letterSpacing: 4,
-            fontSize: '0.7rem',
-            fontWeight: 900,
-            textTransform: 'uppercase',
-            transition: '0.3s all',
-          }}
-        >
-          {status}
-        </Typography>
+      <Stack spacing={3} alignItems="center" sx={{ width: 300 }}>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={statusIndex}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Typography
+              sx={{
+                color: '#e11d48',
+                fontFamily: 'Outfit',
+                letterSpacing: 4,
+                fontSize: '0.65rem',
+                fontWeight: 900,
+                textTransform: 'uppercase',
+                textAlign: 'center'
+              }}
+            >
+              {statuses[statusIndex]}
+            </Typography>
+          </motion.div>
+        </AnimatePresence>
 
         <Box
           sx={{
             width: '100%',
-            height: 2,
+            height: 1,
             bgcolor: 'rgba(255,255,255,0.03)',
             borderRadius: 10,
             overflow: 'hidden',
-            position: 'relative',
           }}
         >
           <motion.div
@@ -129,7 +138,6 @@ const LoadingScreen = ({ onComplete }) => {
             style={{
               height: '100%',
               background: '#e11d48',
-              boxShadow: '0 0 20px #e11d48',
             }}
           />
         </Box>
@@ -137,17 +145,16 @@ const LoadingScreen = ({ onComplete }) => {
         <Typography
           variant="caption"
           sx={{
-            color: '#1e293b',
+            color: '#334155',
             fontFamily: 'monospace',
-            fontSize: '0.65rem',
+            fontSize: '0.6rem',
             fontWeight: 700,
             letterSpacing: 2,
           }}
         >
-          LOADING...
+          PREPARING ASSETS...
         </Typography>
       </Stack>
-
     </Box>
   );
 };

@@ -55,16 +55,16 @@ The app loads data in parts to keep it fast:
 * **Initial Load**: Core info is loaded first so the page shows up immediately.
 * **Background Loading**: Other details like projects and skills load in the background as you scroll.
 
-## 4. High-Fidelity Frontend Engineering
-The presentation layer is an aggressive showcase of modern React.js capabilities:
-* **Framer Motion Integration**: Elements do not just appear; they enter the DOM via synchronized orchestration. We utilize `AnimatePresence` and `motion.div` for complex, high-performance GPU-accelerated enter/exit transitions.
+## 4. Frontend Engineering
+The presentation layer is a showcase of modern React.js capabilities:
+* **Framer Motion Integration**: Elements enter the page with smooth, synchronized animations. I used `AnimatePresence` and `motion.div` for high-performance transitions.
 * **Glassmorphism & Theming**: The UI is built using a custom design system layered over **Material UI (MUI)**. We use strict CSS variables (`index.css`) to enforce the *Indigo-Rose* aesthetic, complete with `backdrop-filter: blur(24px)` glass cards and dynamic gradient borders.
 * **Data Visualization**: Complex skill matrices and performance metrics are rendered dynamically using **Recharts**. We strictly enforce dimensional boundaries (`height={350}`) to avoid ResizeObserver calculation bugs during React's initial render cycle.
 
-## 5. Advanced Cross-Window Telemetry (Iframe Bridge)
-The Professional Resume viewer is technically an isolated, static HTML micro-application embedded via an `<iframe>`. 
-* **The Problem**: Browsers block parent React applications from tracking mouse coordinates inside an iframe due to security boundaries, which normally breaks custom global cursors.
-* **The Engineering Solution**: We built a secure, bidirectional telemetry bridge. The embedded iframe aggressively broadcasts its internal `X/Y` mouse coordinates to the parent React window via `window.postMessage()`. The React app intercepts these signals, calculates the bounding box offset, and smoothly drives the Custom Spotlight Cursor over the iframe with zero lag.
+## 5. Cross-Window Communication (Iframe Bridge)
+The Professional Resume viewer is an isolated HTML page embedded via an `<iframe>`. 
+* **The Problem**: Browsers block parent apps from tracking mouse coordinates inside an iframe, which usually breaks custom cursors.
+* **The Solution**: I built a communication bridge. The iframe sends its mouse coordinates to the parent React window via `window.postMessage()`. The React app then uses these coordinates to move the custom cursor smoothly over the iframe.
 
 ## 6. Security & Network Protocols
 The backend enforces strict networking rules:
@@ -72,7 +72,7 @@ The backend enforces strict networking rules:
 * **Network Error Screen**: If the frontend completely loses connection to the backend API, the application intercepts the global Axios error and triggers a cinematic, full-screen **Network Alert Interface**, gracefully explaining the issue rather than silently freezing.
 * **Email Dispatch Integration**: The Contact form safely formats and delegates messages directly to secure email clients, ensuring privacy and bypassing the need to store sensitive PII in our own database.
 
-## 7. Codebase Sanitization
-The project has undergone extreme technical debt removal:
-* Unused server-side rendering (EJS) logic, redundant MongoDB admin controllers, and bloated NPM packages (`web-vitals`, `express-validator`, `bcryptjs`) were systematically purged.
-* The result is a lightweight, strictly decoupled MERN architecture with an incredibly fast production build time.
+## 7. Codebase Cleanup
+The project has been thoroughly cleaned to improve performance:
+* Unused logic, redundant controllers, and bloated packages were removed.
+* The result is a lightweight, decoupled MERN architecture with a fast production build.
