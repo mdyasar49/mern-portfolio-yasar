@@ -504,6 +504,31 @@ body.dark-mode-interactive b {
   padding-bottom: 12px !important;
   margin-bottom: 16px !important;
 }
+/* Contact links — black, no decoration in PDF */
+.pdf-capture .contact-line a {
+  color: #000 !important;
+  text-decoration: none !important;
+}
+/* Hide ALL fixed-position UI chrome during PDF capture:
+   cursor elements, action buttons, modals, notifications */
+.pdf-capture #rp-cursor-dot,
+.pdf-capture #rp-cursor-ring,
+.pdf-capture #rp-cursor-label,
+.pdf-capture #resume-actions,
+.pdf-capture .action-btn,
+.pdf-capture .modal,
+.pdf-capture #loading-overlay,
+.pdf-capture #system-toast,
+.pdf-capture .hidden-print {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+/* Also remove any font-family override — force ATS-safe font in PDF */
+.pdf-capture .resume-container,
+.pdf-capture .resume-container * {
+  font-family: 'Calibri', 'Arial', 'Liberation Sans', sans-serif !important;
+}
 
 /* Modal System */
 .modal {
