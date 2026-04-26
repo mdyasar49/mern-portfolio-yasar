@@ -24,7 +24,7 @@ import { Mail, MapPin, Globe, Clock, User, MessageSquare, X, ChevronRight } from
 import { motion, AnimatePresence } from 'framer-motion';
 import { submitContactMessage, fetchMessageLogs } from '../services/api';
 import socket from '../services/socket';
-import { API_BASE_URL } from '../config';
+
 
 const Contact = ({ profile }) => {
   const [formData, setFormData] = useState({

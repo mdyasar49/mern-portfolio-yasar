@@ -5,7 +5,7 @@ import { Shield, Zap, Users, MessageSquare } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import SEO from '../components/SEO';
 import socket from '../services/socket';
-import { API_BASE_URL } from '../config';
+
 
 const Documentation = memo(({ profile }) => {
   const [markdown, setMarkdown] = useState('');

@@ -29,8 +29,8 @@ import RecruiterHUD from './components/RecruiterHUD';
 import LoadingScreen from './components/LoadingScreen';
 import DocumentationHUD from './components/DocumentationHUD';
 import { Toaster, toast } from 'react-hot-toast';
-import { API_BASE_URL, SOCKET_URL } from './config';
 import socket from './services/socket';
+
 
 // ─── Lazy Loaded Modules (Optimization) ──────────────────────────────────
 // These pages are only downloaded when the user actually navigates to them,

@@ -7,7 +7,7 @@ import { Box, Typography, Container, Stack, Grid } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Terminal, Zap, Users, MessageSquare } from 'lucide-react';
 import socket from '../services/socket';
-import { API_BASE_URL } from '../config';
+
 
 const SystemLogStream = memo(({ profile }) => {
   const [logs, setLogs] = useState([]);

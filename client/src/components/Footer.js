@@ -18,7 +18,7 @@ import {
 import { motion } from 'framer-motion';
 import { fetchSystemAnalytics } from '../services/api';
 import socket from '../services/socket';
-import { API_BASE_URL } from '../config';
+
 
 const Footer = memo(({ profile }) => {
   const socials = profile?.socials;
