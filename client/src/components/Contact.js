@@ -18,6 +18,8 @@ import {
 import { Mail, MapPin, Globe, Clock, User, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { submitContactMessage, fetchMessageLogs } from '../services/api';
+import { io } from 'socket.io-client';
+import { API_BASE_URL } from '../config';
 
 const Contact = ({ profile }) => {
   const [formData, setFormData] = useState({
@@ -39,6 +41,16 @@ const Contact = ({ profile }) => {
 
   React.useEffect(() => {
     loadMessages();
+
+    // Socket.io for real-time updates
+    const socket = io(API_BASE_URL);
+    socket.on('newInquiry', (newMsg) => {
+      setMessages((prev) => [newMsg, ...prev].slice(0, 5));
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   const loadMessages = async () => {

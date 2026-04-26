@@ -11,28 +11,28 @@ const ERROR_CONFIG = {
     color: '#e11d48',
     title: 'OFFLINE',
     subtitle: 'Please check your internet connection and try again.',
-    code: 'OFFLINE',    diagnostics: ['IP_STACK_UNREACHABLE', 'DNS_RESOLUTION_FAILURE', 'LOCAL_ADAPTER_INACTIVE'],
+    code: 'CONNECTION_LOST',
   },
   server: {
     icon: ServerCrash,
     color: '#818cf8',
     title: 'SERVER ERROR',
     subtitle: 'The server is not responding right now. Please try again later.',
-    code: 'SERVER_ERROR',    diagnostics: ['CLUSTER_PROTOCOL_HANG', 'DB_GATEWAY_TIMEOUT', 'RESOURCE_SLEEP_DETECTION'],
+    code: 'SERVICE_UNAVAILABLE',
   },
   notfound: {
     icon: SearchX,
     color: '#4f46e5',
     title: 'NOT FOUND',
     subtitle: "We couldn't find the page you're looking for.",
-    code: 'NOT_FOUND',    diagnostics: ['NODE_ADDR_MISMATCH', 'MANIFEST_ENTRY_VOID', 'URI_DECODE_EXCEPTION'],
+    code: 'PAGE_MISSING',
   },
   unknown: {
     icon: AlertOctagon,
     color: '#e11d48',
     title: 'ERROR',
     subtitle: 'Something went wrong. Please try refreshing the page.',
-    code: 'UNKNOWN_ERROR',    diagnostics: ['STACK_OVERFLOW_RISK', 'KERNEL_SYNC_ERROR', 'BUFFER_FLOW_INTERRUPT'],
+    code: 'SYSTEM_ERROR',
   },
 };
 

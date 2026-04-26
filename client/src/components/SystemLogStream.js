@@ -144,14 +144,18 @@ const SystemLogStream = memo(({ profile }) => {
                               color: '#475569',
                               fontFamily: 'monospace',
                               fontSize: '0.75rem',
+                              minWidth: 80
                             }}
                           >
                             [{log.time}]
                           </Typography>
+                          <Box sx={{ color: log.color, display: 'flex', alignItems: 'center' }}>
+                            {log.icon}
+                          </Box>
                           <Typography
                             sx={{
-                              color: 'primary.main',
-                              fontWeight: 700,
+                              color: 'white',
+                              fontWeight: 600,
                               fontFamily: 'monospace',
                               fontSize: '0.8rem',
                             }}

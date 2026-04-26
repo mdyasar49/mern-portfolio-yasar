@@ -1,16 +1,18 @@
 import React, { memo, useState, useEffect } from 'react';
 import { Box, Typography, Container, Stack, Grid, Button } from '@mui/material';
-import { motion } from 'framer-motion';
-import { Shield } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Shield, Zap, Users, MessageSquare } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import SEO from '../components/SEO';
+import { io } from 'socket.io-client';
+import { API_BASE_URL } from '../config';
 
 const Documentation = memo(({ profile }) => {
   const [markdown, setMarkdown] = useState('');
   const [readme, setReadme] = useState('');
   const [activeTab, setActiveTab] = useState('explanation');
   const docs = profile?.documentation || {};
-  const logs = docs.engineeringObjective?.systemMetricsConfig?.logTemplates || [];
+  const [statusLogs, setStatusLogs] = useState(docs.engineeringObjective?.systemMetricsConfig?.logTemplates || []);
 
   useEffect(() => {
     fetch('/docs/PROJECT_EXPLANATION.md')
@@ -22,6 +24,27 @@ const Documentation = memo(({ profile }) => {
       .then((res) => res.text())
       .then((text) => setReadme(text))
       .catch((err) => console.error('Failed to load readme:', err));
+
+    // Socket.io for real-time status updates
+    const socket = io(API_BASE_URL);
+
+    socket.on('visitorUpdate', (data) => {
+      setStatusLogs((prev) => [
+        { type: 'TRAFFIC', message: `Visitor count sync: ${data.count}`, color: '#00ffcc', icon: <Users size={12} /> },
+        ...prev.slice(0, 4)
+      ]);
+    });
+
+    socket.on('newInquiry', (data) => {
+      setStatusLogs((prev) => [
+        { type: 'INQUIRY', message: `Incoming message: ${data.name}`, color: '#33ccff', icon: <MessageSquare size={12} /> },
+        ...prev.slice(0, 4)
+      ]);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   return (
@@ -219,14 +242,25 @@ const Documentation = memo(({ profile }) => {
                     Environment Status
                   </Typography>
                   <Stack spacing={2}>
-                    {logs.map((log, i) => (
-                      <Box key={i} sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: log.color, boxShadow: `0 0 10px ${log.color}` }} />
-                        <Typography sx={{ color: '#475569', fontSize: '0.75rem', fontFamily: 'monospace', fontWeight: 600 }}>
-                          [{log.type}] <span style={{ color: '#94a3b8' }}>{log.message}</span>
-                        </Typography>
-                      </Box>
-                    ))}
+                    <AnimatePresence mode="popLayout">
+                      {statusLogs.map((log, i) => (
+                        <motion.div
+                          key={log.id || i}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 10 }}
+                        >
+                          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', color: log.color }}>
+                              {log.icon || <Zap size={12} />}
+                            </Box>
+                            <Typography sx={{ color: '#475569', fontSize: '0.75rem', fontFamily: 'monospace', fontWeight: 600 }}>
+                              [{log.type}] <span style={{ color: '#94a3b8' }}>{log.message}</span>
+                            </Typography>
+                          </Box>
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
                   </Stack>
                 </Box>
 

@@ -50,15 +50,15 @@ The two layers are linked via a **REST API Bridge**:
 
 -   **Modular Data Loading:** Fragment-based progressive loading for optimal performance.
 -   **Modern UI/UX:** Responsive design using Material UI and Framer Motion.
+-   **Real-time Synchronization:** Live visitor tracking and instant inquiry notifications via Socket.io.
 -   **Data Resilience:** Fallback local storage (JSON) when database connectivity is unavailable.
 -   **Automated Communication:** Integrated email system for contact form notifications and auto-replies.
--   **System Status:** Live tracking of system health and performance metrics.
--   **Admin Dashboard:** Secure JWT-protected management interface for content updates.
+-   **System Status:** Live tracking of system health and performance metrics with real-time logging.
 
 ## 🛠️ Technology Stack
 
--   **Frontend:** React.js, Material UI (MUI), Lucide Icons, Framer Motion.
--   **Backend:** Node.js, Express.js, Nodemailer, JWT.
+-   **Frontend:** React.js, Material UI (MUI), Lucide Icons, Framer Motion, Socket.io-client.
+-   **Backend:** Node.js, Express.js, Socket.io, Nodemailer.
 -   **Database:** MongoDB (with Local JSON Fallback).
 -   **Utilities:** Axios, Dotenv, CORS, Helmet, Compression.
 
@@ -78,27 +78,19 @@ mern-portfolio-yasar/
     └── models/         # Data Schema Architecture
 ```
 
-## 🚀 Rapid Deployment
-
-1.  **Environment Setup:** Create a `.env` file in the `server` directory.
-    ```env
-    PORT=5001
-    EMAIL_USER=your-email@gmail.com
-    EMAIL_PASS=your-app-password
-    RECEIVER_EMAIL=your-email@gmail.com
-    ```
-2.  **Server Initialization:**
-    ```bash
-    cd server
-    npm install
-    npm run dev
-    ```
-3.  **Client Initialization:**
+### 🚀 Production Deployment
+1.  **Build the Client:**
     ```bash
     cd client
-    npm install
+    npm run build
+    ```
+2.  **Run the Server (Production Mode):**
+    ```bash
+    cd server
+    # Set NODE_ENV to production
     npm start
     ```
+    The server will automatically serve the optimized React build from the `client/build` folder.
 
 ## 📜 License
 
