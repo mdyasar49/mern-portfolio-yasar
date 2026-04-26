@@ -261,15 +261,19 @@ const statsFile = path.join(__dirname, '../stats.json');
 
 // Define function to read local stats
 const getLocalStats = () => {
+  const defaultStats = { visitors: 0, history: [] };
   try {
-    // If the stats file exists, read and parse it
     if (fs.existsSync(statsFile)) {
-      return JSON.parse(fs.readFileSync(statsFile, 'utf-8'));
+      const data = JSON.parse(fs.readFileSync(statsFile, 'utf-8'));
+      return {
+        visitors: typeof data.visitors === 'number' ? data.visitors : 0,
+        history: Array.isArray(data.history) ? data.history : [],
+      };
     }
-    // Ignore errors quietly
-  } catch (e) {}
-  // If no file exists or an error occurs, return a default object with 0 visitors
-  return { visitors: 0 };
+  } catch (e) {
+    logger.error('Error reading local stats:', e);
+  }
+  return defaultStats;
 };
 
 // Define function to save stats to local file
@@ -351,7 +355,6 @@ exports.getVisitors = asyncHandler(async (req, res, next) => {
 
   if (!mongoose.connection || mongoose.connection.readyState !== 1) {
     const stats = getLocalStats();
-    if (!stats.history) stats.history = [];
 
     if (shouldIncrement) {
       stats.visitors += 1;
@@ -364,7 +367,7 @@ exports.getVisitors = asyncHandler(async (req, res, next) => {
     return res.status(200).json({
       success: true,
       count: stats.visitors,
-      history: req.headers.authorization ? stats.history : undefined,
+      history: stats.history, // Always return history for the public analytics view
       mode: 'PORTABLE',
     });
   }
@@ -388,7 +391,7 @@ exports.getVisitors = asyncHandler(async (req, res, next) => {
     res.status(200).json({
       success: true,
       count: stats.visitors,
-      history: req.headers.authorization ? stats.history : undefined,
+      history: stats.history,
     });
   } catch (error) {
     logger.error('Stats service failure:', error);
