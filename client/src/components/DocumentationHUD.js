@@ -3,7 +3,7 @@
  */
 
 import React, { useState } from 'react';
-import { Box, Typography, Stack, Divider, Grid } from '@mui/material';
+import { Box, Typography, Stack, Divider, Grid, alpha } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, X, Server, Database, Globe, ShieldCheck } from 'lucide-react';
 
@@ -25,7 +25,7 @@ const DocumentationHUD = ({ profile }) => {
           position: 'fixed',
           right: { xs: 16, md: 32 },
           bottom: { xs: 20, md: 32 },
-          zIndex: 10001,
+          zIndex: 1000,
         }}
       >
         <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
@@ -106,10 +106,19 @@ const DocumentationHUD = ({ profile }) => {
                   boxShadow: '0 30px 80px rgba(0,0,0,0.8)',
                   maxHeight: '70vh',
                   overflowY: 'auto',
-                  '&::-webkit-scrollbar': { width: '3px' },
-                  '&::-webkit-scrollbar-thumb': {
-                    background: 'rgba(99,102,241,0.3)',
-                    borderRadius: '10px',
+                  "&::-webkit-scrollbar": {
+                      width: "5px",
+                      height: "5px",
+                  },
+                  "&::-webkit-scrollbar-track": {
+                      background: 'transparent',
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                      backgroundColor: alpha("#6366F1", 0.28),
+                      borderRadius: "10px",
+                  },
+                  "&::-webkit-scrollbar-thumb:hover": {
+                      backgroundColor: alpha("#6366F1", 0.5),
                   },
                 }}
               >

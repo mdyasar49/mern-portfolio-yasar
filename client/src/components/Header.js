@@ -25,6 +25,7 @@ import {
 import { Menu as MenuIcon, X } from 'lucide-react';
 // React Router hooks for navigation and location tracking
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
+import { motion, useScroll, useSpring } from 'framer-motion';
 
 const Header = ({ profile }) => {
   // State to manage the visibility of the mobile side drawer
@@ -39,6 +40,13 @@ const Header = ({ profile }) => {
   const trigger = useScrollTrigger({
     disableHysteresis: true,
     threshold: 50,
+  });
+
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
   });
 
   // Toggles the mobile drawer menu
@@ -141,6 +149,29 @@ const Header = ({ profile }) => {
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+      {/* ── SCROLL PROGRESS BAR ── */}
+      <Box
+        sx={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: 3,
+          zIndex: 12000,
+          pointerEvents: 'none',
+        }}
+      >
+        <motion.div
+          style={{
+            height: '100%',
+            background: 'linear-gradient(90deg, #e11d48, #f97316)',
+            boxShadow: '0 0 10px rgba(225,29,72,0.5)',
+            transformOrigin: '0%',
+            scaleX,
+          }}
+        />
+      </Box>
+
       {/* ── THE MAIN APPBAR ── */}
       <AppBar
         position="fixed"

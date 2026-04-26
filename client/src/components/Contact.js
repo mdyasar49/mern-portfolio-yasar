@@ -14,11 +14,16 @@ import {
   CircularProgress,
   Alert,
   Snackbar,
+  Dialog,
+  DialogContent,
+  IconButton,
+  Popover,
+  alpha,
 } from '@mui/material';
-import { Mail, MapPin, Globe, Clock, User, MessageSquare } from 'lucide-react';
+import { Mail, MapPin, Globe, Clock, User, MessageSquare, X, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { submitContactMessage, fetchMessageLogs } from '../services/api';
-import { io } from 'socket.io-client';
+import socket from '../services/socket';
 import { API_BASE_URL } from '../config';
 
 const Contact = ({ profile }) => {
@@ -33,23 +38,39 @@ const Contact = ({ profile }) => {
   const [status, setStatus] = useState({ type: '', message: '' });
   const [open, setOpen] = useState(false);
 
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [activeMsg, setActiveMsg] = useState(null);
+
+  const handlePopoverOpen = (event, msg) => {
+    setAnchorEl(event.currentTarget);
+    setActiveMsg(msg);
+  };
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+    setActiveMsg(null);
+  };
+
+  const openPopover = Boolean(anchorEl);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const [messages, setMessages] = useState([]);
+  const [allMessages, setAllMessages] = useState([]);
+  const [showAll, setShowAll] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   React.useEffect(() => {
     loadMessages();
 
     // Socket.io for real-time updates
-    const socket = io(API_BASE_URL);
     socket.on('newInquiry', (newMsg) => {
-      setMessages((prev) => [newMsg, ...prev].slice(0, 5));
+      setAllMessages((prev) => [newMsg, ...prev]);
     });
 
     return () => {
-      socket.disconnect();
+      socket.off('newInquiry');
     };
   }, []);
 
@@ -57,9 +78,9 @@ const Contact = ({ profile }) => {
     try {
       const logs = await fetchMessageLogs();
       if (logs && Array.isArray(logs)) {
-        setMessages(logs.slice(0, 5)); // Show last 5
+        setAllMessages(logs);
       } else if (logs?.payload) {
-        setMessages(logs.payload.slice(0, 5));
+        setAllMessages(logs.payload);
       }
     } catch (err) {
       console.error('Failed to load message history');
@@ -343,118 +364,361 @@ const Contact = ({ profile }) => {
 
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <AnimatePresence mode="popLayout">
-              {messages.length > 0 ? (
-                messages.map((msg, idx) => (
+              {allMessages.length > 0 ? (
+                allMessages.slice(0, 5).map((msg, idx) => (
                   <motion.div
                     key={msg._id || idx}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ delay: idx * 0.1 }}
+                    transition={{ delay: idx * 0.05 }}
                   >
                     <Box
                       className="glass-card"
                       sx={{
-                        p: 4,
+                        p: { xs: 3, md: 4 },
                         borderLeft: '4px solid',
                         borderColor: 'primary.main',
-                        display: 'grid',
-                        gridTemplateColumns: { xs: '1fr', md: '1.5fr 1.5fr 3fr 1fr' },
-                        gap: 3,
-                        alignItems: 'center',
-                        transition: '0.3s',
+                        transition: '0.4s cubic-bezier(0.23, 1, 0.32, 1)',
                         '&:hover': {
                           bgcolor: 'rgba(255,255,255,0.03)',
-                          transform: 'translateX(5px)',
+                          transform: 'translateX(8px)',
+                          borderColor: 'white',
                         },
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <User size={18} className="text-slate-500" />
-                        <Box>
-                          <Typography sx={{ color: 'white', fontWeight: 700, fontSize: '0.9rem' }}>
-                            {msg.name}
-                          </Typography>
-                          <Typography
-                            sx={{
-                              color: 'primary.main',
-                              fontSize: '0.7rem',
-                              fontWeight: 800,
-                              textTransform: 'uppercase',
-                            }}
+                      <Grid container spacing={3} alignItems="center">
+                        {/* User Identity */}
+                        <Grid item xs={12} md={3}>
+                          <Stack direction="row" spacing={2} alignItems="center">
+                            <Box
+                              sx={{
+                                width: 44,
+                                height: 44,
+                                borderRadius: '12px',
+                                bgcolor: 'rgba(225, 29, 72, 0.1)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: 'primary.main',
+                                flexShrink: 0,
+                              }}
+                            >
+                              <User size={20} />
+                            </Box>
+                            <Box sx={{ minWidth: 0 }}>
+                              <Typography
+                                sx={{
+                                  color: 'white',
+                                  fontWeight: 800,
+                                  fontSize: '0.95rem',
+                                  fontFamily: 'Outfit',
+                                  noWrap: true,
+                                }}
+                              >
+                                {msg.name}
+                              </Typography>
+                              <Typography
+                                sx={{
+                                  color: 'primary.main',
+                                  fontSize: '0.65rem',
+                                  fontWeight: 900,
+                                  letterSpacing: 1,
+                                  textTransform: 'uppercase',
+                                }}
+                              >
+                                {msg.profession || 'Inquirer'}
+                              </Typography>
+                            </Box>
+                          </Stack>
+                        </Grid>
+
+                        {/* Subject & Message Preview */}
+                        <Grid item xs={12} md={6}>
+                          <Stack spacing={1}>
+                            <Typography
+                              sx={{
+                                color: 'white',
+                                fontWeight: 700,
+                                fontSize: '0.85rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1.5,
+                              }}
+                            >
+                              <MessageSquare size={14} style={{ opacity: 0.5 }} />
+                              {msg.subject || 'No Subject'}
+                            </Typography>
+                            <Typography
+                              sx={{
+                                color: '#94a3b8',
+                                fontSize: '0.85rem',
+                                lineHeight: 1.6,
+                                display: '-webkit-box',
+                                WebkitLineClamp: 1,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                                cursor: 'pointer',
+                              }}
+                              onClick={(e) => handlePopoverOpen(e, msg)}
+                            >
+                              {msg.message}
+                            </Typography>
+                          </Stack>
+                        </Grid>
+
+                        {/* Metadata & Actions */}
+                        <Grid item xs={12} md={3}>
+                          <Stack
+                            direction="row"
+                            justifyContent={{ xs: 'flex-start', md: 'flex-end' }}
+                            alignItems="center"
+                            spacing={3}
                           >
-                            {msg.profession}
-                          </Typography>
-                        </Box>
-                      </Box>
-
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Mail size={18} className="text-slate-500" />
-                        <Typography sx={{ color: 'slate.400', fontSize: '0.85rem' }}>
-                          {msg.email}
-                        </Typography>
-                      </Box>
-
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <MessageSquare size={18} className="text-slate-500" />
-                        <Box>
-                          <Typography sx={{ color: 'white', fontWeight: 600, fontSize: '0.85rem' }}>
-                            {msg.subject}
-                          </Typography>
-                          <Typography
-                            sx={{
-                              color: 'slate.500',
-                              fontSize: '0.8rem',
-                              display: '-webkit-box',
-                              WebkitLineClamp: 1,
-                              WebkitBoxOrient: 'vertical',
-                              overflow: 'hidden',
-                            }}
-                          >
-                            {msg.message}
-                          </Typography>
-                        </Box>
-                      </Box>
-
-                      <Box sx={{ textAlign: { xs: 'left', md: 'right' } }}>
-                        <Typography
-                          sx={{ color: 'slate.600', fontSize: '0.75rem', fontWeight: 700 }}
-                        >
-                          {new Date(msg.createdAt).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </Typography>
-                        <Typography sx={{ color: 'slate.700', fontSize: '0.65rem' }}>
-                          {new Date(msg.createdAt).toLocaleDateString()}
-                        </Typography>
-                      </Box>
+                            <Box sx={{ textAlign: { xs: 'left', md: 'right' } }}>
+                              <Typography
+                                sx={{
+                                  color: 'white',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 800,
+                                  fontFamily: 'monospace',
+                                }}
+                              >
+                                {new Date(msg.createdAt).toLocaleTimeString([], {
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })}
+                              </Typography>
+                              <Typography
+                                sx={{ color: '#475569', fontSize: '0.65rem', fontWeight: 700 }}
+                              >
+                                {new Date(msg.createdAt).toLocaleDateString()}
+                              </Typography>
+                            </Box>
+                            <IconButton
+                              onClick={(e) => handlePopoverOpen(e, msg)}
+                              sx={{
+                                color: 'primary.main',
+                                bgcolor: 'rgba(225, 29, 72, 0.05)',
+                                '&:hover': { bgcolor: 'primary.main', color: 'white' },
+                              }}
+                            >
+                              <ChevronRight size={20} />
+                            </IconButton>
+                          </Stack>
+                        </Grid>
+                      </Grid>
                     </Box>
                   </motion.div>
                 ))
               ) : (
-                <Typography
+                <Box
                   sx={{
-                    color: 'slate.500',
                     textAlign: 'center',
                     py: 10,
-                    border: '1px dashed rgba(255,255,255,0.1)',
                     borderRadius: 4,
+                    border: '1px dashed rgba(255,255,255,0.1)',
                   }}
                 >
-                  No recent messages found.
-                </Typography>
+                  <Typography sx={{ color: '#475569', fontWeight: 600 }}>
+                    Initializing data stream...
+                  </Typography>
+                </Box>
               )}
             </AnimatePresence>
+
+            {allMessages.length > 5 && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                <Button
+                  onClick={() => setShowAll(true)}
+                  variant="outlined"
+                  endIcon={<ChevronRight size={18} />}
+                  sx={{
+                    color: 'white',
+                    borderColor: 'rgba(255,255,255,0.1)',
+                    px: 4,
+                    py: 1.5,
+                    borderRadius: '100px',
+                    fontWeight: 800,
+                    fontSize: '0.8rem',
+                    letterSpacing: 1,
+                    transition: '0.3s',
+                    '&:hover': {
+                      borderColor: 'primary.main',
+                      bgcolor: 'rgba(225, 29, 72, 0.05)',
+                      transform: 'translateY(-2px)',
+                    },
+                  }}
+                >
+                  VIEW ALL INQUIRIES
+                </Button>
+              </Box>
+            )}
           </Box>
         </motion.div>
       </Box>
+
+      {/* All Inquiries Dialog */}
+      <Dialog
+        open={showAll}
+        onClose={() => setShowAll(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: {
+            bgcolor: '#0f172a',
+            backgroundImage: 'none',
+            borderRadius: 4,
+            border: '1px solid rgba(255,255,255,0.05)',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+            "&::-webkit-scrollbar": {
+                width: "5px",
+                height: "5px",
+            },
+            "&::-webkit-scrollbar-track": {
+                background: 'transparent',
+            },
+            "&::-webkit-scrollbar-thumb": {
+                backgroundColor: alpha("#6366F1", 0.28),
+                borderRadius: "10px",
+            },
+            "&::-webkit-scrollbar-thumb:hover": {
+                backgroundColor: alpha("#6366F1", 0.5),
+            },
+          },
+        }}
+      >
+        <Box sx={{ p: 4, borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box>
+              <Typography variant="h5" sx={{ color: 'white', fontWeight: 900, letterSpacing: -1 }}>
+                ALL INQUIRIES <Box component="span" sx={{ color: 'primary.main', ml: 1 }}>({allMessages.length})</Box>
+              </Typography>
+              <Typography sx={{ color: 'slate.500', fontSize: '0.8rem', mt: 0.5 }}>
+                Manage and review your latest messages
+              </Typography>
+            </Box>
+            <IconButton onClick={() => setShowAll(false)} sx={{ color: 'slate.500', '&:hover': { color: 'white' } }}>
+              <X size={24} />
+            </IconButton>
+          </Box>
+          
+          <TextField
+            fullWidth
+            size="small"
+            placeholder="Search by name, email, or subject..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                color: 'white',
+                bgcolor: 'rgba(255,255,255,0.02)',
+                borderRadius: 2,
+                '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+                '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+              },
+            }}
+          />
+        </Box>
+        <DialogContent sx={{ 
+          p: 4, 
+          bgcolor: 'rgba(0,0,0,0.2)',
+          "&::-webkit-scrollbar": {
+              width: "5px",
+              height: "5px",
+          },
+          "&::-webkit-scrollbar-track": {
+              background: 'transparent',
+          },
+          "&::-webkit-scrollbar-thumb": {
+              backgroundColor: alpha("#6366F1", 0.28),
+              borderRadius: "10px",
+          },
+          "&::-webkit-scrollbar-thumb:hover": {
+              backgroundColor: alpha("#6366F1", 0.5),
+          },
+        }}>
+          <Stack spacing={2}>
+            {allMessages
+              .filter(msg => 
+                msg.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                msg.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                msg.subject?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                msg.message?.toLowerCase().includes(searchTerm.toLowerCase())
+              )
+              .map((msg, idx) => (
+              <Box
+                key={msg._id || idx}
+                sx={{
+                  p: 3,
+                  bgcolor: 'rgba(255,255,255,0.02)',
+                  border: '1px solid rgba(255,255,255,0.05)',
+                  borderRadius: 3,
+                  display: 'grid',
+                  gridTemplateColumns: { xs: '1fr', md: '1fr 2fr' },
+                  gap: 3,
+                }}
+              >
+                <Box>
+                  <Typography sx={{ color: 'white', fontWeight: 700, fontSize: '0.95rem' }}>{msg.name}</Typography>
+                  <Typography sx={{ color: 'primary.main', fontWeight: 800, fontSize: '0.7rem', textTransform: 'uppercase' }}>{msg.profession}</Typography>
+                  <Typography sx={{ color: 'slate.500', fontSize: '0.8rem', mt: 1 }}>{msg.email}</Typography>
+                  <Typography sx={{ color: 'slate.600', fontSize: '0.7rem', mt: 2 }}>
+                    {new Date(msg.createdAt).toLocaleString()}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography sx={{ color: 'white', fontWeight: 600, fontSize: '0.9rem', mb: 1 }}>{msg.subject}</Typography>
+                  <Typography sx={{ color: 'slate.400', fontSize: '0.85rem', lineHeight: 1.6 }}>{msg.message}</Typography>
+                </Box>
+              </Box>
+            ))}
+          </Stack>
+        </DialogContent>
+      </Dialog>
 
       <Snackbar open={open} autoHideDuration={6000} onClose={() => setOpen(false)}>
         <Alert severity={status.type || 'info'} sx={{ borderRadius: 2 }}>
           {status.message}
         </Alert>
       </Snackbar>
+
+      {/* Individual Message Popover */}
+      <Popover
+        open={openPopover}
+        anchorEl={anchorEl}
+        onClose={handlePopoverClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        PaperProps={{
+          sx: {
+            p: 3,
+            maxWidth: 400,
+            bgcolor: '#1e293b',
+            color: 'white',
+            borderRadius: 3,
+            border: '1px solid rgba(255,255,255,0.1)',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5)',
+          },
+        }}
+      >
+        {activeMsg && (
+          <Box>
+            <Typography sx={{ fontWeight: 800, color: 'primary.main', fontSize: '0.7rem', mb: 1, textTransform: 'uppercase' }}>
+              Subject: {activeMsg.subject}
+            </Typography>
+            <Typography sx={{ fontSize: '0.9rem', lineHeight: 1.6, color: 'slate.300' }}>
+              {activeMsg.message}
+            </Typography>
+          </Box>
+        )}
+      </Popover>
     </Container>
   );
 };

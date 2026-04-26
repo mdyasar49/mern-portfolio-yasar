@@ -3,126 +3,237 @@
   body, a, button, .interactive {
     cursor: none !important;
   }
+
+  /* ── Custom Cursor ── */
+  #rp-cursor-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #e11d48;
+    pointer-events: none;
+    z-index: 999999;
+    transform: translate(-50%, -50%);
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    mix-blend-mode: difference;
+  }
+
+  #rp-cursor-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid #e11d48;
+    pointer-events: none;
+    z-index: 999998;
+    transform: translate(-50%, -50%);
+    transition:
+      width 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+      height 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+      border-color 0.3s ease,
+      background-color 0.3s ease;
+  }
+
+  #rp-cursor-dot.hovered {
+    background-color: white;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+
+  #rp-cursor-ring.hovered {
+    width: 80px;
+    height: 80px;
+    border-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(4px);
+  }
+
+  /* ── Link hover: teal diamond ring with ↗ label ── */
+  #rp-cursor-dot.link-hovered {
+    background-color: #0ea5e9;
+    transform: translate(-50%, -50%) scale(1.2);
+    box-shadow: 0 0 8px rgba(14, 165, 233, 0.8);
+  }
+
+  #rp-cursor-ring.link-hovered {
+    width: 52px;
+    height: 52px;
+    border-color: #0ea5e9;
+    border-width: 2px;
+    border-radius: 6px;
+    transform: translate(-50%, -50%) rotate(45deg);
+    background-color: rgba(14, 165, 233, 0.06);
+    backdrop-filter: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Arrow label — counter-rotate so it stays upright */
+  #rp-cursor-label {
+    display: none;
+    color: #0ea5e9;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    line-height: 1;
+    pointer-events: none;
+    transform: rotate(-45deg);
+  }
+
+  #rp-cursor-ring.link-hovered #rp-cursor-label {
+    display: block;
+  }
 }
 
+/* ──────────────────────────────────────────────
+   ATS-FRIENDLY RESUME STYLES
+   Web view: clean, readable, professional
+   PDF/Print: pure black-on-white, no colors
+────────────────────────────────────────────── */
+
 body {
-  font-family: 'Outfit', sans-serif;
-  color: #0f172a;
+  font-family: 'Calibri', 'Arial', 'Liberation Sans', sans-serif;
+  color: #1a1a1a;
   line-height: 1.5;
   background-color: #050507;
   padding: 0;
   margin: 0;
 }
+
 .resume-container {
-  max-width: 850px;
+  max-width: 820px;
   margin: 0 auto;
-  padding: 60px 80px;
+  padding: 52px 64px;
   background: #ffffff;
-  box-shadow: 0 50px 100px rgba(0, 0, 0, 0.5);
-  border-radius: 4px;
-  border-top: 8px solid #e11d48;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+  border-radius: 2px;
+  border-top: 4px solid #1a1a1a;
+  /* Use Inter on screen for crisp rendering; PDF forces Calibri */
+  font-family: 'Inter', 'Calibri', 'Arial', sans-serif;
 }
-.section-header {
-  font-size: 0.7rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  color: #e11d48;
-  border-bottom: 1px solid #e2e8f0;
-  margin-top: 25px;
-  margin-bottom: 12px;
-  padding-bottom: 6px;
-  letter-spacing: 3px;
-}
+
+/* ── Header ── */
 .header-container {
   text-align: left;
-  margin-bottom: 30px;
-  border-bottom: 2px solid #0f172a;
-  padding-bottom: 20px;
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 1.5px solid #1a1a1a;
 }
+
 .name {
-  font-size: 3.5rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  margin-bottom: 0;
-  color: #0f172a;
-  letter-spacing: -2px;
-  line-height: 1;
-}
-.job-title {
-  font-size: 0.9rem;
-  font-weight: 800;
-  margin-top: 5px;
-  margin-bottom: 15px;
-  color: #6366f1;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-.contact-line {
-  font-size: 0.75rem;
-  margin-bottom: 4px;
-  color: #64748b;
-  font-weight: 600;
-}
-.contact-line a {
-  color: #0f172a;
-  text-decoration: none;
+  font-size: 2.4rem;
   font-weight: 700;
-  transition: color 0.2s;
+  text-transform: uppercase;
+  color: #1a1a1a;
+  letter-spacing: 1px;
+  line-height: 1.1;
+  margin: 0 0 4px 0;
 }
-.contact-line a:hover {
-  color: #6366f1;
-}
-.summary-text {
+
+.job-title {
   font-size: 0.85rem;
-  text-align: justify;
-  color: #334155;
-  line-height: 1.7;
+  font-weight: 600;
+  color: #444444;
+  margin: 4px 0 12px 0;
+  letter-spacing: 0.5px;
 }
+
+.contact-line {
+  font-size: 0.78rem;
+  color: #333333;
+  font-weight: 400;
+  margin-bottom: 3px;
+  letter-spacing: 0.2px;
+}
+
+.contact-line a {
+  color: #1a1a1a;
+  text-decoration: none;
+}
+
+/* ── Section Headings ── */
+.section-header {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #1a1a1a;
+  border-bottom: 1.5px solid #1a1a1a;
+  margin-top: 22px;
+  margin-bottom: 10px;
+  padding-bottom: 4px;
+  letter-spacing: 1.5px;
+}
+
+/* ── Summary ── */
+.summary-text {
+  font-size: 0.83rem;
+  color: #222222;
+  line-height: 1.65;
+  text-align: left;
+}
+
+/* ── Skills ── */
 .skill-item {
   font-size: 0.8rem;
-  margin-bottom: 6px;
-  color: #334155;
-  font-weight: 600;
+  margin-bottom: 5px;
+  color: #222222;
+  line-height: 1.55;
 }
+
+.skill-item b {
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+/* ── Experience / Projects / Education ── */
 .exp-item {
-  margin-bottom: 25px;
+  margin-bottom: 18px;
+  page-break-inside: avoid;
 }
+
 .exp-top {
   display: flex;
   justify-content: space-between;
-  font-weight: 900;
-  font-size: 0.95rem;
-  color: #0f172a;
+  align-items: baseline;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #1a1a1a;
+  flex-wrap: wrap;
+  gap: 4px;
 }
+
 .exp-sub {
   display: flex;
   justify-content: space-between;
-  font-style: normal;
-  font-weight: 700;
-  font-size: 0.8rem;
-  margin-bottom: 8px;
-  color: #6366f1;
-}
-ul {
-  margin: 10px 0 0 0;
-  padding-left: 15px;
-  list-style-type: none;
-}
-li {
+  font-weight: 500;
   font-size: 0.8rem;
   margin-bottom: 6px;
-  color: #475569;
-  line-height: 1.6;
-  position: relative;
+  color: #444444;
+  font-style: italic;
 }
+
+/* ── Bullet Points — standard disc for ATS ── */
+ul {
+  margin: 6px 0 0 0;
+  padding-left: 18px;
+  list-style-type: disc;
+}
+
+li {
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+  color: #333333;
+  line-height: 1.55;
+  position: relative;
+  list-style-type: disc;
+}
+
 li::before {
-  content: '→';
-  color: #6366f1;
-  font-weight: 900;
-  display: inline-block;
-  width: 1.2em;
-  margin-left: -1.2em;
-  opacity: 0.5;
+  content: none;
 }
 #loading-overlay {
   position: fixed;
@@ -204,17 +315,6 @@ li::before {
   transform: scale(0.95);
 }
 
-/* Layout Grid */
-.resume-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 30px;
-  margin-top: 15px;
-}
-.side-col {
-  border-left: 1px solid #e5e7eb;
-  padding-left: 20px;
-}
 
 .hidden {
   display: none !important;
@@ -265,18 +365,45 @@ body.dark-mode-interactive .section-header {
   border-bottom: 2px solid #38bdf8;
   color: #38bdf8;
 }
-body.dark-mode-interactive .side-col {
-  border-left-color: #334155;
-}
 body.dark-mode-interactive b {
   color: #38bdf8;
 }
 
-/* Print & PDF Capture Optimizations */
+/* ── Web-only visual polish (suppressed in PDF/Print) ── */
+@media screen {
+  /* Subtle left accent on section content blocks */
+  .exp-item {
+    border-left: 2px solid #e5e7eb;
+    padding-left: 12px;
+  }
+  /* Accent color on job title / company line for readability */
+  .exp-sub span {
+    color: #374151;
+  }
+  /* Slightly softer link color on screen */
+  .contact-line a {
+    color: #374151;
+  }
+  .contact-line a:hover {
+    color: #111;
+    text-decoration: underline;
+  }
+  /* Name — slightly larger on screen */
+  .name {
+    font-size: 2.6rem;
+  }
+}
+
+/* ──────────────────────────────────────────────
+   PRINT & PDF CAPTURE — FULLY ATS COMPLIANT
+   No colors, no decorative elements.
+   Pure black text on white background.
+────────────────────────────────────────────── */
 @media print {
   body {
     background: #fff !important;
     color: #000 !important;
+    font-family: 'Calibri', 'Arial', sans-serif !important;
     margin: 0;
     padding: 0;
   }
@@ -296,19 +423,24 @@ body.dark-mode-interactive b {
   .action-btn {
     display: none !important;
   }
-  .resume-grid {
-    display: block !important;
-  }
-  .side-col {
-    border-left: none !important;
-    padding-left: 0 !important;
-    margin-top: 20px;
-  }
   .section-header {
-    border-bottom: 2.5px solid #000 !important;
     color: #000 !important;
-    -webkit-print-color-adjust: exact;
+    border-bottom: 1px solid #000 !important;
+    border-top: none !important;
+    background: none !important;
+    letter-spacing: 1px !important;
   }
+  .name { color: #000 !important; }
+  .job-title { color: #000 !important; font-style: normal !important; }
+  .contact-line { color: #000 !important; }
+  .exp-top { color: #000 !important; }
+  .exp-sub { color: #333 !important; }
+  .summary-text { color: #000 !important; }
+  .skill-item { color: #000 !important; }
+  .skill-item b { color: #000 !important; }
+  li { color: #000 !important; }
+  li::before { content: none !important; }
+  ul { list-style-type: disc !important; }
   .fade-in {
     animation: none !important;
     opacity: 1 !important;
@@ -316,16 +448,17 @@ body.dark-mode-interactive b {
   }
 }
 
-/* Specific class to force stable state during html2canvas capture */
+/* PDF Capture via html2canvas — same ATS rules */
 .pdf-capture {
   background: white !important;
 }
 .pdf-capture .resume-container {
   background: white !important;
-  color: black !important;
-  padding: 40px !important;
+  color: #000 !important;
+  padding: 52px 64px !important;
   box-shadow: none !important;
-  border-top: 6px solid #6366f1 !important;
+  border-top: none !important;
+  border-radius: 0 !important;
   transform: none !important;
 }
 .pdf-capture .fade-in {
@@ -333,18 +466,43 @@ body.dark-mode-interactive b {
   animation: none !important;
   transform: none !important;
 }
-.pdf-capture .name {
-  color: #000 !important;
-}
+/* All text elements — force black on white */
+.pdf-capture .name { color: #000 !important; font-size: 2rem !important; }
+.pdf-capture .job-title { color: #111 !important; }
+.pdf-capture .contact-line { color: #111 !important; }
 .pdf-capture .section-header {
-  color: #6366f1 !important;
-  border-bottom: 2px solid #e2e8f0 !important;
+  color: #000 !important;
+  border-bottom: 1.5px solid #000 !important;
+  border-top: none !important;
+  background: none !important;
+  letter-spacing: 1px !important;
 }
+.pdf-capture .exp-top { color: #000 !important; }
+.pdf-capture .exp-sub { color: #333 !important; }
+.pdf-capture .summary-text { color: #000 !important; }
+.pdf-capture .skill-item { color: #000 !important; }
+.pdf-capture .skill-item b { color: #000 !important; }
 .pdf-capture p,
 .pdf-capture div,
 .pdf-capture li,
 .pdf-capture span {
+  color: #000 !important;
   opacity: 1 !important;
+}
+.pdf-capture li::before { content: none !important; }
+.pdf-capture ul { list-style-type: disc !important; padding-left: 18px !important; }
+/* Remove screen-only decorative border from exp-items in PDF */
+.pdf-capture .exp-item {
+  border-left: none !important;
+  padding-left: 0 !important;
+  margin-bottom: 14px !important;
+}
+.pdf-capture .exp-item .exp-sub span { color: #333 !important; }
+/* Ensure header border stays in PDF */
+.pdf-capture .header-container {
+  border-bottom: 1px solid #000 !important;
+  padding-bottom: 12px !important;
+  margin-bottom: 16px !important;
 }
 
 /* Modal System */
@@ -516,16 +674,10 @@ body.dark-mode-interactive b {
 }
 
 @media screen and (max-width: 768px) {
-  .resume-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  .side-col {
-    border-left: none;
-    padding-left: 0;
-    border-top: 1px solid #e5e7eb;
-    padding-top: 20px;
+  /* Reduce exp-item left accent on tablets */
+  .exp-item {
+    border-left-width: 1px;
+    padding-left: 8px;
   }
 
   /* Center modal for tablets */

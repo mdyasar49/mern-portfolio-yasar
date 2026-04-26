@@ -29,8 +29,8 @@ import RecruiterHUD from './components/RecruiterHUD';
 import LoadingScreen from './components/LoadingScreen';
 import DocumentationHUD from './components/DocumentationHUD';
 import { Toaster, toast } from 'react-hot-toast';
-import { io } from 'socket.io-client';
-import { API_BASE_URL } from './config';
+import { API_BASE_URL, SOCKET_URL } from './config';
+import socket from './services/socket';
 
 // ─── Lazy Loaded Modules (Optimization) ──────────────────────────────────
 // These pages are only downloaded when the user actually navigates to them,
@@ -256,7 +256,7 @@ const App = () => {
     window.addEventListener('mousemove', handleMouseMove);
 
     // Global Socket Connection Monitoring
-    const socket = io(API_BASE_URL);
+    // We use the shared socket instance
     
     socket.on('connect', () => {
       // Don't show toast on initial connect, only on reconnect
@@ -286,7 +286,6 @@ const App = () => {
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
-      socket.disconnect();
     };
   }, []);
 

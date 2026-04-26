@@ -22,7 +22,7 @@ const RecruiterHUD = ({ profile }) => {
           position: 'fixed',
           bottom: { xs: 20, md: 130 },
           left: { xs: 16, md: 32 },
-          zIndex: 10001,
+          zIndex: 1000,
         }}
       >
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>

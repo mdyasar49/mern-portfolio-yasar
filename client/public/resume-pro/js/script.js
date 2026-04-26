@@ -144,6 +144,12 @@ async function loadComponents() {
   });
   await Promise.all(promises);
   initUI();
+  
+  // Hide share toggle if viewed directly (not in an iframe) as per user request
+  if (window.self === window.top) {
+    if (UI.shareToggle) UI.shareToggle.style.display = 'none';
+  }
+
   setupEventListeners();
 }
 
@@ -177,6 +183,7 @@ function processTemplate(tpl, data) {
 const RenderEngine = {
   header(tpl, p) {
     const socials = safeObj(p.socials);
+    // Extract the slug from the full LinkedIn URL
     const linkedinId = safeStr(socials.linkedin).split('/').filter(Boolean).pop() || 'linkedin';
     const portfolio =
       safeArr(p.projects).find((pr) => safeStr(pr.name).includes('Portfolio'))?.link ||
@@ -190,7 +197,7 @@ const RenderEngine = {
         phone: safeStr(p.phone, '+91-9025943184'),
         email: safeStr(p.email, 'mohamedyasar081786@gmail.com'),
         linkedinId,
-        portfolioUrl: portfolio.replace('https://', ''),
+        portfolioUrl: portfolio.replace(/^https?:\/\//, ''),
       }),
     );
   },
@@ -200,15 +207,17 @@ const RenderEngine = {
   skills(tpl, p) {
     inject('skills-module', tpl);
     const s = safeObj(p.technicalSkills);
+    // ATS-friendly: label on same line as comma-separated values
     const html = [
-      { l: 'Frontend', v: safeArr(s.frontend).map(sanitizeSkill).join(', ') },
-      { l: 'Backend', v: safeArr(s.backend).map(sanitizeSkill).join(', ') },
-      { l: 'Database', v: safeArr(s.database).map(sanitizeSkill).join(', ') },
-      { l: 'Tools', v: safeArr(s.tools).map(sanitizeSkill).join(', ') },
-      { l: 'AI Tech', v: safeArr(s.aiTools).map(sanitizeSkill).join(', ') },
+      { l: 'Frontend',  v: safeArr(s.frontend).map(sanitizeSkill).join(', ') },
+      { l: 'Backend',   v: safeArr(s.backend).map(sanitizeSkill).join(', ') },
+      { l: 'Database',  v: safeArr(s.database).map(sanitizeSkill).join(', ') },
+      { l: 'Tools',     v: safeArr(s.tools).map(sanitizeSkill).join(', ') },
+      { l: 'AI & ML',   v: safeArr(s.aiTools).map(sanitizeSkill).join(', ') },
       { l: 'Expertise', v: safeArr(s.other).map(sanitizeSkill).join(', ') },
     ]
-      .map((i) => (i.v ? `<div class="skill-item"><b>${i.l}:</b> ${i.v}</div>` : ''))
+      .filter((i) => i.v)
+      .map((i) => `<div class="skill-item"><b>${i.l}:</b> ${i.v}</div>`)
       .join('');
     inject('skills-list', html);
   },
@@ -217,14 +226,17 @@ const RenderEngine = {
     const html = safeArr(p.experience)
       .map(
         (exp) => `
-            <div class="exp-item">
-                <div class="exp-top"><span>${safeStr(exp.role)}</span><span><i>${safeStr(exp.period)}</i></span></div>
-                <div class="exp-sub"><span>${safeStr(exp.company)}, ${safeStr(exp.location)}</span></div>
-                <ul>${safeArr(exp.description)
-                  .map((d) => `<li>${safeStr(d)}</li>`)
-                  .join('')}</ul>
-            </div>
-        `,
+        <div class="exp-item">
+          <div class="exp-top">
+            <span>${safeStr(exp.role)}</span>
+            <span>${safeStr(exp.period)}</span>
+          </div>
+          <div class="exp-sub">
+            <span>${safeStr(exp.company)}${exp.location ? ', ' + safeStr(exp.location) : ''}</span>
+          </div>
+          <ul>${safeArr(exp.description).map((d) => `<li>${safeStr(d)}</li>`).join('')}</ul>
+        </div>
+      `,
       )
       .join('');
     inject('experience-container', html);
@@ -233,17 +245,24 @@ const RenderEngine = {
     inject('projects-module', tpl);
     const html = safeArr(p.projects)
       .filter((pr) => pr.name !== 'Scientific Calculator')
-      .map(
-        (pr) => `
-            <div class="exp-item">
-                <div class="exp-top"><span>${safeStr(pr.name)}</span></div>
-                <div class="exp-sub"><span><i>Role: ${safeStr(pr.role || 'Full Stack Contributor')} | Tech: ${safeArr(pr.technologies).join(', ')}</i></span></div>
-                <ul>${safeArr(pr.description)
-                  .map((d) => `<li>${safeStr(d)}</li>`)
-                  .join('')}</ul>
-            </div>
-        `,
-      )
+      .map((pr) => {
+        // Add GitHub/live link if available — ATS can index URLs
+        const linkStr = pr.link
+          ? `<span style="font-weight:400;"> | <a href="${pr.link}" target="_blank" style="color:#1a1a1a;">${pr.link.replace(/^https?:\/\//, '')}</a></span>`
+          : '';
+        const techStr = safeArr(pr.technologies).join(', ');
+        return `
+        <div class="exp-item">
+          <div class="exp-top">
+            <span>${safeStr(pr.name)}${linkStr}</span>
+          </div>
+          <div class="exp-sub">
+            <span>Role: ${safeStr(pr.role || 'Full Stack Contributor')} | Technologies: ${techStr}</span>
+          </div>
+          <ul>${safeArr(pr.description).map((d) => `<li>${safeStr(d)}</li>`).join('')}</ul>
+        </div>
+      `;
+      })
       .join('');
     inject('projects-container', html);
   },
@@ -252,11 +271,16 @@ const RenderEngine = {
     const html = safeArr(p.education)
       .map(
         (edu) => `
-            <div class="exp-item">
-                <div class="exp-top"><span>${safeStr(edu.degree)}</span><span>${safeStr(edu.year)}</span></div>
-                <div class="exp-sub"><span>${safeStr(edu.institution)}</span></div>
-            </div>
-        `,
+        <div class="exp-item">
+          <div class="exp-top">
+            <span>${safeStr(edu.degree)}</span>
+            <span>${safeStr(edu.year)}</span>
+          </div>
+          <div class="exp-sub">
+            <span>${safeStr(edu.institution)}</span>
+          </div>
+        </div>
+      `,
       )
       .join('');
     inject('education-container', html);
@@ -264,13 +288,16 @@ const RenderEngine = {
   footer(tpl, p) {
     inject('footer-module', tpl);
     const inf = safeObj(p.additionalInfo);
+    const softSkills = safeArr(p.softSkills).join(', ');
+    const languages = safeArr(inf.languages).join(', ');
     inject(
       'additional-container',
       `
-            <div><b>Availability:</b> ${safeStr(inf.availability)}</div>
-            <div><b>Languages:</b> ${safeArr(inf.languages).join(', ')}</div>
-            <div style="margin-top:5px"><b>Soft Skills:</b> ${safeArr(p.softSkills).join(', ')}</div>
-        `,
+        <div class="skill-item"><b>Availability:</b> ${safeStr(inf.availability)}</div>
+        ${inf.workPreference ? `<div class="skill-item"><b>Work Preference:</b> ${safeStr(inf.workPreference)}</div>` : ''}
+        ${languages ? `<div class="skill-item"><b>Languages:</b> ${languages}</div>` : ''}
+        ${softSkills ? `<div class="skill-item"><b>Soft Skills:</b> ${softSkills}</div>` : ''}
+      `,
     );
   },
 };
@@ -423,6 +450,8 @@ function executeEmailDispatch() {
   );
 }
 window.executeEmailDispatch = executeEmailDispatch;
+// Alias so the modal button works correctly
+window.executeEmailMessage = executeEmailDispatch;
 
 function toggleShareMode(mode) {
   const root = document.getElementById('share-menu-root');
@@ -539,5 +568,70 @@ window.addEventListener('mouseover', (e) => {
   const interactive = e.target.closest('a, button, [role="button"], .interactive');
   window.parent.postMessage({ type: 'IFRAME_MOUSE_OVER', isHovered: !!interactive }, '*');
 });
+
+// --- [CUSTOM_CURSOR_ENGINE] ---
+// Only mount when viewed standalone (not inside the portfolio iframe).
+// When inside the iframe, the parent React app's CustomCursor handles this.
+(function initCursor() {
+  if (window.innerWidth < 900) return; // desktop only
+
+  // Inject cursor elements
+  const dot = document.createElement('div');
+  dot.id = 'rp-cursor-dot';
+
+  const ring = document.createElement('div');
+  ring.id = 'rp-cursor-ring';
+
+  // Link label shown inside the ring on link hover
+  const label = document.createElement('span');
+  label.id = 'rp-cursor-label';
+  label.textContent = '↗';
+  ring.appendChild(label);
+
+  document.body.appendChild(dot);
+  document.body.appendChild(ring);
+
+  let mouseX = 0, mouseY = 0;
+  let ringX = 0, ringY = 0;
+
+  // Snap dot instantly, ring trails with lerp
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    dot.style.left = mouseX + 'px';
+    dot.style.top = mouseY + 'px';
+  });
+
+  // Distinguish link hover vs button hover
+  window.addEventListener('mouseover', (e) => {
+    const link   = e.target.closest('a');
+    const button = e.target.closest('button, [role="button"], .interactive');
+
+    // Clear all states first
+    dot.classList.remove('hovered', 'link-hovered');
+    ring.classList.remove('hovered', 'link-hovered');
+
+    if (link) {
+      // Link — teal diamond ring with arrow label
+      dot.classList.add('link-hovered');
+      ring.classList.add('link-hovered');
+    } else if (button) {
+      // Button — expanded white ring
+      dot.classList.add('hovered');
+      ring.classList.add('hovered');
+    }
+  });
+
+  // Smooth trailing ring animation
+  function animateRing() {
+    ringX += (mouseX - ringX) * 0.15;
+    ringY += (mouseY - ringY) * 0.15;
+    ring.style.left = ringX + 'px';
+    ring.style.top = ringY + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+})();
+
 
 init();

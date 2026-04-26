@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { fetchSystemAnalytics } from '../services/api';
-import { io } from 'socket.io-client';
+import socket from '../services/socket';
 import { API_BASE_URL } from '../config';
 
 const Footer = memo(({ profile }) => {
@@ -67,7 +67,6 @@ const Footer = memo(({ profile }) => {
     fetchVisitorsData();
 
     // Socket.io for real-time updates
-    const socket = io(API_BASE_URL);
     socket.on('visitorUpdate', (data) => {
       if (data && data.count !== undefined) {
         setVisitorCount(data.count);
@@ -75,7 +74,7 @@ const Footer = memo(({ profile }) => {
     });
 
     return () => {
-      socket.disconnect();
+      socket.off('visitorUpdate');
     };
   }, []);
 

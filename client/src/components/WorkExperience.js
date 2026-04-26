@@ -7,108 +7,160 @@ import { Box, Typography, Stack, Container, Grid } from '@mui/material';
 import { motion } from 'framer-motion';
 import { Calendar, MapPin } from 'lucide-react';
 
-const CareerCard = memo(({ job, index }) => (
-  <motion.div
-    initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
-    whileInView={{ opacity: 1, x: 0 }}
-    transition={{ duration: 0.8 }}
-    viewport={{ once: true }}
-  >
-    <Box
-      className="glass-card"
-      sx={{
-        p: { xs: 4, md: 6 },
-        mb: 4,
-        position: 'relative',
-        transition: '0.4s',
-        '&:hover': {
-          borderColor: 'primary.main',
-          transform: 'scale(1.02)',
-        },
-      }}
-    >
-      <Grid container spacing={4}>
-        <Grid item xs={12} md={4}>
-          <Stack spacing={2}>
-            <Typography
-              variant="h5"
-              sx={{
-                color: 'white',
-                fontWeight: 900,
-                fontFamily: 'Outfit',
-                letterSpacing: -0.5,
-              }}
-            >
-              {job.company}
-            </Typography>
-            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ color: 'primary.main' }}>
-              <Calendar size={16} />
-              <Typography
-                sx={{
-                  fontWeight: 800,
-                  fontSize: '0.75rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: 1,
-                }}
-              >
-                {job.period}
-              </Typography>
-            </Stack>
-            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ color: '#64748b' }}>
-              <MapPin size={16} />
-              <Typography sx={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                {job.location || 'Remote'}
-              </Typography>
-            </Stack>
-          </Stack>
-        </Grid>
+const CareerCard = memo(({ job, index }) => {
+  const isEven = index % 2 === 0;
 
-        <Grid item xs={12} md={8}>
-          <Stack spacing={3}>
-            <Typography
-              variant="h6"
-              sx={{
-                color: 'white',
-                fontWeight: 700,
-                fontSize: '1.25rem',
-              }}
-            >
-              {job.role}
-            </Typography>
-            <Typography
-              sx={{
-                color: '#94a3b8',
-                fontSize: '1rem',
-                lineHeight: 1.8,
-              }}
-            >
-              {job.description}
-            </Typography>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
-              {job.technologies?.map((tech) => (
-                <Box
-                  key={tech}
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: index * 0.1 }}
+      viewport={{ once: true }}
+      style={{ width: '100%' }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: { xs: 'flex-start', md: isEven ? 'flex-start' : 'flex-end' },
+          position: 'relative',
+          mb: 8,
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            left: { xs: 0, md: '50%' },
+            top: 40,
+            width: 20,
+            height: 20,
+            borderRadius: '50%',
+            bgcolor: 'primary.main',
+            transform: { xs: 'translateX(-50%)', md: 'translateX(-50%)' },
+            boxShadow: '0 0 20px rgba(225, 29, 72, 0.4)',
+            zIndex: 2,
+            display: { xs: 'none', md: 'block' },
+          },
+        }}
+      >
+        <Box
+          className="glass-card"
+          sx={{
+            width: { xs: '100%', md: '45%' },
+            p: { xs: 4, md: 6 },
+            transition: '0.4s',
+            '&:hover': {
+              borderColor: 'primary.main',
+              transform: 'scale(1.02)',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+            },
+          }}
+        >
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <Stack spacing={2}>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="flex-start"
+                  flexWrap="wrap"
+                  gap={2}
+                >
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      color: 'white',
+                      fontWeight: 900,
+                      fontFamily: 'Outfit',
+                      letterSpacing: -0.5,
+                    }}
+                  >
+                    {job.company}
+                  </Typography>
+                  <Stack
+                    direction="row"
+                    spacing={1.5}
+                    alignItems="center"
+                    sx={{
+                      px: 2,
+                      py: 0.5,
+                      borderRadius: '100px',
+                      bgcolor: 'rgba(225, 29, 72, 0.1)',
+                      border: '1px solid rgba(225, 29, 72, 0.2)',
+                      color: 'primary.main',
+                    }}
+                  >
+                    <Calendar size={14} />
+                    <Typography
+                      sx={{
+                        fontWeight: 800,
+                        fontSize: '0.65rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: 1,
+                      }}
+                    >
+                      {job.period}
+                    </Typography>
+                  </Stack>
+                </Stack>
+
+                <Typography
+                  variant="h6"
                   sx={{
-                    px: 1.5,
-                    py: 0.5,
-                    borderRadius: '4px',
-                    bgcolor: 'rgba(255,255,255,0.02)',
-                    border: '1px solid rgba(255,255,255,0.05)',
-                    color: '#64748b',
-                    fontSize: '0.7rem',
+                    color: 'white',
                     fontWeight: 700,
+                    fontSize: '1.1rem',
                   }}
                 >
-                  {tech}
+                  {job.role}
+                </Typography>
+
+                <Stack direction="row" spacing={1.5} alignItems="center" sx={{ color: '#64748b' }}>
+                  <MapPin size={14} />
+                  <Typography sx={{ fontWeight: 600, fontSize: '0.8rem' }}>
+                    {job.location || 'Remote'}
+                  </Typography>
+                </Stack>
+
+                <Typography
+                  sx={{
+                    color: '#94a3b8',
+                    fontSize: '0.9rem',
+                    lineHeight: 1.7,
+                  }}
+                >
+                  {job.description}
+                </Typography>
+
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.2 }}>
+                  {job.technologies?.map((tech) => (
+                    <Box
+                      key={tech}
+                      sx={{
+                        px: 1.2,
+                        py: 0.4,
+                        borderRadius: '4px',
+                        bgcolor: 'rgba(255,255,255,0.02)',
+                        border: '1px solid rgba(255,255,255,0.05)',
+                        color: '#64748b',
+                        fontSize: '0.65rem',
+                        fontWeight: 700,
+                        transition: '0.3s',
+                        '&:hover': {
+                          color: 'white',
+                          borderColor: 'primary.main',
+                        },
+                      }}
+                    >
+                      {tech}
+                    </Box>
+                  ))}
                 </Box>
-              ))}
-            </Box>
-          </Stack>
-        </Grid>
-      </Grid>
-    </Box>
-  </motion.div>
-));
+              </Stack>
+            </Grid>
+          </Grid>
+        </Box>
+      </Box>
+    </motion.div>
+  );
+});
 
 const WorkExperience = memo(({ profile, experience }) => {
   if (!experience) return null;
@@ -142,11 +194,25 @@ const WorkExperience = memo(({ profile, experience }) => {
           </Typography>
         </Box>
 
-        <Stack spacing={2}>
-          {experience.map((job, i) => (
-            <CareerCard key={i} job={job} index={i} />
-          ))}
-        </Stack>
+        <Box sx={{ position: 'relative' }}>
+          {/* Vertical Line */}
+          <Box
+            sx={{
+              position: 'absolute',
+              left: { xs: 0, md: '50%' },
+              top: 0,
+              bottom: 0,
+              width: 1,
+              bgcolor: 'rgba(255,255,255,0.05)',
+              display: { xs: 'none', md: 'block' },
+            }}
+          />
+          <Stack spacing={2}>
+            {experience.map((job, i) => (
+              <CareerCard key={i} job={job} index={i} />
+            ))}
+          </Stack>
+        </Box>
       </Container>
     </Box>
   );

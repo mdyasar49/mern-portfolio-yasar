@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Zap, Users, MessageSquare } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import SEO from '../components/SEO';
-import { io } from 'socket.io-client';
+import socket from '../services/socket';
 import { API_BASE_URL } from '../config';
 
 const Documentation = memo(({ profile }) => {
@@ -25,9 +25,7 @@ const Documentation = memo(({ profile }) => {
       .then((text) => setReadme(text))
       .catch((err) => console.error('Failed to load readme:', err));
 
-    // Socket.io for real-time status updates
-    const socket = io(API_BASE_URL);
-
+    // We use the shared socket instance
     socket.on('visitorUpdate', (data) => {
       setStatusLogs((prev) => [
         { type: 'TRAFFIC', message: `Visitor count sync: ${data.count}`, color: '#00ffcc', icon: <Users size={12} /> },
@@ -43,7 +41,8 @@ const Documentation = memo(({ profile }) => {
     });
 
     return () => {
-      socket.disconnect();
+      socket.off('visitorUpdate');
+      socket.off('newInquiry');
     };
   }, []);
 

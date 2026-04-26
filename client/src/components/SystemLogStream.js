@@ -6,7 +6,7 @@ import React, { useState, useEffect, memo } from 'react';
 import { Box, Typography, Container, Stack, Grid } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Terminal, Zap, Users, MessageSquare } from 'lucide-react';
-import { io } from 'socket.io-client';
+import socket from '../services/socket';
 import { API_BASE_URL } from '../config';
 
 const SystemLogStream = memo(({ profile }) => {
@@ -14,9 +14,10 @@ const SystemLogStream = memo(({ profile }) => {
   const objective =
     profile?.documentation?.engineeringObjective || 'Optimizing digital ecosystems for scale.';
 
-  useEffect(() => {
-    // Socket.io for real-time activity
-    const socket = io(API_BASE_URL);
+    const initialLogAdded = React.useRef(false);
+
+    useEffect(() => {
+    // We use the shared socket instance
 
     const addLog = (text, icon = <Zap size={14} />, color = 'primary.main') => {
       const newLog = {
@@ -39,11 +40,15 @@ const SystemLogStream = memo(({ profile }) => {
       addLog(`Message received from: ${data.name}`, <MessageSquare size={14} />, '#33ccff');
     });
 
-    // Initial logs
-    addLog('System protocols established');
+    // Initial logs - only add once
+    if (!initialLogAdded.current) {
+      addLog('System protocols established');
+      initialLogAdded.current = true;
+    }
 
     return () => {
-      socket.disconnect();
+      socket.off('visitorUpdate');
+      socket.off('newInquiry');
     };
   }, []);
 

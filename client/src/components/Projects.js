@@ -19,6 +19,8 @@ import {
   Tabs,
   Tab,
   Container,
+  DialogContent,
+  alpha,
 } from '@mui/material';
 import { Github, X, Activity, Cpu, ArrowUpRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -47,6 +49,12 @@ const ProjectCard = memo(({ project, onOpen }) => {
           position: 'relative',
           overflow: 'hidden',
           cursor: 'pointer',
+          transition: 'all 0.5s cubic-bezier(0.23, 1, 0.32, 1)',
+          '&:hover': {
+            borderColor: 'primary.main',
+            transform: 'translateY(-12px)',
+            boxShadow: '0 20px 40px rgba(225, 29, 72, 0.15)',
+          }
         }}
         onClick={() => onOpen(project)}
       >
@@ -160,10 +168,14 @@ const ProjectCard = memo(({ project, onOpen }) => {
 const Projects = memo(({ profile, projects }) => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
+  const [filter, setFilter] = useState('All');
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   if (!projects || !Array.isArray(projects)) return null;
+
+  // Actually, let's keep it simple: filter by the first tech or a category field
+  const displayCategories = ['All', ...new Set(projects.map(p => p.category || 'Web Development'))];
 
   return (
     <Box id="projects" sx={{ py: { xs: 15, md: 25 } }}>
@@ -195,18 +207,73 @@ const Projects = memo(({ profile, projects }) => {
           </Typography>
         </Box>
 
-        <Grid container spacing={4}>
-          {projects.map((project) => (
-            <Grid item xs={12} md={6} lg={4} key={project.name}>
-              <ProjectCard
-                project={project}
-                onOpen={(p) => {
-                  setSelectedProject(p);
-                  setActiveTab(0);
+        {/* Category Filters */}
+        <Box sx={{ mb: 10, display: 'flex', justifyContent: 'center' }}>
+          <Tabs
+            value={filter}
+            onChange={(e, v) => setFilter(v)}
+            variant="scrollable"
+            scrollButtons="auto"
+            sx={{
+              '& .MuiTabs-indicator': { display: 'none' },
+              '& .MuiTabs-flexContainer': { gap: 2 },
+            }}
+          >
+            {displayCategories.map((cat) => (
+              <Tab
+                key={cat}
+                label={cat}
+                value={cat}
+                sx={{
+                  fontWeight: 800,
+                  fontSize: '0.75rem',
+                  letterSpacing: 2,
+                  px: 4,
+                  py: 1.5,
+                  borderRadius: '100px',
+                  bgcolor: filter === cat ? 'primary.main' : 'rgba(255,255,255,0.02)',
+                  color: filter === cat ? 'white !important' : '#64748b',
+                  border: '1px solid',
+                  borderColor: filter === cat ? 'primary.main' : 'rgba(255,255,255,0.05)',
+                  transition: '0.3s',
+                  minWidth: 'auto',
+                  minHeight: 'auto',
+                  '&:hover': {
+                    bgcolor: filter === cat ? 'primary.main' : 'rgba(255,255,255,0.05)',
+                    borderColor: 'primary.main',
+                  },
                 }}
               />
-            </Grid>
-          ))}
+            ))}
+          </Tabs>
+        </Box>
+
+        <Grid container spacing={4}>
+          <AnimatePresence mode="popLayout">
+            {projects
+              .filter(p => filter === 'All' || (p.category === filter || (filter !== 'All' && p.technologies.includes(filter))))
+              .map((project) => (
+                <Grid 
+                  item 
+                  xs={12} md={6} lg={4} 
+                  key={project.name}
+                  component={motion.div}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <ProjectCard
+                    project={project}
+                    onOpen={(p) => {
+                      setSelectedProject(p);
+                      setActiveTab(0);
+                    }}
+                  />
+                </Grid>
+              ))}
+          </AnimatePresence>
         </Grid>
       </Container>
 
@@ -217,16 +284,14 @@ const Projects = memo(({ profile, projects }) => {
         maxWidth="lg"
         fullWidth
         fullScreen={fullScreen}
-        scroll="body"
         PaperProps={{
           sx: {
             bgcolor: 'rgba(5,5,7,0.99)',
             backgroundImage: 'none',
-            borderRadius: fullScreen ? 0 : '32px',
-            border: '1px solid rgba(225,29,72,0.2)',
-            backdropFilter: 'blur(40px)',
-            boxShadow: '0 50px 100px rgba(0,0,0,1), 0 0 40px rgba(225,29,72,0.1)',
-            overflow: 'hidden',
+            borderRadius: fullScreen ? 0 : '40px',
+            border: '1px solid rgba(225,29,72,0.3)',
+            backdropFilter: 'blur(50px)',
+            boxShadow: '0 50px 150px rgba(0,0,0,1)',
           },
         }}
       >
@@ -238,7 +303,12 @@ const Projects = memo(({ profile, projects }) => {
               exit={{ opacity: 0, scale: 1.05 }}
               transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
             >
-              <Box sx={{ position: 'relative' }}>
+              <DialogContent sx={{ 
+                p: 0, 
+                bgcolor: 'transparent',
+                overflow: 'hidden',
+              }}>
+                <Box sx={{ position: 'relative' }}>
                 {/* Visual Details */}
                 {!fullScreen && (
                   <>
@@ -298,16 +368,23 @@ const Projects = memo(({ profile, projects }) => {
                   onClick={() => setSelectedProject(null)}
                   sx={{
                     position: 'absolute',
-                    top: 24,
-                    right: 24,
-                    zIndex: 10,
-                    bgcolor: 'rgba(255,255,255,0.03)',
+                    top: { xs: 20, md: 32 },
+                    right: { xs: 20, md: 32 },
+                    zIndex: 100,
+                    bgcolor: 'rgba(0,0,0,0.5)',
+                    backdropFilter: 'blur(10px)',
                     color: 'white',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    '&:hover': { bgcolor: '#ef4444', borderColor: '#ef4444' },
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    p: 1.5,
+                    '&:hover': { 
+                      bgcolor: '#ef4444', 
+                      borderColor: '#ef4444',
+                      transform: 'rotate(90deg)'
+                    },
+                    transition: 'all 0.3s cubic-bezier(0.23, 1, 0.32, 1)',
                   }}
                 >
-                  <X size={20} />
+                  <X size={24} />
                 </IconButton>
 
                 <Grid container>
@@ -315,10 +392,10 @@ const Projects = memo(({ profile, projects }) => {
                   <Grid item xs={12} md={5}>
                     <Box
                       sx={{
-                        height: '100%',
                         position: 'relative',
-                        minHeight: { xs: 240, sm: 300, md: 700 },
+                        minHeight: { xs: 240, sm: 300, md: 550 },
                         bgcolor: 'black',
+                        height: '100%',
                       }}
                     >
                       <Box
@@ -436,7 +513,26 @@ const Projects = memo(({ profile, projects }) => {
 
                   {/* Right Column: Narrative & Stack */}
                   <Grid item xs={12} md={7}>
-                    <Box sx={{ p: { xs: 3, sm: 5, md: 8, lg: 10 } }}>
+                    <Box sx={{ 
+                      p: { xs: 3, sm: 5, md: 6, lg: 8 }, 
+                      pb: { xs: 12, md: 8 },
+                      maxHeight: { md: '80vh' },
+                      overflowY: { md: 'auto' },
+                      "&::-webkit-scrollbar": {
+                          width: "5px",
+                          height: "5px",
+                      },
+                      "&::-webkit-scrollbar-track": {
+                          background: 'transparent',
+                      },
+                      "&::-webkit-scrollbar-thumb": {
+                          backgroundColor: alpha("#6366F1", 0.28),
+                          borderRadius: "10px",
+                      },
+                      "&::-webkit-scrollbar-thumb:hover": {
+                          backgroundColor: alpha("#6366F1", 0.5),
+                      },
+                    }}>
                       <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -461,7 +557,7 @@ const Projects = memo(({ profile, projects }) => {
                               sx={{
                                 color: 'white',
                                 fontWeight: 900,
-                                fontSize: { xs: '2.2rem', sm: '3.2rem', md: '5rem' },
+                                fontSize: { xs: '2rem', sm: '3rem', md: '4rem' },
                                 fontFamily: 'Outfit',
                                 letterSpacing: -1.5,
                                 lineHeight: 1.1,
@@ -502,13 +598,13 @@ const Projects = memo(({ profile, projects }) => {
                             </Tabs>
                           </Box>
 
-                          <Box sx={{ minHeight: { xs: 200, md: 300 } }}>
+                          <Box sx={{ minHeight: { xs: 150, md: 200 } }}>
                             {activeTab === 0 ? (
                               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                                 <Typography
                                   sx={{
                                     color: '#94a3b8',
-                                    fontSize: { xs: '1rem', md: '1.25rem' },
+                                    fontSize: { xs: '0.95rem', md: '1.1rem' },
                                     lineHeight: 1.8,
                                     fontWeight: 400,
                                   }}
@@ -565,7 +661,7 @@ const Projects = memo(({ profile, projects }) => {
                                 bgcolor: 'primary.main',
                                 color: 'white',
                                 borderRadius: '14px',
-                                px: { xs: 3, md: 6 },
+                                px: { xs: 3, md: 5 },
                                 py: { xs: 1.5, md: 2 },
                                 textTransform: 'none',
                                 fontWeight: 900,
@@ -607,7 +703,8 @@ const Projects = memo(({ profile, projects }) => {
                   </Grid>
                 </Grid>
               </Box>
-            </motion.div>
+            </DialogContent>
+          </motion.div>
           )}
         </AnimatePresence>
       </Dialog>

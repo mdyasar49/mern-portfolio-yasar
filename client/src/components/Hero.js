@@ -66,11 +66,28 @@ const Hero = memo(({ profile }) => {
             >
               {profile.customData?.availabilityLabel || 'AVAILABILITY'}
             </Typography>
-            <Typography
-              sx={{ color: 'white', fontSize: '0.75rem', fontWeight: 800, fontFamily: 'monospace' }}
-            >
-              {profile.customData?.availabilityStatus || 'OPEN TO WORK'}
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <Box
+                sx={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: '50%',
+                  bgcolor: '#22c55e',
+                  boxShadow: '0 0 10px #22c55e',
+                  animation: 'pulse 2s infinite',
+                }}
+              />
+              <Typography
+                sx={{
+                  color: 'white',
+                  fontSize: '0.75rem',
+                  fontWeight: 800,
+                  fontFamily: 'monospace',
+                }}
+              >
+                {profile.customData?.availabilityStatus || 'OPEN TO WORK'}
+              </Typography>
+            </Box>
           </Box>
           <Box sx={{ width: 1, height: 30, bgcolor: 'rgba(255,255,255,0.1)' }} />
           <Box>

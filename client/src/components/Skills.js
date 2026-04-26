@@ -22,12 +22,20 @@ const SkillCard = memo(({ title, skills, icon: Icon, delay, color }) => (
         display: 'flex',
         flexDirection: 'column',
         gap: 3,
+        transition: 'all 0.4s cubic-bezier(0.23, 1, 0.32, 1)',
         '&:hover': {
           borderColor: color,
+          transform: 'translateY(-10px)',
+          boxShadow: `0 20px 40px ${color}15`,
+          '& .skill-icon-box': {
+            transform: 'scale(1.1) rotate(5deg)',
+            boxShadow: `0 0 20px ${color}30`,
+          }
         },
       }}
     >
       <Box
+        className="skill-icon-box"
         sx={{
           width: 48,
           height: 48,
@@ -37,6 +45,7 @@ const SkillCard = memo(({ title, skills, icon: Icon, delay, color }) => (
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          transition: '0.4s',
         }}
       >
         <Icon size={24} />

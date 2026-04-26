@@ -20,10 +20,14 @@ const server = http.createServer(app);
 
 // Initialize Socket.io
 const { Server } = require('socket.io');
+const { getAllowedOrigins } = require('./config/cors');
+const allowedOrigins = getAllowedOrigins();
+
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || '*',
+    origin: allowedOrigins,
     methods: ['GET', 'POST'],
+    credentials: true
   },
 });
 
