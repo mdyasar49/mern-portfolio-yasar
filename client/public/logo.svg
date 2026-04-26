@@ -1,29 +1,20 @@
 <svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="mGrad" x1="512" y1="300" x2="512" y2="700" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#FF7A00" />
-      <stop offset="100%" stop-color="#FF0000" />
+    <linearGradient id="myGradient" x1="0" y1="512" x2="800" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF8C00"/>
+      <stop offset="0.5" stop-color="#FF1493"/>
+      <stop offset="1" stop-color="#D02090"/>
     </linearGradient>
-    <linearGradient id="yGrad" x1="512" y1="300" x2="512" y2="700" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#FF0000" />
-      <stop offset="100%" stop-color="#E2127A" />
-    </linearGradient>
-    <filter id="dotGlow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="20" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    <filter id="cyanGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="20" result="blur"/>
+      <feFlood flood-color="#00FFFF" flood-opacity="0.6" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
     </filter>
   </defs>
-  
-  <rect width="1024" height="1024" fill="#000000" />
-
-  <g transform="translate(150, 350)">
-    <!-- Bold M -->
-    <path d="M0 300 V0 L120 150 L240 0 V300" stroke="url(#mGrad)" stroke-width="85" stroke-linecap="butt" stroke-linejoin="miter" />
-    
-    <!-- Bold Y -->
-    <path d="M300 0 L400 130 L500 0 M400 130 V300" stroke="url(#yGrad)" stroke-width="85" stroke-linecap="butt" stroke-linejoin="miter" />
-    
-    <!-- Glowing Cyan Dot -->
-    <circle cx="610" cy="270" r="45" fill="#00F2FE" filter="url(#dotGlow)" />
-  </g>
+  <text x="400" y="550" text-anchor="middle" font-family="Arial Black, sans-serif" font-weight="900" font-size="380" fill="url(#myGradient)" letter-spacing="-15">MY</text>
+  <circle cx="820" cy="620" r="50" fill="#00FFFF" filter="url(#cyanGlow)"/>
 </svg>

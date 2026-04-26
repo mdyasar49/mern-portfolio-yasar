@@ -133,9 +133,21 @@ const DynamicBackground = () => {
         height: '100%',
         zIndex: -1,
         pointerEvents: 'none',
-        background: 'radial-gradient(circle at 50% 50%, #0a0a14 0%, #010409 100%)',
+        background: '#020204',
       }}
     >
+      {/* Grid Overlay */}
+      <Box
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), 
+                           linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)`,
+          backgroundSize: '40px 40px',
+          maskImage: 'radial-gradient(circle at 50% 50%, black, transparent 80%)',
+          pointerEvents: 'none',
+        }}
+      />
       <canvas
         ref={canvasRef}
         style={{
@@ -145,7 +157,7 @@ const DynamicBackground = () => {
           opacity: 0.6,
         }}
       />
-      {/* Organic Quantum Aurora Layer */}
+      {/* Soft background glow effects */}
       <Box
         sx={{
           position: 'absolute',
@@ -170,7 +182,7 @@ const DynamicBackground = () => {
             left: '-10%',
             width: '60%',
             height: '60%',
-            background: 'radial-gradient(circle, #6366f1 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(225, 29, 72, 0.15) 0%, transparent 70%)',
           }}
         />
         <motion.div
@@ -186,7 +198,7 @@ const DynamicBackground = () => {
             right: '-10%',
             width: '70%',
             height: '70%',
-            background: 'radial-gradient(circle, #ec4899 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)',
           }}
         />
         <motion.div
@@ -200,12 +212,12 @@ const DynamicBackground = () => {
             left: '30%',
             width: '40%',
             height: '40%',
-            background: 'radial-gradient(circle, #00ffcc 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(51, 204, 255, 0.1) 0%, transparent 70%)',
           }}
         />
       </Box>
 
-      {/* Floating Data Stream Particles (Subtle) */}
+      {/* Subtle floating elements */}
       {[...Array(10)].map((_, i) => (
         <motion.div
           key={i}

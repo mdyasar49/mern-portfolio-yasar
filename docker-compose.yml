@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # Backend Server
+  server:
+    build: ./server
+    container_name: portfolio-backend
+    ports:
+      - "5001:5001"
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI=${MONGO_URI}
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASS=${EMAIL_PASS}
+      - RECEIVER_EMAIL=${RECEIVER_EMAIL}
+    networks:
+      - portfolio-network
+
+  # Frontend Client
+  client:
+    build: ./client
+    container_name: portfolio-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    networks:
+      - portfolio-network
+
+networks:
+  portfolio-network:
+    driver: bridge

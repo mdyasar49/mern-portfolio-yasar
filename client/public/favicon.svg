@@ -1,5 +1,20 @@
-<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="32" height="32" fill="black" />
-  <circle cx="26" cy="24" r="3.5" fill="#00ffff" />
-  <path d="M4 22 V8 L10 14 L16 8 V22" stroke="#FF7A00" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="myGradient" x1="0" y1="512" x2="800" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF8C00"/>
+      <stop offset="0.5" stop-color="#FF1493"/>
+      <stop offset="1" stop-color="#D02090"/>
+    </linearGradient>
+    <filter id="cyanGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="20" result="blur"/>
+      <feFlood flood-color="#00FFFF" flood-opacity="0.6" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <text x="400" y="550" text-anchor="middle" font-family="Arial Black, sans-serif" font-weight="900" font-size="380" fill="url(#myGradient)" letter-spacing="-15">MY</text>
+  <circle cx="820" cy="620" r="50" fill="#00FFFF" filter="url(#cyanGlow)"/>
 </svg>

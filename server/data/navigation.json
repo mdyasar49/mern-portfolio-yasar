@@ -3,7 +3,8 @@
     { "name": "About", "path": "/#about", "type": "anchor" },
     { "name": "Skills", "path": "/#skills", "type": "anchor" },
     { "name": "Projects", "path": "/#projects", "type": "anchor" },
-    { "name": "Resume", "path": "/#resume", "type": "anchor" },
+    { "name": "Resume", "path": "/resume", "type": "route" },
+    { "name": "Docs", "path": "/documentation", "type": "route" },
     { "name": "Contact", "path": "/#contact", "type": "anchor" }
   ]
 }

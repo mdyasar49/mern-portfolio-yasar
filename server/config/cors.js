@@ -1,3 +1,4 @@
+const logger = require('../utils/logger');
 const normalizeOrigin = (value = '') => value.trim().replace(/\/+$/, '');
 
 const splitOrigins = (value = '') => value.split(',').map(normalizeOrigin).filter(Boolean);
@@ -45,10 +46,7 @@ const createCorsOptions = () => {
         if (!origin || isAllowedOrigin(origin, allowedOrigins)) {
           callback(null, true);
         } else {
-          console.error(
-            `🔴 [CORS_BLOCKED] Origin "${origin}" is not in whitelist:`,
-            allowedOrigins,
-          );
+          logger.error(`CORS Blocked: Origin "${origin}" is not allowed`);
           callback(new Error(`CORS policy blocked access from origin ${origin}.`));
         }
       },

@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   fetchBasicDetails,
-  fetchHeader,
   fetchSkills,
   fetchExperience,
   fetchProjects,
@@ -14,16 +13,13 @@ import {
 } from '../services/api';
 
 /**
- * Custom Hook: useProfile
- * Implements Progressive Module Loading (PML) architecture.
- * Fetches core data first for instant visibility, then hydrates other modules.
+ * Hook to manage profile data loading.
  */
 const useProfile = () => {
   const [profile, setProfile] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [errorType, setErrorType] = useState(null);
-  const [maintenanceMode, setMaintenanceMode] = useState(false);
 
   const hydrateFragment = (fragment) => {
     setProfile((prev) => ({ ...prev, ...fragment }));
@@ -34,21 +30,15 @@ const useProfile = () => {
     setError(null);
 
     try {
-      // PHASE 1: Critical UI Path (Global Layout: Header & Footer)
-      // Fetches navigation, identity, and social links in a single request
+      // Load basic layout first
       const layout = await fetchCommonLayout();
 
       setProfile((prev) => ({ ...prev, ...layout }));
-      setMaintenanceMode(layout.maintenanceMode || false);
 
-      // Initial load is "complete" once we have the layout basics
+      // Initial load is "complete" once we have basic layout
       setLoading(false);
 
-      // Helper for slight delay to make progressive loading visible
-      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-      // PHASE 2: Background Hydration (Core Content Modules)
-      // We load critical content modules first to ensure they appear on screen as soon as possible.
+      // Load remaining data in background
       const fragments = [
         { key: 'analytics', fetcher: fetchAnalytics },
         { key: 'documentation', fetcher: fetchDocumentation },
@@ -67,16 +57,16 @@ const useProfile = () => {
           const data = await frag.fetcher();
           if (data) {
             // Logic: If the backend returns a direct array (like Projects or Experience),
-            // we must wrap it in the correct key before merging into the profile.
-            const fragmentToMerge = Array.isArray(data) ? { [frag.key]: data } : data;
+            // or if it's the documentation fragment, we must wrap it in the correct key.
+            const fragmentToMerge =
+              Array.isArray(data) || frag.key === 'documentation' ? { [frag.key]: data } : data;
             hydrateFragment(fragmentToMerge);
           }
         } catch (err) {
-          console.warn(`[PML] Failed to hydrate ${frag.key}:`, err.message);
+          // Individual module failure shouldn't break the app
         }
       }
     } catch (err) {
-      console.error('PML_HYDRATION_FAILURE:', err.message);
       setError(err);
       setErrorType('network');
       setLoading(false);
@@ -87,7 +77,7 @@ const useProfile = () => {
     fetchAllData();
   }, [fetchAllData]);
 
-  return { profile, loading, error, errorType, maintenanceMode, retry: fetchAllData };
+  return { profile, loading, error, errorType, retry: fetchAllData };
 };
 
 export default useProfile;

@@ -1,3 +1,5 @@
+const logger = require('../utils/logger');
+
 /**
  * Centralized Error Handling Middleware
  */
@@ -5,8 +7,8 @@ const errorHandler = (err, req, res, next) => {
   let error = { ...err };
   error.message = err.message;
 
-  // Log for developer
-  console.error(`[Error] ${err.name}: ${err.message}`);
+  // Log for developer using Winston
+  logger.error(`${err.name}: ${err.message}`, { stack: err.stack });
 
   // Mongoose bad ObjectId
   if (err.name === 'CastError') {
@@ -26,7 +28,7 @@ const errorHandler = (err, req, res, next) => {
     return res.status(400).json({ success: false, error: message });
   }
 
-  // In Production: Hide detailed error messages for a [Premium/Clean] experience
+  // In Production: Hide detailed error messages for better security
   const isProduction = process.env.NODE_ENV === 'production';
 
   res.status(error.statusCode || 500).json({

@@ -3,9 +3,7 @@ import { Box, Typography, Button } from '@mui/material';
 import { ShieldAlert, RefreshCcw } from 'lucide-react';
 
 /**
- * [React Error Boundary]
- * Catches JavaScript errors anywhere in their child component tree,
- * logs those errors, and displays a fallback UI instead of the component tree that crashed.
+ * Error boundary to catch UI crashes.
  */
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -20,7 +18,7 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     // You can also log the error to an error reporting service
-    console.error('Critical UI Failure:', error, errorInfo);
+    console.error('UI Error:', error, errorInfo);
   }
 
   render() {
@@ -43,13 +41,12 @@ class ErrorBoundary extends React.Component {
           <ShieldAlert size={64} color="#ff3366" style={{ marginBottom: '24px' }} />
           <Typography
             variant="h4"
-            sx={{ fontFamily: 'Syncopate', fontWeight: 900, mb: 2, letterSpacing: 2 }}
+            sx={{ fontWeight: 900, mb: 2 }}
           >
-            UI_INTERFACE_CRITICAL_FAILURE
+            Something went wrong
           </Typography>
           <Typography variant="body1" sx={{ color: '#64748b', mb: 4, maxWidth: 500 }}>
-            A component has experienced an unhandled exception. The containment protocol has
-            isolated the error to prevent a full system shutdown.
+            An unexpected error occurred. Please try refreshing the page.
           </Typography>
           <Button
             variant="contained"
@@ -68,7 +65,7 @@ class ErrorBoundary extends React.Component {
               '&:hover': { bgcolor: '#ff3366', transform: 'scale(1.05)' },
             }}
           >
-            REBOOT_INTERFACE
+            REFRESH PAGE
           </Button>
         </Box>
       );

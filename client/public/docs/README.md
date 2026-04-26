@@ -1,4 +1,4 @@
-# 🚀 MERN Full-Stack Engineering Showcase
+# 🚀 MERN Full-Stack Portfolio
 
 ### Engineered by [Mohamed Yasar](https://github.com/mdyasar49)
 
@@ -9,7 +9,7 @@
 
 ---
 
-## 💎 The Engineering Objective
+## 💎 Project Goal
 
 This isn't just a portfolio; it's a **Production-Grade Simulation**. Most beginners build static sites; I engineered a decoupled system where the Frontend (React) and Backend (Node/Express) function as independent entities, communicating over a secure REST API.
 
@@ -25,7 +25,7 @@ This isn't just a portfolio; it's a **Production-Grade Simulation**. Most beginn
 | **Technical Audit**    | **Elite Annotation Layer**. Every core module is line-by-line annotated in English, explaining purpose and implementation logic.       | Ensures the codebase is SaaS-ready, professional, and easily maintainable.          |
 | **Data Resilience**    | **Zero-Downtime Hybrid Layer**. Automatically switches between MongoDB Atlas (Primary) and `data.json` (Fallback).                     | Portfolio remains 100% functional even if MongoDB connectivity drops.               |
 | **Admin Control**      | **Comprehensive Management Hub**. Real-time profile editing, system health monitoring, and proposal management via JWT authentication. | High-fidelity control over the entire ecosystem with secure, persistent updates.    |
-| **System Interface**   | **Real-Time Log Streaming & HUD**. Clean, responsive layout prioritizing typography and live system telemetry.                         | Professional, data-driven insights into portfolio performance and operations.       |
+| **Activity Logs**    | **Live Activity Feed**. Shows recent visitor activity and system status in real-time.                             | Provides transparency and engagement for visitors.                                  |
 | **Interactive Resume** | **Dynamic Action Hub**. Integrated download, print, share, and modal system functionality.                                             | High-fidelity control over resume viewing, generation, and distribution.            |
 | **Multilingual**       | **Dynamic Localization Engine**. Real-time Google Translate API integration with a custom Thanglish phonetic layer.                    | Documentation is accessible across multiple dialects with 100% layout preservation. |
 
@@ -50,7 +50,30 @@ graph TD
 
 ---
 
-## 📁 Repository DNA
+## 📡 Client & Server Separation
+
+The project is divided into two separate parts that work together:
+
+1.  **Frontend (Client):** This is the user interface built with **React.js**. It handles everything the user sees and interacts with. It lives in the `/client` folder.
+2.  **Backend (Server):** This is the engine built with **Node.js and Express**. It handles data, security, and logic. It lives in the `/server` folder.
+
+### How do they talk to each other?
+The client and server communicate using a **REST API**. 
+- The **Client** sends requests (like "Give me the project list") using a tool called **Axios**.
+- The **Server** receives the request, gets the data from the database (MongoDB or a local file), and sends it back as a **JSON** response.
+- This separation means the frontend and backend are independent. You can change the design without touching the data logic, and vice versa.
+
+### 🔄 Communication Workflow Example:
+To illustrate the synergy between the two layers, here is the lifecycle of a data request:
+1.  **Trigger:** A user navigates to the "Projects" section in the **React UI**.
+2.  **Request:** React dispatches an asynchronous `GET` request via **Axios** to `http://localhost:5001/api/fragments/projects`.
+3.  **Processing:** The **Express Server** receives the request, validates the origin (CORS), and queries the **MongoDB** cluster (or falls back to `projects.json`).
+4.  **Response:** The Server sends back a clean **JSON** object containing the project data.
+5.  **Render:** React receives the JSON, updates its **State**, and the UI instantly hydrates with the project cards using **Framer Motion** animations.
+
+---
+
+## 📁 Project Structure
 
 ```text
 mern-portfolio-yasar/
@@ -71,7 +94,7 @@ mern-portfolio-yasar/
 
 ## 🚀 Rapid Deployment Guide
 
-### 1. Engine Room (Backend)
+### 1. Backend Setup
 
 ```bash
 cd server
@@ -80,7 +103,7 @@ npm install
 npm run dev
 ```
 
-### 2. Control Deck (Frontend)
+### 2. Frontend Setup
 
 ```bash
 cd client
@@ -99,7 +122,7 @@ npm start
 | `GET`  | `/api/profile`          | Core Data         | Supports DB/JSON failover.                |
 | `GET`  | `/api/visitors`         | Traffic Analytics | 7-day history & platform metrics.         |
 | `POST` | `/api/proposals/submit` | Guest Refinements | Dispatches email alerts to Admin.         |
-| `GET`  | `/api/health`           | System Integrity  | Monitors DB status & Memory usage.        |
+| `GET`  | `/api/health`           | Status            | Checks if the server and database are active. |
 
 ---
 
@@ -114,12 +137,12 @@ npm start
 
 ---
 
-## 🔮 Roadmap to v3.0
+## 🔮 Roadmap
 
 - [x] **Code Live Mode:** Real-time architectural transparency engine.
 - [x] **Technical Documentation Audit:** Comprehensive annotation of all core logic.
 - [ ] **Dark/Light Mode Orchestration:** Advanced theme switching with persistent user preference.
-- [ ] **AI-Powered Code Analysis:** Integrating LLM-based architectural explanations for all code blocks.
+- [ ] **Technical Deep-Dive:** Adding more detailed explanations for core components.
 - [ ] **Enhanced Testing Suite:** Implementing Jest and Cypress for 100% core logic coverage.
 
 ---

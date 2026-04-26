@@ -9,8 +9,10 @@ const SEO = ({ title, description, image }) => {
     // 1. Core Metadata
     const baseTitle = 'A. Mohamed Yasar';
     const finalTitle = title ? `${title} | ${baseTitle}` : baseTitle;
-    const finalDesc = description || 'Elite Full Stack Engineer & MERN Stack UI Architect';
-    const finalImage = image || 'https://mern-portfolio-yasar-1.onrender.com/og-preview.png';
+    const finalDesc =
+      description ||
+      'Professional Engineering Portfolio of A. Mohamed Yasar. Professional Full Stack MERN Developer.';
+    const finalImage = image || '/og-image.png';
 
     document.title = finalTitle;
 

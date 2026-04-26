@@ -1,10 +1,10 @@
 {
   "engineeringObjective": {
-    "title": "The Engineering Objective",
-    "description": "This isn't just a portfolio; it's a Production-Grade Simulation. Engineered as a decoupled MERN system where the Frontend and Backend function as independent entities, communicating over a secure REST API with multi-layer failover protocols.",
+    "title": "Project Goal",
+    "description": "I built this portfolio using the MERN stack with a focus on keeping the Frontend and Backend separate. This makes the system more modular and easier to manage. They talk to each other through a secure API.",
     "encryption": "AES_256",
-    "firewall": "ACTIVE_STRICT",
-    "telemetryConfig": {
+    "firewall": "ACTIVE",
+    "systemMetricsConfig": {
       "logTemplates": [
         {
           "type": "API",
@@ -14,13 +14,13 @@
         },
         {
           "type": "DB",
-          "message": "Handshake with MongoDB Atlas successful",
+          "message": "Connection with MongoDB Atlas successful",
           "icon": "Database",
           "color": "#33ccff"
         },
         {
           "type": "SYS",
-          "message": "Engine warm-up complete: {{VERSION}}",
+          "message": "System initialization complete: {{VERSION}}",
           "icon": "Server",
           "color": "#ff3366"
         },
@@ -29,46 +29,27 @@
           "message": "Strict CORS Policy active: Origin Validated",
           "icon": "Activity",
           "color": "#ff9933"
-        },
-        {
-          "type": "SLA",
-          "message": "API_STABILITY: {{STABILITY}} [OPERATIONAL]",
-          "icon": "Activity",
-          "color": "#00ffcc"
-        },
-        {
-          "type": "SLA",
-          "message": "CODE_COVERAGE: {{COVERAGE}} [STABLE]",
-          "icon": "Activity",
-          "color": "#33ccff"
-        },
-        {
-          "type": "SLA",
-          "message": "COMPUTE_EFFICIENCY: {{EFFICIENCY}} [OPTIMIZED]",
-          "icon": "Activity",
-          "color": "#ff9933"
-        },
-        {
-          "type": "API",
-          "message": "Payload compression enabled (Gzip)",
-          "icon": "Globe",
-          "color": "#00ffcc"
         }
       ]
     }
   },
-  "coreSystemDNA": [
-    { "title": "DATA_RESILIENCE", "val": "Hybrid Mongo/JSON Failover", "color": "#00ffcc" },
-    { "title": "ATOMIC_ARCHITECTURE", "val": "Fragmented JSON Modules", "color": "#6366f1" },
-    { "title": "DURATION_ENGINE", "val": "Real-time Calc Logic", "color": "#ff3366" }
+  "coreArchitecture": [
+    { "title": "FRONTEND LAYER", "val": "Independent React.js", "color": "#6366f1" },
+    { "title": "BACKEND LAYER", "val": "Isolated Node/Express", "color": "#ff3366" },
+    { "title": "COMMUNICATION", "val": "REST API / Axios Bridge", "color": "#00ffcc" },
+    { "title": "DATA STORAGE", "val": "Hybrid MongoDB & JSON", "color": "#33ccff" }
   ],
   "securityProtocols": [
-    { "title": "Hardened Production Shield", "status": "STATE: ACTIVE_STRICT", "color": "#00ffcc" },
-    { "title": "Direct Access Shield", "status": "STATUS: ENFORCED", "color": "#33ccff" }
+    { "title": "Production Security", "status": "ACTIVE", "color": "#00ffcc" },
+    { "title": "Access Control", "status": "ACTIVE", "color": "#33ccff" }
   ],
   "performanceMetrics": [
     { "label": "PERF", "val": "98%", "color": "#00ffcc" },
     { "label": "SEO", "val": "100%", "color": "#33ccff" },
     { "label": "ACCESSIBILITY", "val": "95%", "color": "#ff3366" }
-  ]
+  ],
+  "projectExplanation": {
+    "title": "How I Built This",
+    "content": "This project is built using React for the frontend and Node/Express for the backend. I wanted to create something that is fast, clean, and easy to update.\n\n### 1. Separate Frontend & Backend\nThe code for the UI and the server are kept in different folders. This way, the frontend just asks the server for the data it needs using Axios.\n\n### 2. Flexible Data Handling\nI use both MongoDB and local JSON files. This ensures the site works even if the database has a connection issue.\n\n### 3. Fast Loading\nI designed the site to load the most important information first, so it feels fast and responsive."
+  }
 }

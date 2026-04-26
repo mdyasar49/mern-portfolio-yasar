@@ -1,53 +1,38 @@
 import React, { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { Box, Typography, Button, Stack, Container } from '@mui/material';
 import { motion } from 'framer-motion';
-import {
-  WifiOff,
-  ServerCrash,
-  SearchX,
-  AlertOctagon,
-  RefreshCcw,
-  Home,
-  Terminal,
-  Activity,
-  ShieldAlert,
-  Unplug,
-} from 'lucide-react';
+import { WifiOff, ServerCrash, SearchX, AlertOctagon, Terminal, ShieldAlert } from 'lucide-react';
 
 // ─── Constants & Config ──────────────────────────────────────
 
 const ERROR_CONFIG = {
   network: {
     icon: WifiOff,
-    color: '#ff3366',
-    title: 'CONNECTION LOST',
-    subtitle: 'System is currently offline. Please check your internet connection.',
-    code: 'ERR_CONNECTION_OFFLINE',
-    diagnostics: ['IP_STACK_UNREACHABLE', 'DNS_RESOLUTION_FAILURE', 'LOCAL_ADAPTER_INACTIVE'],
+    color: '#e11d48',
+    title: 'OFFLINE',
+    subtitle: 'Please check your internet connection and try again.',
+    code: 'OFFLINE',    diagnostics: ['IP_STACK_UNREACHABLE', 'DNS_RESOLUTION_FAILURE', 'LOCAL_ADAPTER_INACTIVE'],
   },
   server: {
     icon: ServerCrash,
-    color: '#ff9933',
-    title: 'SERVER UNAVAILABLE',
-    subtitle: 'The server is not responding. Please try again in a moment.',
-    code: 'ERR_BACKEND_UNAVAILABLE',
-    diagnostics: ['CLUSTER_PROTOCOL_HANG', 'DB_GATEWAY_TIMEOUT', 'RESOURCE_SLEEP_DETECTION'],
+    color: '#818cf8',
+    title: 'SERVER ERROR',
+    subtitle: 'The server is not responding right now. Please try again later.',
+    code: 'SERVER_ERROR',    diagnostics: ['CLUSTER_PROTOCOL_HANG', 'DB_GATEWAY_TIMEOUT', 'RESOURCE_SLEEP_DETECTION'],
   },
   notfound: {
     icon: SearchX,
-    color: '#cc33ff',
-    title: 'PAGE NOT FOUND',
-    subtitle: "The page you're looking for doesn't exist or has been moved.",
-    code: 'ERR_ENTRY_NOT_FOUND',
-    diagnostics: ['NODE_ADDR_MISMATCH', 'MANIFEST_ENTRY_VOID', 'URI_DECODE_EXCEPTION'],
+    color: '#4f46e5',
+    title: 'NOT FOUND',
+    subtitle: "We couldn't find the page you're looking for.",
+    code: 'NOT_FOUND',    diagnostics: ['NODE_ADDR_MISMATCH', 'MANIFEST_ENTRY_VOID', 'URI_DECODE_EXCEPTION'],
   },
   unknown: {
     icon: AlertOctagon,
-    color: '#33ccff',
-    title: 'SOMETHING WENT WRONG',
-    subtitle: 'An unexpected error occurred. Our engineers have been notified.',
-    code: 'ERR_UNKNOWN_OVERFLOW',
-    diagnostics: ['STACK_OVERFLOW_RISK', 'KERNEL_SYNC_ERROR', 'BUFFER_FLOW_INTERRUPT'],
+    color: '#e11d48',
+    title: 'ERROR',
+    subtitle: 'Something went wrong. Please try refreshing the page.',
+    code: 'UNKNOWN_ERROR',    diagnostics: ['STACK_OVERFLOW_RISK', 'KERNEL_SYNC_ERROR', 'BUFFER_FLOW_INTERRUPT'],
   },
 };
 
@@ -61,40 +46,18 @@ const GlitchText = ({ children, color }) => (
     <Typography
       variant="h3"
       sx={{
-        fontFamily: 'Syncopate',
+        fontFamily: 'Outfit',
         fontWeight: 900,
         color: '#fff',
         letterSpacing: { xs: 4, md: 8 },
         fontSize: { xs: '1.5rem', md: '2.5rem' },
-        textShadow: `0 0 20px ${color}66`,
+        textShadow: `0 0 40px ${color}66`,
         position: 'relative',
         zIndex: 2,
       }}
     >
       {children}
     </Typography>
-    <motion.div
-      animate={{
-        clipPath: ['inset(80% 0 0 0)', 'inset(10% 0 80% 0)', 'inset(80% 0 0 0)'],
-        x: [-2, 2, -2],
-      }}
-      transition={{ repeat: Infinity, duration: 0.2, ease: 'linear' }}
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        color: color,
-        opacity: 0.5,
-        zIndex: 1,
-        fontFamily: 'Syncopate',
-        fontWeight: 900,
-        letterSpacing: 8,
-        fontSize: '2.5rem',
-      }}
-    >
-      {children}
-    </motion.div>
   </Box>
 );
 
@@ -110,12 +73,12 @@ const NetworkErrorScreen = ({ errorType = 'unknown', onRetry }) => {
 
   const particles = useMemo(
     () =>
-      Array.from({ length: 20 }, (_, i) => ({
+      Array.from({ length: 15 }, (_, i) => ({
         id: i,
         left: `${Math.random() * 100}%`,
-        xDrift: Math.random() * 100 - 50,
-        duration: 2 + Math.random() * 4,
-        delay: Math.random() * 5,
+        xDrift: Math.random() * 60 - 30,
+        duration: 3 + Math.random() * 3,
+        delay: Math.random() * 4,
       })),
     [],
   );
@@ -124,10 +87,10 @@ const NetworkErrorScreen = ({ errorType = 'unknown', onRetry }) => {
   useEffect(() => {
     setTerminalLines([]);
     const lines = [
-      `INITIALIZING RECOVERY...`,
-      `SCANNING NETWORK... COMPLETE.`,
-      `REACHING GATEWAY... TIMEOUT.`,
-      `SYSTEM STATUS: ${safeErrorType.toUpperCase()}_OFFLINE`,
+      `Checking connection...`,
+      `Testing server...`,
+      `Request failed.`,
+      `Status: Offline`,
     ];
     let i = 0;
     const interval = setInterval(() => {
@@ -137,7 +100,7 @@ const NetworkErrorScreen = ({ errorType = 'unknown', onRetry }) => {
       } else {
         clearInterval(interval);
       }
-    }, 400);
+    }, 500);
     return () => clearInterval(interval);
   }, [config.code, safeErrorType]);
 
@@ -147,8 +110,7 @@ const NetworkErrorScreen = ({ errorType = 'unknown', onRetry }) => {
       return;
     }
     setIsRetrying(true);
-    // Visual delay for "Cyber" feel
-    await new Promise((r) => setTimeout(r, 1200));
+    await new Promise((r) => setTimeout(r, 1500));
     try {
       await onRetry();
     } finally {
@@ -160,7 +122,7 @@ const NetworkErrorScreen = ({ errorType = 'unknown', onRetry }) => {
     <Box
       sx={{
         minHeight: '100vh',
-        bgcolor: '#020205',
+        bgcolor: '#050507',
         color: '#fff',
         display: 'flex',
         alignItems: 'center',
@@ -172,23 +134,10 @@ const NetworkErrorScreen = ({ errorType = 'unknown', onRetry }) => {
     >
       {/* Background Animated Elements */}
       <Box sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-        {/* Dynamic Scanlines */}
-        <Box
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage:
-              'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))',
-            backgroundSize: '100% 4px, 3px 100%',
-            pointerEvents: 'none',
-            opacity: 0.3,
-          }}
-        />
-
         {/* Pulsing Radial Gradient */}
         <motion.div
-          animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.15, 0.1] }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
           style={{
             position: 'absolute',
             top: '50%',
@@ -196,20 +145,20 @@ const NetworkErrorScreen = ({ errorType = 'unknown', onRetry }) => {
             width: '800px',
             height: '800px',
             borderRadius: '50%',
-            background: `radial-gradient(circle, ${config.color}33 0%, transparent 70%)`,
+            background: `radial-gradient(circle, ${config.color}22 0%, transparent 70%)`,
             transform: 'translate(-50%, -50%)',
-            filter: 'blur(60px)',
+            filter: 'blur(100px)',
           }}
         />
 
-        {/* Floating Particles (Simple CSS) */}
+        {/* Floating Particles */}
         {particles.map((particle) => (
           <motion.div
             key={particle.id}
             animate={{
-              y: [-20, -120],
+              y: [-10, -150],
               x: particle.xDrift,
-              opacity: [0, 1, 0],
+              opacity: [0, 0.4, 0],
             }}
             transition={{
               duration: particle.duration,
@@ -232,50 +181,32 @@ const NetworkErrorScreen = ({ errorType = 'unknown', onRetry }) => {
 
       {/* Main Container */}
       <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
-        <Stack spacing={6} alignItems="center" textAlign="center">
+        <Stack spacing={8} alignItems="center" textAlign="center">
           {/* Header Section */}
           <Box>
             <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
+              initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: 'spring', damping: 12 }}
+              transition={{ duration: 1 }}
             >
-              <Box sx={{ position: 'relative', mb: 4 }}>
+              <Box sx={{ position: 'relative', mb: 6 }}>
                 <Box
                   sx={{
-                    width: 120,
-                    height: 120,
-                    borderRadius: '30%',
-                    border: `1px solid ${config.color}44`,
+                    width: 130,
+                    height: 130,
+                    borderRadius: '24px',
+                    border: `1px solid rgba(255,255,255,0.05)`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    bgcolor: `${config.color}05`,
-                    backdropFilter: 'blur(10px)',
+                    bgcolor: `rgba(225, 29, 72, 0.02)`,
+                    backdropFilter: 'blur(20px)',
                     position: 'relative',
                     mx: 'auto',
-                    boxShadow: `inset 0 0 20px ${config.color}22, 0 0 40px ${config.color}11`,
+                    boxShadow: `0 30px 60px rgba(0,0,0,0.5)`,
                   }}
                 >
-                  <ErrorIcon size={64} color={config.color} strokeWidth={1.5} />
-
-                  {/* Decorative corner accents */}
-                  {[0, 90, 180, 270].map((angle) => (
-                    <Box
-                      key={angle}
-                      sx={{
-                        position: 'absolute',
-                        width: 15,
-                        height: 15,
-                        borderTop: `2px solid ${config.color}`,
-                        borderLeft: `2px solid ${config.color}`,
-                        top: -2,
-                        left: -2,
-                        transform: `rotate(${angle}deg)`,
-                        transformOrigin: '61px 61px',
-                      }}
-                    />
-                  ))}
+                  <ErrorIcon size={60} color={config.color} strokeWidth={1} />
                 </Box>
               </Box>
             </motion.div>
@@ -285,12 +216,14 @@ const NetworkErrorScreen = ({ errorType = 'unknown', onRetry }) => {
             <Typography
               variant="h6"
               sx={{
-                mt: 2,
-                color: 'rgba(255,255,255,0.7)',
-                fontWeight: 300,
-                maxWidth: 600,
+                mt: 3,
+                color: '#64748b',
+                fontWeight: 500,
+                maxWidth: 550,
                 mx: 'auto',
-                letterSpacing: 1,
+                fontSize: '1.1rem',
+                lineHeight: 1.6,
+                fontFamily: 'Outfit',
               }}
             >
               {config.subtitle}
@@ -302,68 +235,56 @@ const NetworkErrorScreen = ({ errorType = 'unknown', onRetry }) => {
             sx={{
               width: '100%',
               maxWidth: 500,
-              p: 3,
-              bgcolor: 'rgba(10, 12, 18, 0.4)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255,255,255,0.05)',
-              borderRadius: 4,
+              p: 4,
+              bgcolor: 'rgba(255, 255, 255, 0.01)',
+              backdropFilter: 'blur(40px)',
+              border: '1px solid rgba(255,255,255,0.04)',
+              borderRadius: '24px',
               position: 'relative',
               overflow: 'hidden',
             }}
           >
-            {/* Top Bar */}
             <Box
               sx={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                mb: 2,
+                mb: 3,
                 pb: 2,
                 borderBottom: '1px solid rgba(255,255,255,0.05)',
               }}
             >
-              <Stack direction="row" spacing={1} alignItems="center">
-                <Terminal size={14} color={config.color} />
+              <Stack direction="row" spacing={2} alignItems="center">
+                <Terminal size={14} color="#e11d48" />
                 <Typography
                   sx={{
-                    fontSize: '0.7rem',
+                    fontSize: '0.65rem',
                     fontWeight: 900,
-                    letterSpacing: 2,
-                    color: config.color,
+                    letterSpacing: 3,
+                    color: '#e11d48',
+                    textTransform: 'uppercase',
                   }}
                 >
-                  DIAGNOSTIC_LOG
+                  STATUS LOG
                 </Typography>
               </Stack>
-              <Box sx={{ display: 'flex', gap: 0.5 }}>
-                <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#ff5f56' }} />
-                <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#ffbd2e' }} />
-                <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#27c93f' }} />
-              </Box>
             </Box>
 
-            <Stack spacing={1} textAlign="left">
+            <Stack spacing={1.5} textAlign="left">
               {terminalLines.map((line, idx) => (
                 <Typography
                   key={idx}
                   sx={{
-                    fontFamily: '"JetBrains Mono", monospace',
-                    fontSize: '0.75rem',
-                    color:
-                      idx === terminalLines.length - 1 ? config.color : 'rgba(255,255,255,0.5)',
+                    fontFamily: 'monospace',
+                    fontSize: '0.8rem',
+                    color: idx === terminalLines.length - 1 ? '#e11d48' : '#475569',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 1,
+                    gap: 1.5,
+                    fontWeight: 600,
                   }}
                 >
                   <span style={{ opacity: 0.3 }}>&gt;</span> {line}
-                  {idx === terminalLines.length - 1 && (
-                    <motion.span
-                      animate={{ opacity: [0, 1, 0] }}
-                      transition={{ repeat: Infinity, duration: 0.8 }}
-                      style={{ width: 6, height: 12, backgroundColor: config.color }}
-                    />
-                  )}
                 </Typography>
               ))}
             </Stack>
@@ -371,19 +292,19 @@ const NetworkErrorScreen = ({ errorType = 'unknown', onRetry }) => {
             {/* Error Code Tag */}
             <Box
               sx={{
-                mt: 3,
-                p: '4px 12px',
-                bgcolor: `${config.color}11`,
-                border: `1px solid ${config.color}33`,
-                borderRadius: 1,
+                mt: 4,
+                p: '6px 16px',
+                bgcolor: `rgba(225, 29, 72, 0.05)`,
+                border: `1px solid rgba(225, 29, 72, 0.1)`,
+                borderRadius: '8px',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 1,
+                gap: 1.5,
               }}
             >
-              <ShieldAlert size={12} color={config.color} />
+              <ShieldAlert size={12} color="#e11d48" />
               <Typography
-                sx={{ fontSize: '0.65rem', fontWeight: 900, color: config.color, letterSpacing: 1 }}
+                sx={{ fontSize: '0.65rem', fontWeight: 900, color: '#e11d48', letterSpacing: 2 }}
               >
                 {config.code}
               </Typography>
@@ -391,121 +312,62 @@ const NetworkErrorScreen = ({ errorType = 'unknown', onRetry }) => {
           </Box>
 
           {/* Action Buttons */}
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={4}>
             <Button
               variant="contained"
               onClick={handleRetry}
               disabled={isRetrying}
-              startIcon={isRetrying ? null : <RefreshCcw size={18} />}
               sx={{
-                bgcolor: config.color,
-                color: '#fff',
-                px: 6,
-                py: 1.5,
-                borderRadius: '50px',
-                fontFamily: 'Syncopate',
-                fontSize: '0.8rem',
+                bgcolor: 'white',
+                color: 'black',
+                px: 8,
+                py: 2,
+                borderRadius: '100px',
+                fontFamily: 'Outfit',
+                fontSize: '0.9rem',
                 fontWeight: 900,
-                letterSpacing: 2,
-                boxShadow: `0 10px 30px ${config.color}44`,
-                transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                letterSpacing: 1,
+                boxShadow: `0 20px 40px rgba(0,0,0,0.4)`,
+                textTransform: 'uppercase',
+                transition: '0.4s',
                 '&:hover': {
-                  bgcolor: config.color,
-                  transform: 'translateY(-5px) scale(1.05)',
-                  boxShadow: `0 20px 40px ${config.color}66`,
-                },
-                '&:disabled': {
-                  bgcolor: 'rgba(255,255,255,0.05)',
-                  color: 'rgba(255,255,255,0.2)',
+                  bgcolor: '#e11d48',
+                  color: 'white',
+                  transform: 'translateY(-5px)',
+                  boxShadow: `0 20px 40px rgba(225, 29, 72, 0.3)`,
                 },
               }}
             >
-              {isRetrying ? (
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-                  >
-                    <RefreshCcw size={18} />
-                  </motion.div>
-                  <span>RECONNECTING</span>
-                </Stack>
-              ) : hasRetryHandler ? (
-                'RETRY_SERVER'
-              ) : (
-                'RELOAD_PAGE'
-              )}
+              {isRetrying ? 'RETRYING...' : 'TRY AGAIN'}
             </Button>
 
             <Button
               variant="outlined"
               onClick={() => (window.location.href = '/')}
-              startIcon={<Home size={18} />}
               sx={{
                 borderColor: 'rgba(255,255,255,0.1)',
-                color: 'rgba(255,255,255,0.6)',
-                px: 4,
-                py: 1.5,
-                borderRadius: '50px',
-                fontFamily: 'Syncopate',
-                fontSize: '0.8rem',
+                color: 'white',
+                px: 6,
+                py: 2,
+                borderRadius: '100px',
+                fontFamily: 'Outfit',
+                fontSize: '0.9rem',
                 fontWeight: 900,
-                letterSpacing: 2,
-                backdropFilter: 'blur(5px)',
-                transition: 'all 0.3s',
+                letterSpacing: 1,
+                textTransform: 'uppercase',
+                transition: '0.3s',
                 '&:hover': {
-                  borderColor: '#fff',
-                  color: '#fff',
+                  borderColor: 'white',
                   bgcolor: 'rgba(255,255,255,0.05)',
                   transform: 'translateY(-2px)',
                 },
               }}
             >
-              RETURN_TO_HOME
+              RETURN HOME
             </Button>
-          </Stack>
-
-          {/* Footer Branding */}
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Activity size={14} />
-            <Typography sx={{ fontSize: '0.6rem', fontWeight: 900, letterSpacing: 2 }}>
-              STATUS: OFFLINE
-            </Typography>
-          </Stack>
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Unplug size={14} />
-            <Typography sx={{ fontSize: '0.6rem', fontWeight: 900, letterSpacing: 2 }}>
-              UPLINK: DISCONNECTED
-            </Typography>
           </Stack>
         </Stack>
       </Container>
-
-      {/* Extreme border accents */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 40,
-          left: 40,
-          width: 100,
-          height: 100,
-          borderLeft: '1px solid rgba(255,255,255,0.05)',
-          borderTop: '1px solid rgba(255,255,255,0.05)',
-          opacity: 0.5,
-        }}
-      />
-      <Box
-        sx={{
-          position: 'absolute',
-          bottom: 40,
-          right: 40,
-          width: 100,
-          height: 100,
-          borderRight: '1px solid rgba(255,255,255,0.05)',
-          borderBottom: '1px solid rgba(255,255,255,0.05)',
-          opacity: 0.5,
-        }}
-      />
     </Box>
   );
 };

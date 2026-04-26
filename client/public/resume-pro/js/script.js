@@ -1,5 +1,5 @@
 /**
- * [Resume Pro Engine - v2.1 Ultimate]
+ * [Resume Pro Engine - v2.1 Professional]
  * Technologies: Vanilla Javascript, Fetch API, html2pdf.js
  * Purpose: This script orchestrates the dynamic rendering of the professional resume
  * by fetching data from the MERN backend, injecting it into structured templates,
@@ -41,7 +41,7 @@ const CONFIG = {
     'component-loading-overlay': './components/loading-overlay.html',
     'component-resume-actions': './components/resume-actions.html',
     'component-more-modal': './components/more-modal.html',
-    'component-dispatch-overlay': './components/dispatch-overlay.html',
+    'component-download-overlay': './components/dispatch-overlay.html',
   },
 };
 
@@ -56,7 +56,7 @@ const initUI = () => {
     main: document.getElementById('main-resume'),
     actions: document.getElementById('resume-actions'),
     shareModal: document.getElementById('more-modal'),
-    dispatchOverlay: document.getElementById('dispatch-overlay'),
+    downloadOverlay: document.getElementById('download-overlay'),
     themeToggle: document.getElementById('theme-toggle'),
     moreToggle: document.getElementById('more-toggle'),
     moreClose: document.getElementById('more-close'),
@@ -89,7 +89,7 @@ const safeObj = (v) => (v && typeof v === 'object' ? v : {});
  * built-in retry logic and terminal feedback.
  */
 async function fetchProfile(maxAttempts = 3) {
-  setProgress(10, 'SYNCING WITH DATA CORE...');
+  setProgress(10, 'LOADING PROFILE...');
   let lastError = null;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -98,14 +98,14 @@ async function fetchProfile(maxAttempts = 3) {
         const resp = await fetch(url, { cache: 'no-store' });
         if (!resp.ok) throw new Error(`Status ${resp.status}`);
         const data = await resp.json();
-        setProgress(40, 'DATA RETRIEVED.');
+        setProgress(40, 'PROFILE LOADED.');
         return data;
       } catch (e) {
         lastError = e;
       }
     }
     if (attempt < maxAttempts) {
-      setProgress(10 + attempt * 10, `RETRYING CONNECTION (${attempt}/${maxAttempts})...`);
+      setProgress(10 + attempt * 10, `RECONNECTING (${attempt}/${maxAttempts})...`);
       await sleep(2000);
     }
   }
@@ -117,7 +117,7 @@ async function fetchProfile(maxAttempts = 3) {
  * @desc Dynamically mounts the HTML blueprint and interactive UI modules.
  */
 async function loadTemplates() {
-  setProgress(50, 'FETCHING MODULES...');
+  setProgress(50, 'LOADING UI...');
   const keys = Object.keys(CONFIG.templates);
   const results = {};
   const promises = keys.map(async (key, idx) => {
@@ -126,7 +126,7 @@ async function loadTemplates() {
     results[key] = text;
     setProgress(
       50 + Math.floor(((idx + 1) / keys.length) * 40),
-      `MOUNTING ${key.toUpperCase()}...`,
+      `PREPARING ${key.toUpperCase()}...`,
     );
     return text;
   });
@@ -282,10 +282,16 @@ async function init() {
     await loadComponents();
 
     // --- [DATA_EXTRACTION_PROTOCOL] ---
-    // The backend wraps the profile in a 'payload' object.
-    // We unwrap it here to ensure the rendering modules receive the raw persona data.
-    const profileResponse = await fetchProfile();
-    const profile = profileResponse.payload || profileResponse;
+    // The backend now supports SSR (EJS/Thymeleaf equivalent).
+    // We prioritize preloaded data from the server for instant hydration.
+    let profile;
+    if (window.__PRELOADED_PROFILE__) {
+      profile = window.__PRELOADED_PROFILE__;
+      console.log('🚀 [HYDRATION] State pre-hydrated from Server (SSR).');
+    } else {
+      const profileResponse = await fetchProfile();
+      profile = profileResponse.payload || profileResponse;
+    }
 
     // --- Apply Resume Content Overrides (Legacy details restoration) ---
     if (profile.resumeOverride) {
@@ -307,7 +313,7 @@ async function init() {
     }
 
     const templates = await loadTemplates();
-    setProgress(95, 'FINALIZING RENDER...');
+    setProgress(95, 'FINALIZING...');
 
     // Sequence the rendering of each individual document module
     RenderEngine.header(templates.header, profile);
@@ -318,7 +324,7 @@ async function init() {
     RenderEngine.education(templates.education, profile);
     RenderEngine.footer(templates.footer, profile);
 
-    setProgress(100, 'SYSTEM READY.');
+    setProgress(100, 'READY.');
     await sleep(500);
 
     // Hide loader and activate document view
@@ -328,14 +334,14 @@ async function init() {
 
     // Handle auto-dispatch link scenario
     if (isDispatchAuto) {
-      UI.dispatchOverlay.classList.remove('hidden');
+      UI.downloadOverlay.classList.remove('hidden');
       setTimeout(() => {
         window.downloadAsPDF();
-        UI.dispatchOverlay.classList.add('hidden');
+        UI.downloadOverlay.classList.add('hidden');
       }, 1500);
     }
   } catch (err) {
-    setProgress(100, 'DATA LINK OFFLINE. RETRYING...');
+    setProgress(100, 'OFFLINE. RETRYING...');
     setTimeout(() => window.location.reload(), 5000);
   }
 }
@@ -409,8 +415,8 @@ window.getPDFBlob = getPDFBlob;
 function executeEmailDispatch() {
   UI.shareModal.classList.add('hidden');
   const url = `${window.location.origin}${window.location.pathname}?system_dispatch=true`;
-  const sub = 'A. Mohamed Yasar | Authenticated Asset Access';
-  const body = `[ AUTHENTICATED_ACCESS_REQUEST ]\n\nLink: ${url}\n\nVERIFICATION_PROTOCOL: Upon clicking, the system will auto-extract the PDF asset.`;
+  const sub = 'Professional Resume Dispatch | A. Mohamed Yasar';
+  const body = `[ RESUME DOWNLOAD ]\n\nA secure connection has been established to deliver the professional PDF resume of A. Mohamed Yasar.\n\n[ VIEW RESUME ]\n${url}\n\nBuilt with MERN Stack | 2026`;
   window.open(
     `https://mail.google.com/mail/?view=cm&fs=1&tf=1&su=${encodeURIComponent(sub)}&body=${encodeURIComponent(body)}`,
     '_blank',
@@ -418,62 +424,120 @@ function executeEmailDispatch() {
 }
 window.executeEmailDispatch = executeEmailDispatch;
 
-async function executeAssetExtraction() {
-  UI.shareModal.classList.add('hidden');
-  UI.dispatchOverlay.classList.remove('hidden');
-  try {
-    const blob = await getPDFBlob();
-    const file = new File([blob], 'A_MOHAMED_YASAR_RESUME.pdf', { type: 'application/pdf' });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ title: 'A. Mohamed Yasar Resume', files: [file] });
-    } else {
-      downloadAsPDF();
-    }
-  } catch (e) {
-    downloadAsPDF();
-  } finally {
-    UI.dispatchOverlay.classList.add('hidden');
+function toggleShareMode(mode) {
+  const root = document.getElementById('share-menu-root');
+  const selector = document.getElementById('share-mode-selector');
+  if (mode === 'select') {
+    root.classList.add('hidden');
+    selector.classList.remove('hidden');
+  } else {
+    root.classList.remove('hidden');
+    selector.classList.add('hidden');
   }
 }
-window.executeAssetExtraction = executeAssetExtraction;
+window.toggleShareMode = toggleShareMode;
 
-window.dispatchWhatsApp = () => {
+async function executeDownloadProtocol(type = 'file') {
+  UI.shareModal.classList.add('hidden');
+  toggleShareMode('menu'); // Reset UI
+
+  if (type === 'file') {
+    UI.downloadOverlay.classList.remove('hidden');
+    try {
+      const blob = await getPDFBlob();
+      const file = new File([blob], 'A_MOHAMED_YASAR_RESUME.pdf', { type: 'application/pdf' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ title: 'A. Mohamed Yasar Resume', files: [file] });
+      } else {
+        downloadAsPDF();
+      }
+    } catch (e) {
+      downloadAsPDF();
+    } finally {
+      UI.downloadOverlay.classList.add('hidden');
+    }
+  } else {
+    // Share Link
+    const url = window.location.origin + window.location.pathname;
+    if (navigator.share) {
+      await navigator.share({
+        title: 'A. Mohamed Yasar - Resume',
+        text: 'View the professional resume of A. Mohamed Yasar.',
+        url: url,
+      });
+    } else {
+      window.shareToWhatsApp();
+    }
+  }
+}
+window.executeDownloadProtocol = executeDownloadProtocol;
+
+window.shareToWhatsApp = () => {
   const url = window.location.origin + window.location.pathname;
   const text = encodeURIComponent(
-    `Check out A. Mohamed Yasar's Elite Engineering Portfolio: ${url}`,
+    `View the Professional Portfolio & Resume of A. Mohamed Yasar: ${url}`,
   );
   window.open(`https://wa.me/?text=${text}`, '_blank');
   UI.shareModal.classList.add('hidden');
 };
 
+function showNotification(message) {
+  const toast = document.getElementById('system-toast');
+  const msgEl = document.getElementById('toast-message');
+  if (!toast || !msgEl) return;
+
+  msgEl.innerText = message;
+  toast.classList.remove('hidden');
+
+  // Trigger animation
+  setTimeout(() => {
+    toast.style.opacity = '1';
+    toast.style.bottom = '40px';
+  }, 10);
+
+  // Auto-hide after 3 seconds
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.bottom = '30px';
+    setTimeout(() => toast.classList.add('hidden'), 400);
+  }, 3000);
+}
+
 window.copyPortfolioLink = () => {
   const url = window.location.origin + window.location.pathname;
   navigator.clipboard.writeText(url).then(() => {
-    alert('PORTFOLIO_LINK_COPIED_TO_SYSTEM_CLIPBOARD');
+    showNotification('Link Copied');
     UI.shareModal.classList.add('hidden');
   });
 };
 
-window.runAIAudit = async () => {
+window.runSystemAudit = async () => {
   UI.shareModal.classList.add('hidden');
   UI.overlay.classList.remove('hidden');
   const messages = [
-    'ANALYZING_STRUCTURE...',
-    'PARSING_KEYWORDS...',
-    'CALCULATING_ATS_SCORE...',
-    'OPTIMIZING_VECTORS...',
-    'VALIDATING_MODULES...',
+    'ANALYZING...',
+    'PROCESSING...',
+    'CALCULATING...',
+    'OPTIMIZING...',
+    'VALIDATING...',
   ];
   for (const msg of messages) {
     setProgress(Math.random() * 90, msg);
     await sleep(600);
   }
-  setProgress(100, 'AUDIT_COMPLETE: 98.4% ATS_EFFICIENCY');
+  setProgress(100, 'AUDIT COMPLETE');
   await sleep(1000);
   UI.overlay.classList.add('hidden');
-  alert(
-    'SYSTEM_DIAGNOSTICS_REPORT: Core architecture is optimized for high-performance indexing. All security protocols are active.',
-  );
+  showNotification('OPTIMIZATION COMPLETE');
 };
+
+window.addEventListener('mousemove', (e) => {
+  window.parent.postMessage({ type: 'IFRAME_MOUSE_MOVE', x: e.clientX, y: e.clientY }, '*');
+});
+
+window.addEventListener('mouseover', (e) => {
+  const interactive = e.target.closest('a, button, [role="button"], .interactive');
+  window.parent.postMessage({ type: 'IFRAME_MOUSE_OVER', isHovered: !!interactive }, '*');
+});
 
 init();

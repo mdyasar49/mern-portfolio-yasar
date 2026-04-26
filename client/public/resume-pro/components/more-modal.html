@@ -1,38 +1,70 @@
 <div id="more-modal" class="modal hidden">
   <div class="modal-backdrop"></div>
-  <div class="modal-content" style="border-color: rgba(51, 204, 255, 0.4)">
+  <div class="modal-content">
     <div class="modal-header">
-      <div class="modal-subtitle">CORE_SYSTEM_PROTOCOLS</div>
+      <div class="modal-subtitle">SHARE PORTFOLIO</div>
       <button class="modal-close" id="more-close">&times;</button>
     </div>
-    <div class="modal-options">
-      <!-- Standard Share Protocols -->
-      <button class="share-opt" onclick="window.executeEmailDispatch()">
-        <div class="opt-icon" style="color: #38bdf8">
-          <svg viewBox="0 0 24 24" width="24">
+    <div class="modal-options" id="share-menu-root">
+      <!-- Email Protocol -->
+      <button class="share-opt" onclick="window.executeEmailMessage()">
+        <div class="opt-icon" style="color: #6366f1">
+          <svg viewBox="0 0 24 24" width="22">
             <path fill="currentColor" d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
           </svg>
         </div>
         <div class="opt-text">
-          <div class="opt-title">SYSTEM_DISPATCH [EMAIL]</div>
-          <div class="opt-desc">Direct browser-bound sharing via Gmail</div>
+          <div class="opt-title">Direct Email</div>
+          <div class="opt-desc">Send resume via Gmail compose</div>
         </div>
       </button>
-      <button class="share-opt" onclick="window.executeAssetExtraction()">
-        <div class="opt-icon" style="color: #00ffcc">
-          <svg viewBox="0 0 24 24" width="24">
+
+      <!-- Share Asset (Trigger) -->
+      <button
+        class="share-opt"
+        onclick="window.toggleShareMode('select')"
+        style="background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.2)"
+      >
+        <div class="opt-icon" style="color: #6366f1">
+          <svg
+            viewBox="0 0 24 24"
+            width="22"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="18" cy="5" r="3" />
+            <circle cx="6" cy="12" r="3" />
+            <circle cx="18" cy="19" r="3" />
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+          </svg>
+        </div>
+        <div class="opt-text">
+          <div class="opt-title" style="color: white">Share Portfolio</div>
+          <div class="opt-desc">Export via system share protocol</div>
+        </div>
+      </button>
+
+      <!-- Download Asset -->
+      <button class="share-opt" onclick="window.downloadAsPDF()">
+        <div class="opt-icon" style="color: #94a3b8">
+          <svg viewBox="0 0 24 24" width="22">
             <path fill="currentColor" d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z" />
           </svg>
         </div>
         <div class="opt-text">
-          <div class="opt-title">ASSET_EXTRACTION [PDF]</div>
-          <div class="opt-desc">Local PDF compilation and direct share</div>
+          <div class="opt-title">Download PDF</div>
+          <div class="opt-desc">Save professional document locally</div>
         </div>
       </button>
-      <!-- Extended Protocols -->
-      <button class="share-opt" onclick="window.dispatchWhatsApp()">
-        <div class="opt-icon" style="color: #25d366">
-          <svg viewBox="0 0 24 24" width="24">
+
+      <!-- WhatsApp -->
+      <button class="share-opt" onclick="window.shareToWhatsApp()">
+        <div class="opt-icon" style="color: #6366f1">
+          <svg viewBox="0 0 24 24" width="22">
             <path
               fill="currentColor"
               d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.66 20.15 9.3 19.81 8.1 19.14L7.81 18.96L4.69 19.79L5.53 16.74L5.33 16.42C4.6 15.26 4.22 13.92 4.22 12.54C4.22 8.01 7.73 4.5 12.26 4.5C12.19 4.5 12.12 4.5 12.05 3.67M9.75 7.39C9.46 7.39 9 7.5 8.71 7.82C8.42 8.13 7.58 8.97 7.58 10.66C7.58 12.35 8.81 13.97 8.97 14.19C9.14 14.41 11.4 17.92 14.88 19.42C15.71 19.78 16.35 19.99 16.85 20.15C17.68 20.41 18.43 20.37 19.04 20.28C19.71 20.18 21.1 19.43 21.39 18.58C21.68 17.73 21.68 17.01 21.59 16.86C21.5 16.71 21.26 16.62 20.89 16.43C20.5 16.25 18.61 15.31 18.25 15.19C17.9 15.07 17.64 15.01 17.39 15.39C17.14 15.77 16.41 16.62 16.19 16.87C15.96 17.13 15.74 17.16 15.37 16.97C15 16.79 13.82 16.4 12.42 15.15C11.33 14.17 10.59 12.97 10.38 12.6C10.16 12.22 10.36 12.02 10.55 11.83C10.72 11.66 10.93 11.39 11.12 11.17C11.3 10.95 11.37 10.78 11.5 10.54C11.62 10.3 11.56 10.09 11.47 9.9C11.37 9.71 10.66 7.97 10.37 7.39C10.09 6.8 9.8 6.89 9.58 6.89C9.37 6.89 9.15 6.89 8.93 6.89L9.75 7.39Z"
@@ -40,38 +72,99 @@
           </svg>
         </div>
         <div class="opt-text">
-          <div class="opt-title">WHATSAPP_DISPATCH</div>
-          <div class="opt-desc">Direct text sharing via WhatsApp</div>
-        </div>
-      </button>
-      <button class="share-opt" onclick="window.copyPortfolioLink()">
-        <div class="opt-icon" style="color: #a855f7">
-          <svg viewBox="0 0 24 24" width="24">
-            <path
-              fill="currentColor"
-              d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"
-            />
-          </svg>
-        </div>
-        <div class="opt-text">
-          <div class="opt-title">COPY_ACCESS_LINK</div>
-          <div class="opt-desc">Copy portfolio URL to clipboard</div>
-        </div>
-      </button>
-      <button class="share-opt" onclick="window.runAIAudit()">
-        <div class="opt-icon" style="color: #ff9933">
-          <svg viewBox="0 0 24 24" width="24">
-            <path
-              fill="currentColor"
-              d="M13,9V3.5L18.5,9M6,2C4.89,2 4,2.89 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2H6M10,18L7,15L8.41,13.58L10,15.17L13.59,11.58L15,13L10,18Z"
-            />
-          </svg>
-        </div>
-        <div class="opt-text">
-          <div class="opt-title">SYSTEM_DIAGNOSTICS</div>
-          <div class="opt-desc">Initiate AI-Resume Audit [STABLE]</div>
+          <div class="opt-title">WhatsApp Share</div>
+          <div class="opt-desc">Direct social connection</div>
         </div>
       </button>
     </div>
+
+    <!-- Mode Selector (Hidden by Default) -->
+    <div class="modal-options hidden" id="share-mode-selector">
+      <div
+        style="
+          width: 100%;
+          text-align: center;
+          margin-bottom: 20px;
+          font-size: 0.65rem;
+          letter-spacing: 2px;
+          color: #6366f1;
+          font-weight: 900;
+        "
+      >
+        SELECT TYPE
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px">
+        <button class="share-opt-grid" onclick="window.executeDownloadProtocol('file')">
+          <svg viewBox="0 0 24 24" width="24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
+          <span>DOWNLOAD PDF</span>
+        </button>
+        <button class="share-opt-grid" onclick="window.executeDownloadProtocol('link')">
+          <svg viewBox="0 0 24 24" width="24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+          </svg>
+          <span>COPY LINK</span>
+        </button>
+      </div>
+      <button
+        class="modal-cancel"
+        onclick="window.toggleShareMode('menu')"
+        style="
+          width: 100%;
+          background: none;
+          border: none;
+          color: #64748b;
+          font-size: 0.7rem;
+          margin-top: 15px;
+          cursor: pointer;
+          font-weight: 700;
+        "
+      >
+        BACK
+      </button>
+    </div>
+  </div>
+
+  <!-- Custom System Toast (Replaces Browser Alerts) -->
+  <div
+    id="system-toast"
+    class="hidden"
+    style="
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      z-index: 100000;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+      opacity: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    "
+  >
+    <div
+      style="
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #6366f1;
+        box-shadow: 0 0 10px #6366f1;
+      "
+    ></div>
+    <span id="toast-message">NOTIFICATION</span>
   </div>
 </div>

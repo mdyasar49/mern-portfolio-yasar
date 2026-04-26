@@ -1,9 +1,6 @@
 /**
- * Language: JavaScript (React.js)
- * Purpose of this file:
- * This component is the primary Page Assembler (The Home Page).
- * It orchestrates all the individual sections of the portfolio (Hero, About, Projects, etc.)
- * and initializes global decorative effects like the particle background and scanning light.
+ * Portfolio Home Page.
+ * Assembles all sections and handles loading states.
  */
 
 import React, { memo } from 'react';
@@ -16,18 +13,16 @@ import Hero from '../components/Hero';
 import About from '../components/About';
 import Skills from '../components/Skills';
 import TechnicalInsight from '../components/TechnicalInsight';
-import CareerTrajectory from '../components/CareerTrajectory';
+import WorkExperience from '../components/WorkExperience';
 import Projects from '../components/Projects';
-import ScholasticHistory from '../components/ScholasticHistory';
-import ProfessionalDossier from '../components/ProfessionalDossier';
+import EducationHistory from '../components/EducationHistory';
+import ProfessionalResume from '../components/ProfessionalResume';
 import SystemLogStream from '../components/SystemLogStream';
-import YasarSystemHUD from '../components/YasarSystemHUD';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
 
 const Portfolio = memo(({ profile, loading }) => {
-  // ── [PROGRESSIVE LOADING STATE] ──
-  // Display the loader only until the core (navigation/name) is available.
+  // Loading state
   const isCoreLoaded = profile?.name || profile?.menuItems;
 
   if (loading && !isCoreLoaded)
@@ -42,8 +37,8 @@ const Portfolio = memo(({ profile, loading }) => {
           color: 'white',
         }}
       >
-        <Typography variant="h6" sx={{ fontFamily: 'Syncopate', fontWeight: 900 }}>
-          INITIALIZING_SYSTEM_CORE...
+        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+          Loading...
         </Typography>
       </Box>
     );
@@ -61,119 +56,29 @@ const Portfolio = memo(({ profile, loading }) => {
       {/* Update browser tab title and description based on fetched profile data */}
       <SEO title="Portfolio" description={profile?.summary || 'Full Stack Engineer Portfolio'} />
 
-      {/* ── [YASAR SYSTEM HUD OVERLAY] ── */}
-      <YasarSystemHUD />
+      {/* Content */}
 
-      {/* ── [ATMOSPHERIC PARTICLE BACKGROUND] ── */}
-      {/* High-performance canvas-based particle system that floats in the background */}
-      <Box sx={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
-        <canvas id="particle-canvas" style={{ width: '100%', height: '100%', opacity: 0.2 }} />
-      </Box>
-
-      {/* ── [GLOBAL SCANNING LIGHT EFFECT] ── */}
-      {/* A faint horizontal light beam that moves up and down across the entire site */}
-      <Box
-        sx={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '4px',
-          background: 'linear-gradient(90deg, transparent, rgba(51, 204, 255, 0.4), transparent)',
-          zIndex: 2000,
-          opacity: 0.1,
-          animation: 'scan-optimized 10s linear infinite',
-          pointerEvents: 'none',
-          willChange: 'transform',
-        }}
-      />
-
-      {/* Logic for the background particle animation */}
-      <script>
-        {`
-          (function() {
-            const canvas = document.getElementById('particle-canvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            let particles = [];
-
-            function resize() {
-              canvas.width = window.innerWidth;
-              canvas.height = window.innerHeight;
-            }
-
-            window.addEventListener('resize', resize);
-            resize();
-
-            // Individual particle class definition
-            class Particle {
-              constructor() {
-                this.reset();
-              }
-              reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * 0.5;
-                this.vy = (Math.random() - 0.5) * 0.5;
-                this.size = Math.random() * 2;
-              }
-              update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-              }
-              draw() {
-                ctx.fillStyle = '#33ccff';
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-              }
-            }
-
-            // Create 50 initial particles
-            for(let i=0; i<50; i++) particles.push(new Particle());
-
-            // Animation loop
-            function animate() {
-              ctx.clearRect(0, 0, canvas.width, canvas.height);
-              particles.forEach(p => { p.update(); p.draw(); });
-              requestAnimationFrame(animate);
-            }
-            animate();
-          })();
-        `}
-      </script>
-
-      {/* Global CSS keyframes for the scanner effect */}
-      <style>
-        {`
-          @keyframes scan-optimized {
-            0% { transform: translateY(-100vh); }
-            100% { transform: translateY(100vh); }
-          }
-        `}
-      </style>
-
-      {/* ── MAIN CONTENT CONTAINER ── */}
       <Container maxWidth="xl" sx={{ pt: 12, pb: 10 }}>
         {/* Sections are rendered as soon as their specific data arrives */}
         {(profile.name || profile.summary) && <Hero profile={profile} />}
         {profile.summary && <About profile={profile} />}
-        {profile.technicalSkills && <Skills skills={profile.technicalSkills} />}
+        {profile.technicalSkills && <Skills profile={profile} skills={profile.technicalSkills} />}
         {profile.performanceData && <TechnicalInsight profile={profile} />}
 
-        {profile.projects && <Projects projects={profile.projects} />}
+        {profile.projects && <Projects profile={profile} projects={profile.projects} />}
 
-        <Box id="experience-dossier">
-          {profile.experience && <CareerTrajectory experience={profile.experience} />}
-          {profile.education && <ScholasticHistory education={profile.education} />}
+        <Box id="professional-experience">
+          {profile.experience && (
+            <WorkExperience profile={profile} experience={profile.experience} />
+          )}
+          {profile.education && (
+            <EducationHistory profile={profile} education={profile.education} />
+          )}
         </Box>
 
-        {profile.resumeConfig && <ProfessionalDossier profile={profile} />}
-        {(profile.engineeringObjective || profile.telemetryConfig) && (
-          <SystemLogStream profile={profile} />
-        )}
+        {profile.resumeConfig && <ProfessionalResume profile={profile} />}
+        {(profile.documentation?.engineeringObjective ||
+          profile.documentation?.systemMetricsConfig) && <SystemLogStream profile={profile} />}
 
         {profile.email && <Contact profile={profile} />}
       </Container>

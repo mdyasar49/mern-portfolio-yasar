@@ -1,6 +1,6 @@
 {
-  "short_name": "Yasar Portfolio",
-  "name": "Mohamed Yasar | Elite MERN Stack Engineer",
+  "short_name": "MY. Portfolio",
+  "name": "MY. | Elite MERN Stack Engineer",
   "icons": [
     {
       "src": "logo.png",
@@ -20,6 +20,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#030712",
-  "background_color": "#010409"
+  "theme_color": "#e11d48",
+  "background_color": "#050507"
 }

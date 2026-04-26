@@ -1,11 +1,11 @@
+/* Portfolio loading screen styles */
 :root {
-  --brand-bg: #000000;
-  --brand-primary: #00f2fe;
-  --brand-accent: #ff3366;
-  --brand-surface: #0a0a0a;
+  --brand-bg: #050507;
+  --brand-primary: #e11d48;
+  --brand-accent: #00e5ff;
+  --brand-surface: #0d0d10;
 }
 
-/* Global Reset for Loader Phase */
 body {
   background: var(--brand-bg);
   margin: 0;
@@ -15,7 +15,6 @@ body {
   color: #ffffff;
 }
 
-/* Elite System Boot Splash */
 #initial-loader {
   position: fixed;
   top: 0;
@@ -26,9 +25,9 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at center, var(--brand-surface) 0%, var(--brand-bg) 100%);
+  background: radial-gradient(circle at 50% 50%, #0d0d10 0%, #050507 100%);
   z-index: 9999;
-  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 1.2s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .loader-branding {
@@ -42,21 +41,23 @@ body {
 .brand-logo {
   height: 100px;
   width: auto;
-  filter: drop-shadow(0 0 25px rgba(0, 242, 254, 0.3));
+  /* Warm glow matching the og-image orange */
+  filter: drop-shadow(0 0 28px rgba(249, 115, 22, 0.35));
   position: relative;
   z-index: 2;
 }
 
+/* Scan line uses the brand gradient */
 .scan-line {
   position: absolute;
   top: 0;
   left: -20px;
   right: -20px;
   height: 3px;
-  background: var(--brand-primary);
-  box-shadow: 0 0 20px var(--brand-primary);
+  background: linear-gradient(90deg, #f97316, #e11d48, #c026d3);
+  box-shadow: 0 0 18px rgba(225, 29, 72, 0.6);
   z-index: 3;
-  opacity: 0.6;
+  opacity: 0.7;
   animation: hologramScan 2s infinite ease-in-out;
 }
 
@@ -66,7 +67,6 @@ body {
   letter-spacing: 3px;
   color: var(--brand-primary);
   text-transform: uppercase;
-  position: relative;
   opacity: 0.8;
   animation: blink 0.8s infinite alternate;
 }
@@ -97,7 +97,7 @@ body {
   }
 }
 
-/* Animated Background Noise */
+/* Film grain texture */
 #initial-loader::after {
   content: '';
   position: absolute;

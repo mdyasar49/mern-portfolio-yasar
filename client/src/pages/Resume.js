@@ -1,9 +1,5 @@
 /**
- * Language: JavaScript (React.js)
- * Purpose:
- * This component acts as a high-tier interactive gateway for viewing and
- * downloading the professional engineering resume. It utilizes a 3D parallax
- * engine for visual depth and orchestrates secure asset delivery via iFrame.
+ * Resume page.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -14,155 +10,108 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 // Framer Motion for high-fidelity 3D interactions and entrance animations
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 // Icons for technical and action cues
-import { Download, ShieldCheck, Cpu, Send } from 'lucide-react';
+import { Download, ShieldCheck, Send, Link as LinkIcon } from 'lucide-react';
 import SEO from '../components/SEO';
-import API_BASE_URL from '../config';
 
 const Resume = () => {
-  // ── [SYSTEM_STATE_INITIALIZATION] ──
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   // Optimization: Disable heavy 3D calculations on mobile or if the user prefers reduced motion
   const disableHeavyMotion = isMobile || prefersReducedMotion;
 
-  const [isLoaded, setIsLoaded] = useState(false);
   const [isDispatching, setIsDispatching] = useState(false);
   const [isSelectorOpen, setIsSelectorOpen] = useState(false);
 
-  // Resolve the API endpoint for the resume engine (renders the HTML resume version)
-  const resumeApi = API_BASE_URL ? `${API_BASE_URL}/profile` : '';
-  const iframeSrc = resumeApi
-    ? `/resume-pro/index.html?api=${encodeURIComponent(resumeApi)}`
-    : '/resume-pro/index.html';
+  const iframeSrc = '/resume-pro/index.html';
 
-  // ── [3D_PARALLAX_ENGINE_CALCULATIONS] ──
-  // These values track mouse movement to create a high-fidelity depth effect on the resume document.
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  // Smoothing the mouse movement with spring physics
   const mouseXSpring = useSpring(x, { stiffness: 100, damping: 30 });
   const mouseYSpring = useSpring(y, { stiffness: 100, damping: 30 });
-  // Map raw mouse coordinates to 3D rotation degrees
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ['12deg', '-12deg']);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ['-12deg', '12deg']);
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ['10deg', '-10deg']);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ['-10deg', '10deg']);
 
-  /**
-   * [handleMouseMove]
-   * Calculates the cursor position relative to the container to drive the 3D rotation.
-   */
   const handleMouseMove = (e) => {
     if (disableHeavyMotion) return;
     const rect = e.currentTarget.getBoundingClientRect();
-    // Normalize coordinates to -0.5 to 0.5 range
     const xPct = (e.clientX - rect.left) / rect.width - 0.5;
     const yPct = (e.clientY - rect.top) / rect.height - 0.5;
     x.set(xPct);
     y.set(yPct);
   };
 
-  /**
-   * [Lifecycle Manifest]
-   */
   useEffect(() => {
-    // 1. Trigger initial entrance animation delay
-    const timer = setTimeout(() => setIsLoaded(true), 800);
-
-    // 2. High-Premium Auto-Dispatch Feature (Download Only Mode)
-    // Detects if the user entered via a resume-dispatch link to auto-start the download.
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('system_dispatch') === 'true') {
       setIsDispatching(true);
-      const dispatchTimer = setTimeout(() => {
-        handleDownload();
-      }, 2500);
-      return () => {
-        clearTimeout(timer);
-        clearTimeout(dispatchTimer);
-      };
+      setTimeout(() => handleDownload(), 2500);
     }
-
-    return () => clearTimeout(timer);
   }, []);
 
-  /**
-   * [handleDownload]
-   * Triggers the asset extraction protocol. Communicates with the internal iframe
-   * to generate a high-resolution PDF.
-   */
   const handleDownload = () => {
     const frame = document.getElementById('resume-frame');
-    // If the iframe has the PDF generation script loaded, use it
     if (frame && frame.contentWindow.downloadAsPDF) {
       frame.contentWindow.downloadAsPDF();
     } else {
-      // Fallback: Direct link to static asset if the dynamic engine fails to respond.
       window.open('/resume-pro/A_MOHAMED_YASAR_RESUME.pdf', '_blank');
     }
   };
 
-  /**
-   * [executeEmailDispatch]
-   * Orchestrates the construction of an authenticated dispatch link sent via email.
-   * This generates a pre-formatted Gmail compose link for the recruiter.
-   */
   const executeEmailDispatch = () => {
     setIsSelectorOpen(false);
-    const resumeUrl = `${window.location.origin}${window.location.pathname}?system_dispatch=true`;
-    const subject = encodeURIComponent(
-      'A. Mohamed Yasar | Authenticated Engineering Portfolio & Asset Dispatch',
-    );
+    const resumeUrl = `${window.location.origin}/resume`;
+    const subject = encodeURIComponent('Technical Resume Dispatch | Mohamed Yasar');
     const body = encodeURIComponent(
-      `[ AUTHENTICATED_ACCESS_REQUEST ]\n\n` +
-        `A secure connection has been established to grant you access to the live professional architecture and engineering profile of A. Mohamed Yasar.\n\n` +
-        `[ SECURE_PORTAL_LOGON ]\n${resumeUrl}\n\n` +
-        `VERIFICATION_PROTOCOL: Upon entering the gateway via the secure link above, the system will automatically extract and deliver the validated PDF Resume asset directly to your device.\n\n` +
-        `DISPATCH_ID: ${Math.random().toString(36).substring(7).toUpperCase()}\n` +
-        `Core Infrastructure v4.0.5 | Built with MERN`,
+      `Hello,\n\nPlease find my resume at the link below:\n\n${resumeUrl}\n\nBest regards.`,
     );
     const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&tf=1&su=${subject}&body=${body}`;
     window.open(gmailUrl, '_blank');
   };
 
-  /**
-   * [executeAssetExtraction]
-   * High-tier extraction protocol utilizing the experimental Web Share API
-   * for native mobile delivery or direct blob download for desktop.
-   */
-  const executeAssetExtraction = async () => {
+
+  const executeAssetExtraction = async (type = 'file') => {
     setIsSelectorOpen(false);
     setIsDispatching(true);
-
     try {
       const frame = document.getElementById('resume-frame');
       let pdfBlob;
-
-      // 1. Generate PDF snapshot from the index.html content rendered inside the iframe.
       if (frame && frame.contentWindow.getPDFBlob) {
         pdfBlob = await frame.contentWindow.getPDFBlob();
       }
-
       if (!pdfBlob) {
         handleDownload();
         return;
       }
 
-      const file = new File([pdfBlob], 'A_MOHAMED_YASAR_RESUME.pdf', { type: 'application/pdf' });
-
-      // 2. Intelligence: Check if we can share the file directly (Mobile Priority).
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          title: 'A. Mohamed Yasar - Technical Asset',
-          text: 'Directly sharing the professional PDF engine export of A. Mohamed Yasar.',
-          files: [file],
-        });
+      if (type === 'file') {
+        const file = new File([pdfBlob], 'Mohamed_Yasar_Resume.pdf', { type: 'application/pdf' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: 'Mohamed Yasar - Resume',
+            files: [file],
+          });
+        } else {
+          handleDownload();
+        }
       } else {
-        // 3. Fallback: Desktop direct download.
-        handleDownload();
+        // Share Link
+        const shareUrl = window.location.origin + '/resume';
+        if (navigator.share) {
+          await navigator.share({
+            title: 'Mohamed Yasar - Portfolio & Resume',
+            text: 'View the professional portfolio and resume of Mohamed Yasar.',
+            url: shareUrl,
+          });
+        } else {
+          window.open(
+            `https://wa.me/?text=${encodeURIComponent('View Mohamed Yasar Resume: ' + shareUrl)}`,
+            '_blank',
+          );
+        }
       }
     } catch (error) {
-      console.error('Extraction Dispatch Failure:', error);
-      handleDownload();
+      if (type === 'file') handleDownload();
     } finally {
       setIsDispatching(false);
     }
@@ -173,25 +122,22 @@ const Resume = () => {
       onMouseMove={handleMouseMove}
       sx={{
         minHeight: '100vh',
-        bgcolor: '#02040a',
+        bgcolor: '#050507',
         position: 'relative',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         perspective: '2000px',
-        pt: { xs: 14, md: 5 },
+        pt: { xs: 15, md: 8 },
         pb: 10,
-        px: { xs: 2, md: 0 },
       }}
     >
       <SEO
-        title="Elite Resume | A. Mohamed Yasar"
-        description="Access the high-tier professional resume and architecture profile of A. Mohamed Yasar."
+        title="Resume | Mohamed Yasar"
+        description="View and download the professional technical resume of Mohamed Yasar, MERN Stack Developer."
       />
 
-      {/* ── [ASSET_DISPATCH_OVERLAY] ── */}
-      {/* Visual feedback shown during the PDF generation and download process */}
       <AnimatePresence>
         {isDispatching && (
           <motion.div
@@ -202,29 +148,28 @@ const Resume = () => {
               position: 'fixed',
               inset: 0,
               zIndex: 5000,
-              backgroundColor: '#02040a',
+              backgroundColor: 'rgba(5,5,7,0.95)',
               display: 'flex',
-              flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              backdropFilter: 'blur(20px)',
+              backdropFilter: 'blur(30px)',
             }}
           >
             <Stack spacing={4} alignItems="center">
-              <Box sx={{ width: 100, height: 100, position: 'relative' }}>
+              <Box sx={{ width: 80, height: 80, position: 'relative' }}>
                 <Box
                   sx={{
                     position: 'absolute',
                     inset: 0,
                     borderRadius: '50%',
-                    border: '2px solid rgba(51, 204, 255, 0.1)',
-                    borderTop: '2px solid #33ccff',
+                    border: '2px solid rgba(99,102,241,0.1)',
+                    borderTop: '2px solid #e11d48',
                     animation: 'spin 1s linear infinite',
                   }}
                 />
                 <ShieldCheck
-                  size={40}
-                  color="#33ccff"
+                  size={32}
+                  color="#e11d48"
                   style={{
                     position: 'absolute',
                     top: '50%',
@@ -236,36 +181,24 @@ const Resume = () => {
               <Box sx={{ textAlign: 'center' }}>
                 <Typography
                   sx={{
-                    color: '#33ccff',
+                    color: 'white',
                     fontWeight: 900,
-                    fontFamily: 'Syncopate',
-                    letterSpacing: 3,
+                    letterSpacing: 4,
                     mb: 1,
+                    fontSize: '0.8rem',
                   }}
                 >
-                  DISPATCHING_ASSET
+                  PREPARING DOCUMENT
                 </Typography>
-                <Typography variant="caption" sx={{ color: '#444', fontFamily: 'monospace' }}>
-                  SECURE_CHANNEL_ESTABLISHED | M_YASAR.PDF
+                <Typography variant="caption" sx={{ color: '#64748b', fontFamily: 'monospace' }}>
+                  PORTFOLIO v1.0
                 </Typography>
               </Box>
-              <Typography variant="body2" sx={{ color: '#888', fontStyle: 'italic' }}>
-                Your professional asset download will start momentarily...
-              </Typography>
-              <Button
-                onClick={() => setIsDispatching(false)}
-                variant="text"
-                sx={{ color: '#334155', fontSize: '0.6rem' }}
-              >
-                RETURN_TO_PORTAL
-              </Button>
             </Stack>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ── [PROTOCOL_SELECTOR_MODAL] ── */}
-      {/* Choice between direct download and email sharing */}
       <Modal open={isSelectorOpen} onClose={() => setIsSelectorOpen(false)} closeAfterTransition>
         <Fade in={isSelectorOpen}>
           <Box
@@ -274,12 +207,12 @@ const Resume = () => {
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: { xs: '95%', sm: 350 },
-              bgcolor: 'rgba(13, 17, 23, 0.95)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(51, 204, 255, 0.3)',
-              borderRadius: 3,
-              p: { xs: 2.5, sm: 3.5 },
+              width: { xs: '90%', sm: 380 },
+              bgcolor: '#0f172a',
+              borderRadius: '24px',
+              border: '1px solid rgba(255,255,255,0.08)',
+              boxShadow: '0 50px 100px rgba(0,0,0,0.8)',
+              p: 4,
               outline: 'none',
             }}
           >
@@ -287,246 +220,249 @@ const Resume = () => {
               <Box>
                 <Typography
                   sx={{
-                    fontFamily: 'Syncopate',
                     fontWeight: 900,
-                    fontSize: '0.75rem',
-                    color: '#33ccff',
-                    letterSpacing: 3,
+                    fontSize: '0.65rem',
+                    color: 'primary.main',
+                    letterSpacing: 4,
                     mb: 1,
                   }}
                 >
-                  SELECT_DISPATCH_PROTOCOL
+                  DOWNLOAD OPTIONS
                 </Typography>
-                <Divider sx={{ borderColor: 'rgba(51, 204, 255, 0.1)' }} />
+                <Divider sx={{ borderColor: 'rgba(255,255,255,0.05)' }} />
               </Box>
 
               <Stack spacing={2}>
-                <Button
-                  fullWidth
-                  onClick={executeEmailDispatch}
-                  sx={{
-                    py: 2,
-                    bgcolor: 'rgba(255,255,255,0.02)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    color: 'white',
-                    borderRadius: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-start',
-                    px: 3,
-                    '&:hover': { bgcolor: 'rgba(51, 204, 255, 0.05)', borderColor: '#33ccff' },
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      fontWeight: 900,
-                      fontSize: '0.8rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                    }}
-                  >
-                    <Send size={16} color="#33ccff" /> SYSTEM_DISPATCH [EMAIL]
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: '#555', ml: 3.2 }}>
-                    Direct browser-bound sharing via Gmail
-                  </Typography>
-                </Button>
+                    <Button
+                      fullWidth
+                      onClick={handleDownload}
+                      sx={{
+                        py: 2,
+                        px: 3,
+                        bgcolor: 'rgba(255,255,255,0.02)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '16px',
+                        color: 'white',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                        '&:hover': {
+                          bgcolor: 'rgba(255,255,255,0.05)',
+                          borderColor: 'rgba(255,255,255,0.2)',
+                        },
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontWeight: 800,
+                          fontSize: '0.85rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1.5,
+                        }}
+                      >
+                        <Download size={18} color="#e11d48" /> Download PDF Resume
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: '#64748b', ml: 4 }}>
+                        Save the professional technical document
+                      </Typography>
+                    </Button>
 
-                <Button
-                  fullWidth
-                  onClick={executeAssetExtraction}
-                  sx={{
-                    py: 2,
-                    bgcolor: 'rgba(255,255,255,0.02)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    color: 'white',
-                    borderRadius: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-start',
-                    px: 3,
-                    '&:hover': { bgcolor: 'rgba(0, 255, 204, 0.05)', borderColor: '#00ffcc' },
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      fontWeight: 900,
-                      fontSize: '0.8rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                    }}
-                  >
-                    <Download size={16} color="#00ffcc" /> ASSET_EXTRACTION [PDF]
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: '#555', ml: 3.2 }}>
-                    Local PDF compilation and direct download
-                  </Typography>
-                </Button>
+                    <Button
+                      fullWidth
+                      onClick={() => executeAssetExtraction('link')}
+                      sx={{
+                        py: 2,
+                        px: 3,
+                        bgcolor: 'rgba(255,255,255,0.02)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '16px',
+                        color: 'white',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                        '&:hover': { bgcolor: 'rgba(51, 204, 255, 0.05)', borderColor: '#33ccff' },
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontWeight: 800,
+                          fontSize: '0.85rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1.5,
+                        }}
+                      >
+                        <LinkIcon size={18} color="#33ccff" /> Copy Share Link
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: '#64748b', ml: 4 }}>
+                        Export via system share protocol
+                      </Typography>
+                    </Button>
+
+                    <Button
+                      fullWidth
+                      onClick={executeEmailDispatch}
+                      sx={{
+                        py: 2,
+                        px: 3,
+                        bgcolor: 'rgba(255,255,255,0.02)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '16px',
+                        color: 'white',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                        '&:hover': { bgcolor: 'rgba(99,102,241,0.1)', borderColor: 'primary.main' },
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontWeight: 800,
+                          fontSize: '0.85rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1.5,
+                        }}
+                      >
+                        <Send size={18} color="#6366f1" /> Send via Email
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: '#64748b', ml: 4 }}>
+                        Direct dispatch to your inbox
+                      </Typography>
+                    </Button>
               </Stack>
-              <Button
-                onClick={() => setIsSelectorOpen(false)}
-                sx={{ color: '#444', fontSize: '0.65rem' }}
-              >
-                CANCEL_AND_RETURN
-              </Button>
             </Stack>
           </Box>
         </Fade>
       </Modal>
 
-      {/* Decorative background elements (Circuit-style) */}
-      <Box
-        sx={{
-          position: 'absolute',
-          inset: 0,
-          opacity: 0.1,
-          backgroundImage: 'radial-gradient(#33ccff 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-          pointerEvents: 'none',
-        }}
-      />
-      <Box sx={{ position: 'absolute', top: '10%', left: '5%', opacity: 0.2 }}>
-        <Cpu size={120} color="#33ccff" />
-      </Box>
-
-      {/* Security Status Overlay (Top-Left) */}
-      <AnimatePresence>
-        {isLoaded && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            style={{
-              position: 'fixed',
-              top: isMobile ? 16 : 30,
-              left: isMobile ? 16 : 40,
-              zIndex: 1000,
-            }}
-          >
-            <Stack direction="row" spacing={2} alignItems="center">
-              <Box sx={{ p: 1, bgcolor: '#ff3366', borderRadius: '8px', color: 'white' }}>
-                <ShieldCheck size={20} />
-              </Box>
-              <Box>
-                <Typography
-                  variant="caption"
-                  sx={{ color: '#ff3366', fontWeight: 900, display: 'block', letterSpacing: 2 }}
-                >
-                  ENCRYPTED_ASSET_ACCESS
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ color: 'white', fontWeight: 700, fontFamily: 'Syncopate' }}
-                >
-                  RESUME_PROTO_v4.0
-                </Typography>
-              </Box>
-            </Stack>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ── [CENTRAL_ASSET_GRID] ── */}
       <Container
         maxWidth="lg"
-        sx={{ position: 'relative', display: 'flex', justifyContent: 'center' }}
+        sx={{
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
       >
+        <Box sx={{ mb: 6, textAlign: 'center' }}>
+          <Typography
+            sx={{
+              color: 'primary.main',
+              fontWeight: 900,
+              fontSize: '0.65rem',
+              letterSpacing: 5,
+              mb: 1.5,
+            }}
+          >
+            RESUME PORTAL
+          </Typography>
+          <Typography
+            variant="h2"
+            sx={{
+              color: 'white',
+              fontWeight: 900,
+              fontSize: { xs: '2.5rem', md: '4rem' },
+              fontFamily: 'Outfit',
+              letterSpacing: -1,
+            }}
+          >
+            Professional Resume.
+          </Typography>
+        </Box>
+
         <motion.div
           style={{
-            // Applying the calculated 3D rotation
             rotateX: disableHeavyMotion ? '0deg' : rotateX,
             rotateY: disableHeavyMotion ? '0deg' : rotateY,
             zIndex: 10,
             transformStyle: 'preserve-3d',
             position: 'relative',
           }}
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.2 }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
         >
-          {/* Document Corner Framing UI */}
-          <Box
-            sx={{
-              position: 'absolute',
-              top: -30,
-              left: -30,
-              width: 80,
-              height: 80,
-              borderTop: '4px solid #33ccff',
-              borderLeft: '4px solid #33ccff',
-              borderRadius: '20px 0 0 0',
-              opacity: 0.6,
-            }}
-          />
-          <Box
-            sx={{
-              position: 'absolute',
-              bottom: -30,
-              right: -30,
-              width: 80,
-              height: 80,
-              borderBottom: '4px solid #ff3366',
-              borderRight: '4px solid #ff3366',
-              borderRadius: '0 0 20px 20px',
-              opacity: 0.6,
-            }}
-          />
+          {/* Document Framing Brackets */}
+          {!isMobile && (
+            <>
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: -40,
+                  left: -40,
+                  width: 60,
+                  height: 60,
+                  borderTop: '2px solid #e11d48',
+                  borderLeft: '2px solid #e11d48',
+                  opacity: 0.3,
+                }}
+              />
+              <Box
+                sx={{
+                  position: 'absolute',
+                  bottom: -40,
+                  right: -40,
+                  width: 60,
+                  height: 60,
+                  borderBottom: '2px solid #e11d48',
+                  borderRight: '2px solid #e11d48',
+                  opacity: 0.3,
+                }}
+              />
+            </>
+          )}
 
-          {/* ── [IFRAME CONTAINER] ── */}
-          {/* Renders the HTML version of the resume which is used for the interactive view and PDF generation */}
           <Box
-            className="holographic-border animate-cyber-reveal"
             sx={{
-              width: { xs: '95vw', sm: '85vw', md: '210mm' },
-              height: { xs: '135vw', sm: '120vh', md: '297mm' },
+              width: { xs: '90vw', sm: '80vw', md: '210mm' },
+              height: { xs: '127vw', sm: '113vh', md: '297mm' },
               backgroundColor: 'white',
               position: 'relative',
               overflow: 'hidden',
-              border: '2px solid rgba(255,255,255,0.05)',
-              boxShadow: '0 80px 160px rgba(0,0,0,0.9), 0 0 100px rgba(51, 204, 255, 0.15)',
+              borderRadius: '8px',
+              boxShadow: '0 50px 100px rgba(0,0,0,0.8)',
             }}
           >
             <iframe
               id="resume-frame"
               src={iframeSrc}
-              title="Professional Resume Architecture"
+              title="Resume Preview"
               width="100%"
               height="100%"
-              style={{ border: 'none', background: 'white' }}
+              style={{ border: 'none' }}
             />
           </Box>
-
-          {/* Main Action Button */}
-          <Box sx={{ mt: 4, textAlign: 'center' }}>
-            <Button
-              variant="contained"
-              size="large"
-              onClick={() => setIsSelectorOpen(true)}
-              startIcon={<Download size={22} />}
-              sx={{
-                px: 6,
-                py: 2,
-                borderRadius: 10,
-                bgcolor: '#33ccff',
-                color: '#000',
-                fontWeight: 900,
-                fontFamily: 'Syncopate',
-                fontSize: '0.8rem',
-                '&:hover': { bgcolor: '#00ffcc', transform: 'scale(1.05)' },
-              }}
-            >
-              INITIALIZE_DOWNLOAD
-            </Button>
-          </Box>
         </motion.div>
+
+        {/* Action Button */}
+        <Box sx={{ mt: 8 }}>
+          <Button
+            variant="contained"
+            size="large"
+            onClick={() => setIsSelectorOpen(true)}
+            startIcon={<Download size={20} />}
+            sx={{
+              px: 8,
+              py: 2.5,
+              borderRadius: '100px',
+              bgcolor: 'white',
+              color: 'black',
+              fontWeight: 900,
+              fontSize: '0.9rem',
+              '&:hover': { bgcolor: '#e11d48', color: 'white' },
+            }}
+          >
+            Download Resume
+          </Button>
+        </Box>
       </Container>
 
-      {/* Global CSS for animations and scrollbars */}
       <style>{`
           @keyframes spin { to { transform: rotate(360deg); } }
           iframe::-webkit-scrollbar { width: 6px; }
-          iframe::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.4); border-radius: 10px; }
+          iframe::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
       `}</style>
     </Box>
   );

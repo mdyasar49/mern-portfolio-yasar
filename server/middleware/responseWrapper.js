@@ -1,6 +1,5 @@
 /**
- * Standardized API Response Orchestrator
- * Ensures all outbound payloads adhere to a unified architecture.
+ * Middleware to wrap API responses in a standard format.
  */
 const responseWrapper = (req, res, next) => {
   const originalJson = res.json;
@@ -13,7 +12,6 @@ const responseWrapper = (req, res, next) => {
         meta: {
           timestamp: new Date().toISOString(),
           path: req.originalUrl,
-          version: 'v4.2.0-stable',
         },
       };
       return originalJson.call(this, wrappedData);

@@ -1,9 +1,5 @@
 /**
- * Language: JavaScript (Node.js/Mongoose)
- * Purpose of this file:
- * This file defines the database schema and model for the "Contact" messages.
- * It enforces the structure for messages sent through the portfolio's contact form,
- * ensuring they have a name, email, message, and trackable read/unread status.
+ * Mongoose schema for contact form messages.
  */
 
 // Import the mongoose library to define the schema and interact with MongoDB

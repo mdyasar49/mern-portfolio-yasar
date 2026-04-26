@@ -1,18 +1,12 @@
 /**
- * Language: JavaScript (Node.js/Mongoose)
- * Purpose of this file:
- * This file establishes the structural blueprint (Schema) for the main portfolio data.
- * Mongoose uses this to enforce data integrity and structure for all your skills,
- * projects, experience, and personal information before it gets saved to MongoDB.
+ * Mongoose schema for the portfolio profile.
  */
 
 // Import the mongoose library to define schemas and interact with MongoDB
 const mongoose = require('mongoose');
 
-/**
- * [ExperienceSchema]
- * Models professional work history with nested arrays for task descriptions.
- */
+// Schema for work experience entries
+
 // Define the sub-schema structure for a single job/experience entry
 const ExperienceSchema = new mongoose.Schema({
   // The job title
@@ -27,10 +21,8 @@ const ExperienceSchema = new mongoose.Schema({
   description: [String],
 });
 
-/**
- * [ProjectSchema]
- * Models individual engineering projects, including technical stacks and real-time stats.
- */
+// Schema for project entries
+
 // Define the sub-schema structure for a single portfolio project
 const ProjectSchema = new mongoose.Schema({
   // Name of the project
@@ -53,10 +45,8 @@ const ProjectSchema = new mongoose.Schema({
   stats: { type: Map, of: String },
 });
 
-/**
- * [ProfileSchema] (Master Aggregate)
- * The root document that brings together all biography data, skills, and sub-schemas.
- */
+// Main Profile schema
+
 // Define the main schema structure for the entire portfolio profile
 const ProfileSchema = new mongoose.Schema({
   // Full name, which is strictly required
@@ -78,7 +68,7 @@ const ProfileSchema = new mongoose.Schema({
     backend: [String],
     database: [String],
     tools: [String],
-    aiTools: [String],
+    productivityTools: [String],
     other: [String],
   },
 
@@ -121,6 +111,13 @@ const ProfileSchema = new mongoose.Schema({
   readme: String,
   // Detailed explanation of projects
   projectExplanation: String,
+
+  // [NEW] Dynamic Content Store (Removes hardcoding from frontend)
+  // Store section titles, taglines, and metadata (e.g., version, availability)
+  customData: {
+    type: Map,
+    of: String,
+  },
 });
 
 // Compile and export the main schema as a usable Mongoose model named 'Profile'

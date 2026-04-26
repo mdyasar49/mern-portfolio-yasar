@@ -1,7 +1,5 @@
 /**
- * Portfolio Backend Controller
- * Manages profile data, visitor tracking, and system health.
- * Uses Hybrid Storage (MongoDB + Local JSON).
+ * Controller for portfolio data.
  */
 
 // Import the Node.js built-in 'fs' (file system) module to read and write files locally
@@ -14,20 +12,18 @@ const Profile = require('../models/Profile');
 const asyncHandler = require('../middleware/asyncHandler');
 // Import mongoose to interact with the MongoDB database
 const mongoose = require('mongoose');
-// Import the Stats model which tracks visitor counts and maintenance mode in MongoDB
+// Import the Stats model which tracks visitor counts in MongoDB
 const Stats = require('../models/Stats');
 
-// [PERFORMANCE_OPTIMIZATION] In-memory cache for the primary profile payload
-// This reduces disk I/O and DB queries for high-traffic environments.
+const logger = require('../utils/logger');
+
+// In-memory cache for profile data
 let cachedProfile = null;
 let lastCacheUpdate = 0;
 const CACHE_TTL = 300000; // 5 minutes
 
-/**
- * Utility: Safety Normalizers
- * These helper functions ensure that even if data is missing or corrupted,
- * the frontend receives valid default data types (empty arrays, strings, objects).
- */
+// Data sanitization helpers
+
 // If the value is an array, return it. Otherwise, return an empty array.
 const safeArray = (value) => (Array.isArray(value) ? value : []);
 // If the value is a valid object, return it. Otherwise, return an empty object.
@@ -36,9 +32,7 @@ const safeObject = (value) => (value && typeof value === 'object' ? value : {});
 const safeString = (value, fallback = '') => (typeof value === 'string' ? value : fallback);
 
 /**
- * [analyzeSystemState]
- * Utility to calculate real-time engineering metrics based on actual system state.
- * This avoids hardcoding "99.9%" or other static values.
+ * Calculates system metrics based on server state.
  */
 const analyzeSystemState = () => {
   // 1. Calculate Compute Efficiency based on actual memory pressure
@@ -67,9 +61,7 @@ const analyzeSystemState = () => {
 };
 
 /**
- * [normalizeProfile]
- * Function purpose: Transforms the raw database/JSON object into a strictly structured format
- * expected by the React.js frontend, preventing frontend crashes due to missing fields.
+ * Sanitizes the profile data for the frontend.
  */
 // Define the normalizeProfile function that takes raw source data
 const normalizeProfile = (source) => {
@@ -99,7 +91,7 @@ const normalizeProfile = (source) => {
       backend: safeArray(technicalSkills.backend),
       database: safeArray(technicalSkills.database),
       tools: safeArray(technicalSkills.tools),
-      aiTools: safeArray(technicalSkills.aiTools),
+      productivityTools: safeArray(technicalSkills.productivityTools),
       other: safeArray(technicalSkills.other),
     },
     // Safely map over the experience array to guarantee each item has the correct structure
@@ -130,6 +122,9 @@ const normalizeProfile = (source) => {
       institution: safeString(edu?.institution, 'Institution'),
       institutionUrl: safeString(edu?.institutionUrl),
       year: safeString(edu?.year),
+      period: safeString(edu?.period || edu?.year),
+      description: safeString(edu?.description),
+      achievements: safeArray(edu?.achievements),
     })),
     // Safely extract softSkills array
     softSkills: safeArray(profile.softSkills),
@@ -148,8 +143,15 @@ const normalizeProfile = (source) => {
       facebook: safeString(socials.facebook),
     },
     // Extract raw readme and project explanation strings
-    readme: safeString(profile.readme),
-    projectExplanation: safeString(profile.projectExplanation),
+    // Extract documentation data
+    documentation: {
+      engineeringObjective: safeObject(profile.engineeringObjective),
+      coreArchitecture: safeArray(profile.coreArchitecture),
+      projectExplanation: safeObject(profile.projectExplanation),
+      securityProtocols: safeArray(profile.securityProtocols),
+    },
+    // [NEW] Custom Data Map for dynamic strings
+    customData: safeObject(profile.customData),
     // Safely extract navigation menu items
     menuItems: safeArray(profile.menuItems),
     // Safely extract analytics and performance metrics
@@ -160,9 +162,7 @@ const normalizeProfile = (source) => {
 };
 
 /**
- * [getLocalData]
- * Function purpose: Aggregates portfolio data from multiple atomized JSON files
- * in the /data directory. This provides better organization and maintainability.
+ * Loads data from local JSON files.
  */
 const getLocalData = () => {
   try {
@@ -204,7 +204,7 @@ const getLocalData = () => {
             aggregatedData = { ...aggregatedData, ...content };
           }
         } catch (e) {
-          console.error(`Error parsing ${file}:`, e.message);
+          logger.error(`Error parsing ${file}:`, e);
         }
       }
     });
@@ -248,13 +248,13 @@ const getLocalData = () => {
 
     return aggregatedData;
   } catch (err) {
-    console.error('Atomic Data Aggregation Error:', err.message);
+    logger.error('Data aggregation failed:', err);
     return null;
   }
 };
 
 /**
- * Persistence Logic for system stats (Visitors/Maintenance) when DB is down.
+ * Persistence Logic for system stats (Visitors) when DB is down.
  */
 // Define path for local stats JSON file
 const statsFile = path.join(__dirname, '../stats.json');
@@ -269,7 +269,7 @@ const getLocalStats = () => {
     // Ignore errors quietly
   } catch (e) {}
   // If no file exists or an error occurs, return a default object with 0 visitors
-  return { visitors: 0, maintenanceMode: false };
+  return { visitors: 0 };
 };
 
 // Define function to save stats to local file
@@ -298,10 +298,10 @@ exports.getProfile = asyncHandler(async (req, res, next) => {
   // Initialize profile variable to null
   let profile = null;
 
-  // Phase 1: Try Local Storage (High Speed fallback)
+  // Try local data first
   profile = getLocalData();
 
-  // Phase 2: If Local fails or is empty, Fallback to MongoDB (High Durability)
+  // Fallback to database
   // We check if profile is null, empty, or missing critical 'name' field
   const isLocalDataValid = profile && Object.keys(profile).length > 0 && profile.name;
 
@@ -310,10 +310,10 @@ exports.getProfile = asyncHandler(async (req, res, next) => {
       const dbProfile = await Profile.findOne().lean();
       if (dbProfile) {
         profile = dbProfile;
-        console.log('💾 [Storage] Data recovered from MongoDB fallback.');
+        logger.info('Data loaded from MongoDB fallback.');
       }
     } catch (error) {
-      console.error('MongoDB Query Error:', error.message);
+      logger.error('MongoDB query failed:', error);
     }
   }
 
@@ -322,7 +322,7 @@ exports.getProfile = asyncHandler(async (req, res, next) => {
     return res.status(404).json({ success: false, message: 'Portfolio data not found.' });
   }
 
-  // Fetch site orchestration stats (mainly to check if maintenance mode is enabled)
+  // Fetch site orchestration stats
   // Use MongoDB if connected, otherwise use the local stats backup
   const stats = mongoose.connection.readyState === 1 ? await Stats.findOne() : getLocalStats();
 
@@ -330,8 +330,6 @@ exports.getProfile = asyncHandler(async (req, res, next) => {
   const responsePayload = {
     // Spread all properties from the normalized profile
     ...normalizeProfile(profile),
-    // Append the maintenanceMode flag (default to false if missing)
-    maintenanceMode: stats?.maintenanceMode || false,
   };
 
   // Update the in-memory cache
@@ -393,7 +391,7 @@ exports.getVisitors = asyncHandler(async (req, res, next) => {
       history: req.headers.authorization ? stats.history : undefined,
     });
   } catch (error) {
-    console.error('STATS_SERVICE_FAILURE:', error.message);
+    logger.error('Stats service failure:', error);
     res.status(200).json({ success: true, count: 0 });
   }
 });
@@ -503,10 +501,10 @@ exports.getAnalytics = asyncHandler(async (req, res) => {
 
   // Dynamically override the systemStats in the analytics fragment
   data.systemStats = [
-    { label: 'API_STABILITY', value: sys.stability, color: '#33ccff' },
-    { label: 'CODE_COVERAGE', value: sys.coverage, color: '#00ffcc' },
-    { label: 'COMPUTE_EFFICIENCY', value: sys.efficiency, color: '#ff9933' },
-    { label: 'DEPLOYMENT_FREQUENCY', value: sys.frequency, color: '#ff3366' },
+    { label: 'RELIABILITY', value: sys.stability, color: '#33ccff' },
+    { label: 'CODE QUALITY', value: sys.coverage, color: '#00ffcc' },
+    { label: 'PERFORMANCE', value: sys.efficiency, color: '#ff9933' },
+    { label: 'UPTIME', value: sys.frequency, color: '#ff3366' },
   ];
 
   // Dynamically generate performanceData for the chart (last 6 months)
@@ -547,7 +545,11 @@ exports.getAnalytics = asyncHandler(async (req, res) => {
     { name: 'Backend', value: Math.min(100, (tech.backend || []).length * 15), color: '#ec4899' },
     { name: 'Database', value: Math.min(100, (tech.database || []).length * 20), color: '#10b981' },
     { name: 'DevOps', value: Math.min(100, (tech.tools || []).length * 18), color: '#f59e0b' },
-    { name: 'AI_Tools', value: Math.min(100, (tech.aiTools || []).length * 25), color: '#8b5cf6' },
+    {
+      name: 'Modern Tooling',
+      value: Math.min(100, (tech.productivityTools || []).length * 25),
+      color: '#8b5cf6',
+    },
   ];
 
   res.status(200).json({

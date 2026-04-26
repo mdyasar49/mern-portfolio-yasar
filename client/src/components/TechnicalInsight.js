@@ -1,10 +1,9 @@
 /**
- * [React.js & Recharts - Data Visualization Architecture]
- * Technologies: React.js, Material UI (Grid, Paper, Stack), Recharts (ResponsiveContainer, AreaChart, BarChart), Framer Motion
- * Purpose: This component visualizes technical throughput and skill distribution using interactive charts.
+ * Technical growth metrics.
  */
-import React, { useState } from 'react';
-import { Box, Container, Typography, Grid, Paper, Stack } from '@mui/material';
+
+import React, { useState, memo } from 'react';
+import { Box, Container, Typography, Grid, Stack } from '@mui/material';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -18,264 +17,265 @@ import {
   Cell,
 } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Activity, Cpu, Database } from 'lucide-react';
+import { Activity, Zap } from 'lucide-react';
 
-/**
- * TechnicalInsight Component
- * Renders two primary data visualizations: Performance Optimization and Tech Stack Mastery.
- */
-const TechnicalInsight = ({ profile }) => {
-  // Use data from backend or fallback to empty arrays to prevent crashes
+const TechnicalInsight = memo(({ profile }) => {
+  const [mounted, setMounted] = React.useState(false);
   const performanceData = profile?.performanceData || [];
   const skillDistribution = profile?.skillDistribution || [];
   const systemStats = profile?.systemStats || [];
 
   const [activeLog, setActiveLog] = useState(null);
 
-  // Helper to handle chart interactions
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const handleChartHover = (data) => {
     if (data && data.activePayload) {
-      setActiveLog(`[METRIC_SCAN]: ${data.activeLabel} -> VAL_${data.activePayload[0].value}%`);
+      setActiveLog(`${data.activeLabel}: ${data.activePayload[0].value}%`);
     }
   };
 
+  if (!mounted) return null;
+
   return (
-    <Box
-      id="insights"
-      sx={{ py: { xs: 10, md: 20 }, position: 'relative', bgcolor: 'rgba(2, 4, 10, 0.5)' }}
-    >
+    <Box id="insights" sx={{ py: { xs: 15, md: 25 }, position: 'relative' }}>
       <Container maxWidth="xl">
-        {/* Section Header: Metric Definitions */}
-        <Stack spacing={2} sx={{ mb: 12, textAlign: 'center' }}>
-          <motion.div
-            initial={{ opacity: 0, letterSpacing: '20px' }}
-            whileInView={{ opacity: 1, letterSpacing: '8px' }}
-            viewport={{ once: true }}
+        {/* Header */}
+        <Box sx={{ mb: { xs: 10, md: 15 }, textAlign: 'center' }}>
+          <Typography
+            variant="overline"
+            sx={{
+              color: 'primary.main',
+              fontWeight: 800,
+              letterSpacing: 4,
+              mb: 3,
+              display: 'block',
+            }}
           >
-            <Typography
-              variant="overline"
-              sx={{ color: '#00ffcc', fontWeight: 900, fontFamily: 'Syncopate' }}
-            >
-              ENGINEERING_METRICS
-            </Typography>
-          </motion.div>
+            TECHNICAL METRICS
+          </Typography>
           <Typography
             variant="h2"
             sx={{
-              fontFamily: 'Syncopate',
               fontWeight: 900,
-              fontSize: { xs: '2rem', md: '4rem' },
-              textShadow: '0 0 30px rgba(51, 204, 255, 0.2)',
+              fontSize: { xs: '2.5rem', md: '5rem' },
+              color: 'white',
+              letterSpacing: -2,
+              fontFamily: 'Outfit',
             }}
           >
-            SYSTEM{' '}
-            <span style={{ color: '#ff3366', textShadow: '0 0 30px rgba(255, 51, 102, 0.4)' }}>
-              INTELLIGENCE
-            </span>
+            Visualizing{' '}
+            <Box component="span" sx={{ color: 'primary.main' }}>
+              technical
+            </Box>{' '}
+            growth.
           </Typography>
-        </Stack>
+        </Box>
 
         <Grid container spacing={4}>
-          {/* [Visualization A] - Performance Trend (Area Chart) */}
+          {/* Performance Optimization Chart */}
           <Grid item xs={12} lg={8}>
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+            <Box
+              className="glass-card"
+              sx={{
+                p: 4,
+                height: 500,
+                display: 'flex',
+                flexDirection: 'column',
+              }}
             >
-              <Paper
-                className="glass-panel"
-                sx={{
-                  p: 4,
-                  height: 450,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  border: '1px solid rgba(51, 204, 255, 0.1)',
-                  '&:hover': { borderColor: '#00ffcc44' },
-                }}
-              >
-                <Stack
-                  direction="row"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  sx={{ mb: 4 }}
-                >
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      color: 'white',
-                      fontWeight: 900,
-                      fontFamily: 'Syncopate',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 2,
-                    }}
-                  >
-                    <Activity color="#00ffcc" size={24} /> PERFORMANCE_OPTIMIZATION_THROUGHPUT
-                  </Typography>
-                  <Box
-                    sx={{
-                      p: 1,
-                      borderRadius: 2,
-                      bgcolor: 'rgba(0, 255, 204, 0.1)',
-                      color: '#00ffcc',
-                      border: '1px solid #00ffcc44',
-                    }}
-                  >
-                    <Typography variant="caption" sx={{ fontWeight: 900 }}>
-                      +45.2% ACCELERATION
-                    </Typography>
-                  </Box>
-                </Stack>
-
-                {/*
-                  Chart Container
-                  'minWidth: 0' and 'width: 100%' are essential fix for Recharts
-                  ResponsiveContainer initialization issues in flex/grid layouts.
-                */}
-                <Box sx={{ flexGrow: 1, width: '100%', minWidth: 0, position: 'relative' }}>
-                  <ResponsiveContainer width="99.9%" height={300}>
-                    <AreaChart
-                      data={performanceData}
-                      onMouseMove={handleChartHover}
-                      onMouseLeave={() => setActiveLog(null)}
-                    >
-                      <defs>
-                        <linearGradient id="colorOpt" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#00ffcc" stopOpacity={0.3} />
-                          <stop offset="95%" stopColor="#00ffcc" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid
-                        strokeDasharray="3 3"
-                        stroke="rgba(255,255,255,0.05)"
-                        vertical={false}
-                      />
-                      <XAxis
-                        dataKey="name"
-                        stroke="rgba(255,255,255,0.5)"
-                        fontSize={12}
-                        tickLine={false}
-                        axisLine={false}
-                      />
-                      <YAxis
-                        stroke="rgba(255,255,255,0.5)"
-                        fontSize={12}
-                        tickLine={false}
-                        axisLine={false}
-                      />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: 'rgba(2, 4, 10, 0.95)',
-                          border: '1px solid #00ffcc33',
-                          borderRadius: '12px',
-                          backdropFilter: 'blur(10px)',
-                        }}
-                        itemStyle={{ color: '#00ffcc', fontFamily: 'monospace' }}
-                      />
-                      <Area
-                        type="monotone"
-                        dataKey="optimization"
-                        stroke="#00ffcc"
-                        strokeWidth={3}
-                        fillOpacity={1}
-                        fill="url(#colorOpt)"
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </Box>
-              </Paper>
-            </motion.div>
-          </Grid>
-
-          {/* [Visualization B] - Skill Distribution (Horizontal Bar Chart) */}
-          <Grid item xs={12} lg={4}>
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-            >
-              <Paper
-                className="glass-panel"
-                sx={{
-                  p: 4,
-                  height: 450,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  border: '1px solid rgba(255, 51, 102, 0.1)',
-                  '&:hover': { borderColor: '#ff336644' },
-                }}
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+                sx={{ mb: 6 }}
               >
                 <Typography
                   variant="h6"
                   sx={{
                     color: 'white',
-                    fontWeight: 900,
-                    fontFamily: 'Syncopate',
-                    mb: 4,
+                    fontWeight: 800,
+                    fontFamily: 'Outfit',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 2,
                   }}
                 >
-                  <Zap color="#ff3366" size={24} /> TECH_STACK_MASTERY
+                  <Activity color="#e11d48" size={24} /> Technical Growth
                 </Typography>
-                <Box sx={{ flexGrow: 1, width: '100%', minWidth: 0, position: 'relative' }}>
-                  <ResponsiveContainer width="99.9%" height={250}>
-                    <BarChart data={skillDistribution} layout="vertical">
-                      <XAxis type="number" hide />
-                      <YAxis
-                        dataKey="name"
-                        type="category"
-                        stroke="white"
-                        fontSize={11}
-                        width={80}
-                        tickLine={false}
-                        axisLine={false}
-                      />
-                      <Tooltip
-                        cursor={{ fill: 'rgba(255,51,102,0.05)' }}
-                        contentStyle={{
-                          backgroundColor: 'rgba(2, 4, 10, 0.95)',
-                          border: '1px solid #ff336633',
-                          borderRadius: '12px',
-                          backdropFilter: 'blur(10px)',
-                        }}
-                      />
-                      <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
-                        {skillDistribution.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
+                <Box
+                  sx={{
+                    px: 2,
+                    py: 1,
+                    borderRadius: '100px',
+                    bgcolor: 'rgba(225, 29, 72, 0.1)',
+                    border: '1px solid rgba(225, 29, 72, 0.2)',
+                    color: '#e11d48',
+                  }}
+                >
+                  <Typography variant="caption" sx={{ fontWeight: 800 }}>
+                    +45.2% Optimization
+                  </Typography>
                 </Box>
-                <Stack spacing={2} sx={{ mt: 2 }}>
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={activeLog || 'idle'}
-                      initial={{ opacity: 0, y: 5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -5 }}
-                    >
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: activeLog ? '#00ffcc' : 'rgba(255,255,255,0.3)',
-                          fontFamily: 'monospace',
-                          fontWeight: 700,
-                        }}
-                      >
-                        {activeLog || '>_ STANDBY: SCANNING_SYSTEM_RESOURCES...'}
-                      </Typography>
-                    </motion.div>
-                  </AnimatePresence>
-                </Stack>
-              </Paper>
-            </motion.div>
+              </Stack>
+
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  width: '100%',
+                  minWidth: 200,
+                  height: 350,
+                  position: 'relative',
+                }}
+              >
+                <ResponsiveContainer width="100%" height={350} debounce={50}>
+                  <AreaChart
+                    data={performanceData}
+                    onMouseMove={handleChartHover}
+                    onMouseLeave={() => setActiveLog(null)}
+                  >
+                    <defs>
+                      <linearGradient id="colorOpt" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#e11d48" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#e11d48" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="rgba(255,255,255,0.03)"
+                      vertical={false}
+                    />
+                    <XAxis
+                      dataKey="name"
+                      stroke="#475569"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                      dy={10}
+                    />
+                    <YAxis
+                      stroke="#475569"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                      dx={-10}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#050507',
+                        border: '1px solid rgba(225, 29, 72, 0.2)',
+                        borderRadius: '12px',
+                        color: 'white',
+                      }}
+                      itemStyle={{ color: '#e11d48' }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="optimization"
+                      stroke="#e11d48"
+                      strokeWidth={3}
+                      fill="url(#colorOpt)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </Box>
+            </Box>
           </Grid>
 
-          {/* Dynamic Stats Cards: Supplementary Evidence */}
+          {/* Proficiency Chart */}
+          <Grid item xs={12} lg={4}>
+            <Box
+              className="glass-card"
+              sx={{
+                p: 4,
+                height: 500,
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <Typography
+                variant="h6"
+                sx={{
+                  color: 'white',
+                  fontWeight: 800,
+                  fontFamily: 'Outfit',
+                  mb: 6,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 2,
+                }}
+              >
+                <Zap color="#e11d48" size={24} /> Skill Proficiency
+              </Typography>
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  width: '100%',
+                  minWidth: 200,
+                  height: 350,
+                  position: 'relative',
+                }}
+              >
+                <ResponsiveContainer width="100%" height={350} debounce={50}>
+                  <BarChart data={skillDistribution} layout="vertical">
+                    <XAxis type="number" hide />
+                    <YAxis
+                      dataKey="name"
+                      type="category"
+                      stroke="#94a3b8"
+                      fontSize={12}
+                      width={80}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <Tooltip
+                      cursor={{ fill: 'rgba(255,255,255,0.02)' }}
+                      contentStyle={{
+                        backgroundColor: '#050507',
+                        border: '1px solid rgba(225, 29, 72, 0.1)',
+                        borderRadius: '12px',
+                      }}
+                    />
+                    <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
+                      {skillDistribution.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill="#e11d48"
+                          opacity={0.6 + (index / skillDistribution.length) * 0.4}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </Box>
+              <Box sx={{ mt: 4 }}>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeLog || 'idle'}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: activeLog ? 'primary.main' : '#475569',
+                        fontFamily: 'monospace',
+                        fontWeight: 700,
+                        fontSize: '0.7rem',
+                      }}
+                    >
+                      {activeLog || 'Hover over charts for details'}
+                    </Typography>
+                  </motion.div>
+                </AnimatePresence>
+              </Box>
+            </Box>
+          </Grid>
+
+          {/* Stat Cards */}
           {systemStats.map((stat, i) => (
             <Grid item xs={6} md={3} key={i}>
               <motion.div
@@ -284,41 +284,38 @@ const TechnicalInsight = ({ profile }) => {
                 transition={{ delay: i * 0.1 }}
                 viewport={{ once: true }}
               >
-                <Paper
-                  className="glass-panel"
+                <Box
+                  className="glass-card"
                   sx={{
-                    p: 3,
+                    p: 4,
                     textAlign: 'center',
-                    borderBottom: `4px solid ${stat.color}`,
-                    background: `linear-gradient(to bottom, rgba(255,255,255,0.02), ${stat.color}05)`,
+                    borderBottom: `4px solid #e11d48`,
+                    transition: '0.4s',
                     '&:hover': {
-                      transform: 'scale(1.05) translateY(-5px)',
-                      boxShadow: `0 20px 40px ${stat.color}11`,
+                      transform: 'translateY(-10px)',
+                      borderColor: 'white',
                     },
                   }}
                 >
-                  <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
-                    {stat.label === 'API_STABILITY' && <Database color={stat.color} />}
-                    {stat.label === 'CODE_COVERAGE' && <ShieldCheck color={stat.color} />}
-                    {stat.label === 'COMPUTE_EFFICIENCY' && <Cpu color={stat.color} />}
-                    {stat.label === 'DEPLOYMENT_FREQUENCY' && <Zap color={stat.color} />}
-                  </Box>
-                  <Typography variant="h4" sx={{ fontWeight: 900, mb: 0.5, fontFamily: 'Outfit' }}>
+                  <Typography
+                    variant="h4"
+                    sx={{ fontWeight: 900, mb: 1, color: 'white', fontFamily: 'Outfit' }}
+                  >
                     {stat.value}
                   </Typography>
                   <Typography
                     variant="caption"
                     sx={{
-                      color: 'rgba(255,255,255,0.5)',
-                      fontWeight: 900,
+                      color: '#64748b',
+                      fontWeight: 800,
                       letterSpacing: 2,
-                      fontFamily: 'Syncopate',
+                      textTransform: 'uppercase',
                       fontSize: '0.6rem',
                     }}
                   >
-                    {stat.label}
+                    {stat.label.replace(/_/g, ' ')}
                   </Typography>
-                </Paper>
+                </Box>
               </motion.div>
             </Grid>
           ))}
@@ -326,26 +323,6 @@ const TechnicalInsight = ({ profile }) => {
       </Container>
     </Box>
   );
-};
-
-/**
- * [Internal Utility Component]
- * ShieldCheck icon for Security Certification badge
- */
-const ShieldCheck = ({ color, size = 24 }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke={color}
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    <path d="m9 12 2 2 4-4" />
-  </svg>
-);
+});
 
 export default TechnicalInsight;

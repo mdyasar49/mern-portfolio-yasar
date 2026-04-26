@@ -1,9 +1,5 @@
 /**
- * Language: JavaScript (React.js)
- * Purpose of this file:
- * This component renders a high-fidelity "System Initializing" loading screen.
- * It uses a combination of circular scanners, technical progress bars,
- * and terminal log text to create an immersive start-up experience.
+ * Simple loading screen.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -12,7 +8,7 @@ import { motion } from 'framer-motion';
 
 const LoadingScreen = ({ onComplete }) => {
   const [progress, setProgress] = useState(0);
-  const [status, setStatus] = useState('BOOT_SEQUENCE_INIT');
+  const [status, setStatus] = useState('INITIALIZING');
 
   useEffect(() => {
     // Increment progress over time
@@ -20,27 +16,24 @@ const LoadingScreen = ({ onComplete }) => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(timer);
-          // Slight delay before completing to allow "SYSTEM_READY" to be seen
           setTimeout(onComplete, 800);
           return 100;
         }
         return prev + 1;
       });
-    }, 25);
+    }, 20);
 
-    // Cycle through technical status messages
+    // Cycle through professional status messages
     const statusTimer = setInterval(() => {
       const statuses = [
-        'UPLOADING_KERNEL...',
-        'MAPPING_DOM_NODES...',
-        'CALIBRATING_QUANTUM_AURORA...',
-        'ESTABLISHING_SECURE_LINK...',
-        'SYSTEM_STATUS: ONLINE',
-        'INJECTING_NEURAL_INTERFACE...',
-        'OPTIMIZING_THROUGHPUT...',
+        'GETTING THINGS READY',
+        'LOADING CONTENT',
+        'PREPARING UI',
+        'ALMOST THERE',
+        'WELCOME',
       ];
       setStatus(statuses[Math.floor(Math.random() * statuses.length)]);
-    }, 600);
+    }, 500);
 
     return () => {
       clearInterval(timer);
@@ -54,7 +47,7 @@ const LoadingScreen = ({ onComplete }) => {
         position: 'fixed',
         inset: 0,
         zIndex: 20000,
-        bgcolor: '#000',
+        bgcolor: '#050507',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -69,8 +62,8 @@ const LoadingScreen = ({ onComplete }) => {
           style={{
             width: 180,
             height: 180,
-            border: '2px solid rgba(51, 204, 255, 0.1)',
-            borderTop: '2px solid #33ccff',
+            border: '2px solid rgba(225, 29, 72, 0.05)',
+            borderTop: '2px solid #e11d48',
             borderRadius: '50%',
           }}
         />
@@ -80,8 +73,8 @@ const LoadingScreen = ({ onComplete }) => {
           transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
           style={{
             position: 'absolute',
-            inset: 10,
-            border: '1px dashed rgba(255, 51, 102, 0.2)',
+            inset: 15,
+            border: '1px dashed rgba(225, 29, 72, 0.2)',
             borderRadius: '50%',
           }}
         />
@@ -93,9 +86,10 @@ const LoadingScreen = ({ onComplete }) => {
             transform: 'translate(-50%, -50%)',
             color: 'white',
             fontWeight: 900,
-            fontFamily: 'Syncopate',
-            fontSize: '1.5rem',
-            textShadow: '0 0 20px #33ccff',
+            fontFamily: 'Outfit',
+            fontSize: '1.8rem',
+            letterSpacing: -1,
+            textShadow: '0 0 40px rgba(225, 29, 72, 0.4)',
           }}
         >
           {progress}%
@@ -103,15 +97,16 @@ const LoadingScreen = ({ onComplete }) => {
       </Box>
 
       {/* Status & Progress Bar Module */}
-      <Stack spacing={3} alignItems="center" sx={{ width: 350 }}>
+      <Stack spacing={3} alignItems="center" sx={{ width: 320 }}>
         <Typography
           variant="caption"
           sx={{
-            color: status.includes('ONLINE') ? '#00ffcc' : '#33ccff',
-            fontFamily: 'Syncopate',
+            color: '#e11d48',
+            fontFamily: 'Outfit',
             letterSpacing: 4,
             fontSize: '0.7rem',
-            textShadow: status.includes('ONLINE') ? '0 0 10px #00ffcc' : 'none',
+            fontWeight: 900,
+            textTransform: 'uppercase',
             transition: '0.3s all',
           }}
         >
@@ -121,8 +116,8 @@ const LoadingScreen = ({ onComplete }) => {
         <Box
           sx={{
             width: '100%',
-            height: 4,
-            bgcolor: 'rgba(255,255,255,0.05)',
+            height: 2,
+            bgcolor: 'rgba(255,255,255,0.03)',
             borderRadius: 10,
             overflow: 'hidden',
             position: 'relative',
@@ -133,31 +128,26 @@ const LoadingScreen = ({ onComplete }) => {
             animate={{ width: `${progress}%` }}
             style={{
               height: '100%',
-              background: 'linear-gradient(90deg, #33ccff, #ff3366)',
-              boxShadow: '0 0 20px #33ccff',
+              background: '#e11d48',
+              boxShadow: '0 0 20px #e11d48',
             }}
           />
         </Box>
 
         <Typography
           variant="caption"
-          sx={{ color: '#444', fontFamily: 'monospace', fontSize: '0.6rem', letterSpacing: 2 }}
+          sx={{
+            color: '#1e293b',
+            fontFamily: 'monospace',
+            fontSize: '0.65rem',
+            fontWeight: 700,
+            letterSpacing: 2,
+          }}
         >
-          [ ARCHITECT_V4.2.0_INITIALIZATION ]
+          LOADING...
         </Typography>
       </Stack>
 
-      {/* Background Data Flow - Simulates raw system logs during boot */}
-      <Box sx={{ position: 'absolute', bottom: 40, left: 40, opacity: 0.2 }}>
-        {Array.from({ length: 8 }).map((_, i) => (
-          <Typography
-            key={i}
-            sx={{ color: '#00ffcc', fontSize: '0.65rem', fontFamily: 'monospace', mb: 0.5 }}
-          >
-            &gt; 0x{Math.random().toString(16).slice(2, 10).toUpperCase()} ... [OK]
-          </Typography>
-        ))}
-      </Box>
     </Box>
   );
 };

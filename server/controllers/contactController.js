@@ -1,32 +1,15 @@
-/**
- * Language: JavaScript (Node.js)
- * Purpose of this file:
- * This file is a backend controller for managing "contacts" (contact form submissions).
- * It handles the logic for receiving new contact messages from the frontend, saving them
- * to the MongoDB database, saving a local backup copy to a JSON file (portable mode),
- * sending out email notifications via the email service, and providing APIs to retrieve or delete messages.
- */
-
-// Import the Node.js built-in 'fs' (file system) module to read and write files locally
 const fs = require('fs');
-// Import the Node.js built-in 'path' module to work with file and directory paths safely
 const path = require('path');
-// Import the Contact model which defines the MongoDB schema for a contact message
 const Contact = require('../models/Contact');
-// Import the sendContactAlert function from the emailService to send email notifications
-const { sendContactAlert } = require('../services/emailService');
-// Import an async wrapper middleware to handle errors automatically without try-catch blocks everywhere
+const { sendContactAlert, sendAcknowledgmentEmail } = require('../services/emailService');
 const asyncHandler = require('../middleware/asyncHandler');
-// Import mongoose to interact with the MongoDB database and check connection status
 const mongoose = require('mongoose');
+const logger = require('../utils/logger');
 
-// Define the file path where local backups of contacts will be stored (contacts.json)
 const contactsFile = path.join(__dirname, '../contacts.json');
 
 /**
- * [saveLocalContact]
- * Function purpose: Saves a copy of the contact submission to a local JSON file
- * This ensures no data is lost even if the MongoDB connection drops.
+ * Saves contact to local JSON backup.
  */
 // Define a helper function to save a contact to the local JSON file
 const saveLocalContact = (contact) => {
@@ -58,33 +41,25 @@ const saveLocalContact = (contact) => {
     // Write the updated array back to the JSON file, keeping only the 100 most recent entries to prevent massive files
     fs.writeFileSync(contactsFile, JSON.stringify(contacts.slice(0, 100), null, 2));
     // Catch any errors during the file operations
-  } catch (e) {
-    // Log the error to the console if local backup fails
-    console.error('LOCAL_CONTACT_SYNC_ERROR:', e.message);
+    } catch (e) {
+    logger.error('Local contact backup failed:', e);
   }
 };
 
 /**
- * Utility: Input Cleansing Protocol (XSS Protection)
- * Function purpose: Strips all HTML tags and potentially malicious scripts from
- * incoming user strings to prevent cross-site scripting (XSS) attacks.
+ * Simple XSS protection by stripping HTML tags.
  */
 const cleanse = (str = '') => {
   if (typeof str !== 'string') return '';
   return str
-    .replace(/<[^>]*>?/gm, '') // Remove HTML tags
+    .replace(/<[^>]*>?/gm, '')
     .trim();
 };
 
 /**
- * [submitContactForm]
- * @desc    Submit contact form, save to DB and send email
- * @route   POST /api/contact
- * @access  Public
+ * Handles contact form submissions.
  */
-// Export the submitContactForm controller wrapped in the asyncHandler
 exports.submitContactForm = asyncHandler(async (req, res, next) => {
-  // Extract and CLEANSE the necessary fields from the request body
   const name = cleanse(req.body.name);
   const email = cleanse(req.body.email);
   const profession = cleanse(req.body.profession || 'Independent Professional');
@@ -93,34 +68,70 @@ exports.submitContactForm = asyncHandler(async (req, res, next) => {
 
   // Validate that the required fields are provided
   if (!name || !email || !message) {
-    return res.status(400).json({ success: false, error: 'Incomplete dispatch payload.' });
+    return res.status(400).json({ success: false, error: 'Please provide all required fields.' });
   }
 
   // Package the cleansed data
   const contactData = { name, email, profession, subject, message, createdAt: new Date() };
+  logger.info(`New contact message from: ${name}`);
 
   // Step 1. Persist to MongoDB if connected
   if (mongoose.connection && mongoose.connection.readyState === 1) {
     try {
       await Contact.create(contactData);
     } catch (e) {
-      console.error('DB_SAVE_FAIL:', e.message);
+      logger.error('DB save failed for contact:', e);
     }
   }
 
   // Step 2. Persist to Local JSON backup
   saveLocalContact(contactData);
 
-  // Step 3. Dispatch Email Alert
-  try {
-    await sendContactAlert(contactData);
-  } catch (error) {
-    console.error('MAIL_DISPATCH_ERROR:', error);
-  }
+  // Step 3. Dispatch Email Alert to Admin (Non-blocking)
+  sendContactAlert(contactData).catch((error) =>
+    logger.error('Admin email alert failed:', error)
+  );
+
+  // Send acknowledgment email to sender (non-blocking)
+  sendAcknowledgmentEmail(contactData).catch((error) =>
+    logger.error('Acknowledgment email failed:', error)
+  );
 
   // Respond back to the frontend
   res.status(200).json({
     success: true,
-    message: 'Your correspondence has been securely logged and dispatched.',
+    message: 'Your message has been sent successfully.',
+  });
+});
+
+/**
+ * Get all contact messages.
+ */
+exports.getContacts = asyncHandler(async (req, res, next) => {
+  let contacts = [];
+
+  // Priority 1: Fetch from MongoDB if connected
+  if (mongoose.connection && mongoose.connection.readyState === 1) {
+    try {
+      contacts = await Contact.find().sort({ createdAt: -1 });
+    } catch (e) {
+      logger.error('DB fetch failed for contacts:', e);
+    }
+  }
+
+  // Priority 2: If DB returned nothing or is disconnected, use local JSON backup
+  if (contacts.length === 0 && fs.existsSync(contactsFile)) {
+    try {
+      const content = fs.readFileSync(contactsFile, 'utf-8');
+      contacts = JSON.parse(content || '[]');
+    } catch (e) {
+      logger.error('Local contacts read failed:', e);
+    }
+  }
+
+  res.status(200).json({
+    success: true,
+    count: contacts.length,
+    payload: contacts,
   });
 });

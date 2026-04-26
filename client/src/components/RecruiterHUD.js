@@ -1,15 +1,11 @@
 /**
- * Language: JavaScript (React.js)
- * Purpose of this file:
- * This component provides a dedicated "Recruiter Quick-View" dashboard.
- * It's a floating mini-module that HRs can open to see a 30-second elevator pitch,
- * core technical strengths, and direct contact buttons.
+ * Quick view dashboard for recruiters.
  */
 
 import React, { useState } from 'react';
-import { Box, Typography, Stack, Button, Paper, Divider } from '@mui/material';
+import { Box, Typography, Stack, Button, Divider } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Briefcase, CheckCircle2, Download, Send } from 'lucide-react';
+import { Briefcase, CheckCircle2, Download, Send, X } from 'lucide-react';
 
 const RecruiterHUD = ({ profile }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,158 +16,167 @@ const RecruiterHUD = ({ profile }) => {
 
   return (
     <>
-      {/* The Floating Vertical Tab Trigger */}
+      {/* Floating pill trigger — Responsive positioning */}
       <Box
         sx={{
           position: 'fixed',
-          left: 0,
-          top: '50%',
-          transform: 'translateY(-50%)',
+          bottom: { xs: 20, md: 130 },
+          left: { xs: 16, md: 32 },
           zIndex: 10001,
-          display: 'flex',
-          alignItems: 'center',
         }}
       >
-        <motion.div
-          whileHover={{ x: 10 }}
-          style={{
-            background: 'linear-gradient(180deg, #6366f1 0%, #4f46e5 100%)',
-            color: 'white',
-            padding: '12px 10px',
-            borderTopRightRadius: 12,
-            borderBottomRightRadius: 12,
-            cursor: 'pointer',
-            boxShadow: '10px 0 30px rgba(99, 102, 241, 0.3)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 1.5,
-            writingMode: 'vertical-rl',
-            textOrientation: 'mixed',
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderLeft: 'none',
-          }}
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          <Briefcase size={18} style={{ transform: 'rotate(90deg)', marginBottom: 10 }} />
-          <Typography
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <Box
+            onClick={() => setIsOpen(!isOpen)}
             sx={{
-              fontFamily: 'Syncopate',
-              fontWeight: 900,
-              fontSize: '0.6rem',
-              letterSpacing: 2,
-              textTransform: 'uppercase',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
+              px: { xs: 2, md: 2.5 },
+              py: { xs: 1, md: 1.5 },
+              bgcolor: 'rgba(99,102,241,0.15)',
+              border: '1px solid rgba(99,102,241,0.35)',
+              borderRadius: '100px',
+              cursor: 'pointer',
+              backdropFilter: 'blur(12px)',
+              transition: '0.3s',
+              '&:hover': {
+                bgcolor: 'rgba(99,102,241,0.25)',
+              },
             }}
           >
-            {isOpen ? 'CLOSE_CONSOLE' : 'FOR_RECRUITERS'}
-          </Typography>
-        </motion.div>
-      </Box>
-
-      {/* The Dashboard Panel */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: -100, scale: 0.9 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: -100, scale: 0.9 }}
-            style={{
-              position: 'fixed',
-              left: 60,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              zIndex: 10000,
-              width: 340,
-              pointerEvents: 'auto',
-            }}
-          >
-            <Paper
+            {isOpen ? <X size={16} color="#e11d48" /> : <Briefcase size={16} color="#e11d48" />}
+            <Typography
               sx={{
-                p: 3,
-                borderRadius: 4,
-                background: 'rgba(15, 23, 42, 0.95)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(99, 102, 241, 0.3)',
-                boxShadow: '0 30px 60px rgba(0,0,0,0.8)',
-                maxHeight: '70vh',
-                overflowY: 'auto',
-                '&::-webkit-scrollbar': { width: '4px' },
-                '&::-webkit-scrollbar-track': { background: 'transparent' },
-                '&::-webkit-scrollbar-thumb': {
-                  background: 'rgba(99, 102, 241, 0.3)',
-                  borderRadius: '10px',
-                  '&:hover': { background: '#6366f1' },
-                },
+                color: '#a5b4fc',
+                fontWeight: 800,
+                fontSize: { xs: '0.6rem', md: '0.7rem' },
+                letterSpacing: 1.5,
+                textTransform: 'uppercase',
               }}
             >
-              <Typography
+              {isOpen ? 'Close' : 'Quick View'}
+            </Typography>
+          </Box>
+        </motion.div>
+
+        {/* The Dashboard Panel — slides up from the trigger */}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+              style={{
+                position: 'absolute',
+                bottom: '60px',
+                left: 0,
+                width: window.innerWidth < 600 ? 'calc(100vw - 32px)' : 320,
+                pointerEvents: 'auto',
+              }}
+            >
+              <Box
                 sx={{
-                  color: '#6366f1',
-                  fontWeight: 900,
-                  fontFamily: 'Syncopate',
-                  fontSize: '0.7rem',
-                  mb: 2,
+                  p: { xs: 2.5, md: 3 },
+                  borderRadius: '20px',
+                  bgcolor: 'rgba(8,8,18,0.98)',
+                  backdropFilter: 'blur(30px)',
+                  border: '1px solid rgba(99,102,241,0.2)',
+                  boxShadow: '0 24px 60px rgba(0,0,0,0.7)',
                 }}
               >
-                QUICK_SUMMARY
-              </Typography>
-
-              <Stack spacing={2.5}>
-                <Typography variant="body2" sx={{ color: '#cbd5e1', lineHeight: 1.6 }}>
-                  {pitch}
+                {/* Header */}
+                <Typography
+                  sx={{
+                    color: '#e11d48',
+                    fontWeight: 800,
+                    fontSize: '0.6rem',
+                    letterSpacing: 3,
+                    textTransform: 'uppercase',
+                    mb: 2,
+                  }}
+                >
+                  Quick Summary
                 </Typography>
 
-                <Divider sx={{ borderColor: 'rgba(255,255,255,0.05)' }} />
-
-                <Stack spacing={1.5}>
-                  {bullets.map((item) => (
-                    <Stack key={item} direction="row" spacing={1.5} alignItems="center">
-                      <CheckCircle2 size={16} color="#00ffcc" />
-                      <Typography variant="caption" sx={{ color: 'white', fontWeight: 600 }}>
-                        {item}
-                      </Typography>
-                    </Stack>
-                  ))}
-                </Stack>
-
-                <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
-                  <Button
-                    variant="contained"
-                    fullWidth
-                    startIcon={<Download size={16} />}
+                <Stack spacing={2.5}>
+                  {/* Pitch */}
+                  <Typography
                     sx={{
-                      bgcolor: '#6366f1',
-                      borderRadius: 2,
-                      fontSize: '0.7rem',
-                      fontWeight: 900,
-                      fontFamily: 'Syncopate',
+                      color: '#cbd5e1',
+                      fontSize: { xs: '0.8rem', md: '0.85rem' },
+                      lineHeight: 1.7,
                     }}
                   >
-                    RESUME
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    fullWidth
-                    href="#contact"
-                    onClick={() => setIsOpen(false)}
-                    startIcon={<Send size={16} />}
-                    sx={{
-                      borderColor: 'rgba(255,255,255,0.2)',
-                      color: 'white',
-                      borderRadius: 2,
-                      fontSize: '0.7rem',
-                      fontWeight: 900,
-                      fontFamily: 'Syncopate',
-                    }}
-                  >
-                    HIRE
-                  </Button>
+                    {pitch}
+                  </Typography>
+
+                  <Divider sx={{ borderColor: 'rgba(255,255,255,0.05)' }} />
+
+                  {/* Bullets */}
+                  <Stack spacing={1.5}>
+                    {bullets.map((item) => (
+                      <Stack key={item} direction="row" spacing={1.5} alignItems="center">
+                        <CheckCircle2 size={14} color="#e11d48" />
+                        <Typography
+                          sx={{
+                            color: 'white',
+                            fontSize: { xs: '0.75rem', md: '0.8rem' },
+                            fontWeight: 600,
+                          }}
+                        >
+                          {item}
+                        </Typography>
+                      </Stack>
+                    ))}
+                  </Stack>
+
+                  {/* CTA buttons */}
+                  <Stack direction="row" spacing={1.5} sx={{ pt: 0.5 }}>
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      href="/resume"
+                      startIcon={<Download size={14} />}
+                      sx={{
+                        bgcolor: '#e11d48',
+                        borderRadius: '100px',
+                        fontSize: '0.65rem',
+                        fontWeight: 800,
+                        textTransform: 'none',
+                        py: 1,
+                        '&:hover': { bgcolor: '#4f46e5' },
+                      }}
+                    >
+                      Resume
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      fullWidth
+                      href="#contact"
+                      onClick={() => setIsOpen(false)}
+                      startIcon={<Send size={14} />}
+                      sx={{
+                        borderColor: 'rgba(255,255,255,0.15)',
+                        color: 'white',
+                        borderRadius: '100px',
+                        fontSize: '0.65rem',
+                        fontWeight: 800,
+                        textTransform: 'none',
+                        py: 1,
+                        '&:hover': { borderColor: '#e11d48', bgcolor: 'rgba(99,102,241,0.05)' },
+                      }}
+                    >
+                      Hire
+                    </Button>
+                  </Stack>
                 </Stack>
-              </Stack>
-            </Paper>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              </Box>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </Box>
     </>
   );
 };

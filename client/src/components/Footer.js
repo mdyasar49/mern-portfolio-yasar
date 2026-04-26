@@ -1,14 +1,9 @@
 /**
- * Language: JavaScript (React.js)
- * Purpose of this file:
- * This component renders the Footer section, featuring social links, system analytics (visitor tracking),
- * and technical status indicators. It uses a high-end "Dark Cyber" aesthetic with neon accents.
+ * Footer component.
  */
 
 import React, { useState, useEffect, memo } from 'react';
-// Material UI components for layout, icons buttons, and analytical displays
-import { Box, Typography, Container, IconButton, Stack, Grid, Tooltip } from '@mui/material';
-// Lucide icons for social media and technical indicators
+import { Box, Typography, Container, IconButton, Stack, Grid, Divider } from '@mui/material';
 import {
   Linkedin,
   Github,
@@ -16,35 +11,52 @@ import {
   Mail,
   Instagram,
   Facebook,
-  Cpu,
-  ShieldCheck,
-  Terminal,
-  Hash,
+  ArrowUp,
+  Users,
+  MapPin,
 } from 'lucide-react';
-import { Link as RouterLink } from 'react-router-dom';
-// Service layer API to fetch global visitor statistics
+import { motion } from 'framer-motion';
 import { fetchSystemAnalytics } from '../services/api';
 
-const Footer = ({ profile }) => {
+const Footer = memo(({ profile }) => {
   const socials = profile?.socials;
   const name = profile?.name;
   const config = profile?.footerConfig || {};
-
-  // State to store and display the total unique visitor count
   const [visitorCount, setVisitorCount] = useState(0);
-  // Generate a temporary session ID for visual "status" display
-  const [sessionId] = useState(() => Math.random().toString(16).substring(2, 10).toUpperCase());
+  const [systemLoad, setSystemLoad] = useState(12);
+  const [latency, setLatency] = useState(24);
+  const [sessionTime, setSessionTime] = useState('00:00:00');
+  const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
+  const sessionStart = React.useRef(Date.now());
 
-  /**
-   * [Analytics Lifecycle]
-   * On mount, fetch visitor data from the backend.
-   * If it's a first-time visit in this session, trigger an increment.
-   */
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSystemLoad((prev) => {
+        const change = (Math.random() - 0.5) * 2;
+        return Math.max(5, Math.min(45, prev + change));
+      });
+      setLatency(Math.floor(Math.random() * (45 - 15) + 15));
+      setCurrentTime(new Date().toLocaleTimeString());
+    }, 1000);
+
+    const sessionInterval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - sessionStart.current) / 1000);
+      const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+      const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+      const s = String(elapsed % 60).padStart(2, '0');
+      setSessionTime(`${h}:${m}:${s}`);
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(sessionInterval);
+    };
+  }, []);
+
   useEffect(() => {
     const fetchVisitorsData = async () => {
       const hasIncremented = sessionStorage.getItem('v_inc');
       const data = await fetchSystemAnalytics(!hasIncremented);
-
       if (data?.success) {
         setVisitorCount(data.count);
         if (!hasIncremented) sessionStorage.setItem('v_inc', 'true');
@@ -53,296 +65,381 @@ const Footer = ({ profile }) => {
     fetchVisitorsData();
   }, []);
 
-  // Safety check: if core footer data is not loaded, don't show yet
   if (!socials || !name) return null;
 
-  // Configuration for social media buttons
   const socialLinks = [
-    { icon: <Linkedin size={20} />, link: socials.linkedin, color: '#0077b5' },
-    { icon: <Github size={20} />, link: socials.github, color: '#f0f6fc' },
-    { icon: <Twitter size={20} />, link: socials.twitter, color: '#1da1f2' },
-    { icon: <Mail size={20} />, link: `mailto:${profile.email}`, color: '#ff3366' },
-    { icon: <Instagram size={20} />, link: socials.instagram, color: '#e4405f' },
-    { icon: <Facebook size={20} />, link: socials.facebook, color: '#1877f2' },
+    { icon: <Linkedin size={20} />, link: socials.linkedin, label: 'LinkedIn' },
+    { icon: <Github size={20} />, link: socials.github, label: 'GitHub' },
+    { icon: <Twitter size={20} />, link: socials.twitter, label: 'Twitter' },
+    { icon: <Mail size={20} />, link: `mailto:${profile.email}`, label: 'Email' },
+    { icon: <Instagram size={20} />, link: socials.instagram, label: 'Instagram' },
+    { icon: <Facebook size={20} />, link: socials.facebook, label: 'Facebook' },
   ];
+
+  const navLinks = ['About', 'Skills', 'Projects', 'Resume', 'Contact'];
+
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   return (
     <Box
       component="footer"
       sx={{
-        bgcolor: '#000000',
-        borderTop: '1px solid rgba(51, 204, 255, 0.1)',
-        pt: 12,
-        pb: 12,
+        bgcolor: '#050507',
+        pt: { xs: 15, md: 20 },
+        pb: 8,
         position: 'relative',
         overflow: 'hidden',
+        borderTop: '1px solid rgba(255,255,255,0.04)',
       }}
     >
-      {/* [BACKGROUND WATERMARK] - Giant name text with extremely low opacity */}
+      {/* Large watermark name */}
       <Box
         sx={{
           position: 'absolute',
-          bottom: -80,
-          right: -20,
-          opacity: 0.02,
+          bottom: -60,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '100%',
+          textAlign: 'center',
           userSelect: 'none',
           pointerEvents: 'none',
+          opacity: 0.025,
+          whiteSpace: 'nowrap',
         }}
       >
         <Typography
-          sx={{ fontSize: '15rem', fontWeight: 900, fontFamily: 'Syncopate', color: 'white' }}
+          sx={{
+            fontSize: { xs: '20vw', md: '18vw' },
+            fontWeight: 900,
+            fontFamily: 'Outfit',
+            letterSpacing: -16,
+            color: 'white',
+          }}
         >
-          {config.watermark || 'YASAR'}
+          {name.toUpperCase()}
         </Typography>
       </Box>
 
-      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          {/* ── LOGO & STATUS HUD ── */}
-          <Stack spacing={1} alignItems="center" sx={{ mb: 4 }}>
-            <Box
-              component={RouterLink}
-              to="/"
-              onClick={() => {
-                const container = document.getElementById('main-scroll-container');
-                if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
-                else window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              sx={{
-                textDecoration: 'none',
-                display: 'flex',
-                transition: '0.3s',
-                '&:hover': { transform: 'scale(1.05)' },
-              }}
-            >
-              <Box
-                component="img"
-                src="/logo.png"
-                alt="Logo"
+      <Container maxWidth="xl">
+        {/* ── Top Row: Brand + Nav ── */}
+        <Grid container spacing={6} sx={{ mb: 10 }}>
+          {/* Brand column */}
+          <Grid item xs={12} md={5}>
+            <Stack spacing={4}>
+              <Box>
+                <Box
+                  component="img"
+                  src="/logo.png"
+                  alt="Logo"
+                  sx={{ height: 100, width: '120px', filter: 'brightness(2)', display: 'block' }}
+                />
+                <Typography
+                  sx={{ color: 'white', fontWeight: 900, fontSize: '1.2rem', fontFamily: 'Outfit' }}
+                >
+                  {name}
+                </Typography>
+                <Typography
+                  sx={{
+                    color: 'primary.main',
+                    fontWeight: 800,
+                    fontSize: '0.7rem',
+                    letterSpacing: 2,
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {profile.title}
+                </Typography>
+              </Box>
+              <Typography
                 sx={{
-                  height: 50,
-                  width: 'auto',
-                  filter: 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.2))',
+                  color: '#475569',
+                  fontSize: '1rem',
+                  lineHeight: 1.9,
+                  maxWidth: 380,
                 }}
-              />
-            </Box>
+              >
+                "
+                {config.tagline ||
+                  'Crafting next-generation digital experiences with precision and purpose.'}
+                "
+              </Typography>
 
-            {/* Technical metadata labels */}
-            <Stack direction="row" spacing={2} sx={{ opacity: 0.5 }}>
-              <Typography variant="caption" sx={{ fontFamily: 'monospace', color: '#00ffcc' }}>
-                [LICENSE_ID: {sessionId}]
-              </Typography>
-              <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
-                [STATUS: VERIFIED]
-              </Typography>
+              {/* Social icons */}
+              <Stack direction="row" spacing={1.5} flexWrap="wrap">
+                {socialLinks.map((item, i) => (
+                  <IconButton
+                    key={i}
+                    href={item.link || '#'}
+                    target="_blank"
+                    title={item.label}
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      color: '#334155',
+                      border: '1px solid rgba(255,255,255,0.05)',
+                      borderRadius: '10px',
+                      transition: '0.35s cubic-bezier(0.23, 1, 0.32, 1)',
+                      '&:hover': {
+                        color: 'white',
+                        borderColor: 'rgba(225,29,72,0.5)',
+                        bgcolor: 'rgba(225,29,72,0.08)',
+                        transform: 'translateY(-4px)',
+                      },
+                    }}
+                  >
+                    {item.icon}
+                  </IconButton>
+                ))}
+              </Stack>
             </Stack>
-          </Stack>
-
-          {/* Professional Tagline */}
-          <Typography
-            variant="body2"
-            sx={{
-              maxWidth: '600px',
-              textAlign: 'center',
-              mb: 6,
-              color: '#334155',
-              fontWeight: 600,
-              fontStyle: 'italic',
-              lineHeight: 1.8,
-              fontSize: '0.9rem',
-            }}
-          >
-            "{config.tagline}"
-          </Typography>
-
-          {/* ── SOCIAL MAINFRAME ── */}
-          <Box
-            sx={{
-              p: 1,
-              px: 4,
-              borderRadius: 10,
-              background: 'rgba(255,255,255,0.01)',
-              border: '1px solid rgba(255,255,255,0.03)',
-              mb: 8,
-              display: 'flex',
-              gap: 2,
-            }}
-          >
-            {socialLinks.map((item, index) => (
-              <Tooltip key={index} title={item.link ? 'OPEN_LINK' : 'N/A'}>
-                <IconButton
-                  href={item.link || '#'}
-                  target={item.link?.startsWith('mailto:') ? undefined : '_blank'}
-                  sx={{
-                    color: '#444',
-                    transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                    '&:hover': {
-                      color: item.color,
-                      transform: 'scale(1.2) translateY(-4px)',
-                      filter: `drop-shadow(0 0 10px ${item.color}88)`,
-                    },
-                  }}
-                >
-                  {item.icon}
-                </IconButton>
-              </Tooltip>
-            ))}
-          </Box>
-          {/* ── ANALYTICS HUD (System Dashboard Style) ── */}
-          <Grid container spacing={4} sx={{ mb: 10 }}>
-            <Grid item xs={12} md={6}>
-              <Box
-                sx={{
-                  p: 4,
-                  borderRadius: 4,
-                  bgcolor: 'rgba(51, 204, 255, 0.02)',
-                  border: '1px solid rgba(51, 204, 255, 0.1)',
-                  position: 'relative',
-                  overflow: 'hidden',
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: '#33ccff',
-                    fontWeight: 900,
-                    fontFamily: 'Syncopate',
-                    letterSpacing: 2,
-                    mb: 3,
-                    display: 'block',
-                  }}
-                >
-                  TRAFFIC_ANALYTICS_V4
-                </Typography>
-                <Stack direction="row" spacing={3} alignItems="center">
-                  <Box sx={{ p: 2, bgcolor: 'rgba(51, 204, 255, 0.05)', borderRadius: 3 }}>
-                    <Terminal size={24} color="#33ccff" />
-                  </Box>
-                  <Box>
-                    <Typography
-                      sx={{
-                        color: 'white',
-                        fontWeight: 900,
-                        fontFamily: 'monospace',
-                        fontSize: '2rem',
-                      }}
-                    >
-                      {visitorCount > 0 ? visitorCount.toLocaleString() : '---'}
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 700 }}>
-                      GLOBAL_UNIQUE_NODES_IDENTIFIED
-                    </Typography>
-                  </Box>
-                </Stack>
-                {/* Decorative HUD Bracket */}
-                <Box sx={{ position: 'absolute', bottom: -10, right: -10, opacity: 0.1 }}>
-                  <Terminal size={100} />
-                </Box>
-              </Box>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Box
-                sx={{
-                  p: 4,
-                  borderRadius: 4,
-                  bgcolor: 'rgba(255, 51, 102, 0.02)',
-                  border: '1px solid rgba(255, 51, 102, 0.1)',
-                  position: 'relative',
-                  overflow: 'hidden',
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: '#ff3366',
-                    fontWeight: 900,
-                    fontFamily: 'Syncopate',
-                    letterSpacing: 2,
-                    mb: 3,
-                    display: 'block',
-                  }}
-                >
-                  SECURITY_PROTOCOL_ACTIVE
-                </Typography>
-                <Stack direction="row" spacing={3} alignItems="center">
-                  <Box sx={{ p: 2, bgcolor: 'rgba(255, 51, 102, 0.05)', borderRadius: 3 }}>
-                    <ShieldCheck size={24} color="#ff3366" />
-                  </Box>
-                  <Box>
-                    <Typography
-                      sx={{
-                        color: 'white',
-                        fontWeight: 900,
-                        fontFamily: 'monospace',
-                        fontSize: '2rem',
-                      }}
-                    >
-                      AES-256
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 700 }}>
-                      END_TO_END_DATA_ENCRYPTION
-                    </Typography>
-                  </Box>
-                </Stack>
-                {/* Decorative HUD Bracket */}
-                <Box sx={{ position: 'absolute', bottom: -10, right: -10, opacity: 0.1 }}>
-                  <ShieldCheck size={100} />
-                </Box>
-              </Box>
-            </Grid>
           </Grid>
 
-          {/* ── TECHNICAL TERMINAL BAR (Copyright & Versioning) ── */}
-          <Box
-            sx={{
-              width: '100%',
-              pt: 4,
-              borderTop: '1px solid rgba(255,255,255,0.03)',
-              display: 'flex',
-              flexDirection: { xs: 'column', sm: 'row' },
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              gap: 2,
-            }}
-          >
-            <Stack direction="row" spacing={1} alignItems="center">
-              <Hash size={12} color="#334155" />
-              <Typography
-                variant="body2"
-                sx={{
-                  color: '#64748b',
-                  fontWeight: 700,
-                  fontSize: '0.7rem',
-                  fontFamily: 'monospace',
-                  letterSpacing: 0.5,
-                }}
-              >
-                &copy; {new Date().getFullYear()} {name} • MIT Licensed
-              </Typography>
-            </Stack>
+          {/* Spacer */}
+          <Grid item xs={12} md={1} />
 
-            {/* Version control and location metadata */}
-            <Stack direction="row" spacing={3}>
-              <Stack direction="row" spacing={1} alignItems="center">
-                <Cpu size={12} color="#33ccff" />
-                <Typography
-                  sx={{ color: '#33ccff', fontWeight: 900, fontSize: '0.65rem', letterSpacing: 1 }}
+          {/* Navigation */}
+          <Grid item xs={6} md={3}>
+            <Typography
+              sx={{
+                color: '#1e293b',
+                fontWeight: 800,
+                fontSize: '0.65rem',
+                letterSpacing: 3,
+                mb: 3,
+                textTransform: 'uppercase',
+              }}
+            >
+              {profile.customData?.navLabel || 'Navigation'}
+            </Typography>
+            <Stack spacing={2}>
+              {navLinks.map((link) => (
+                <Box
+                  key={link}
+                  component="a"
+                  href={`#${link.toLowerCase()}`}
+                  sx={{
+                    color: '#475569',
+                    textDecoration: 'none',
+                    fontSize: '0.9rem',
+                    fontWeight: 500,
+                    transition: '0.25s',
+                    width: 'fit-content',
+                    '&:hover': { color: 'white', pl: 0.5 },
+                  }}
                 >
-                  {config.engineVersion}
+                  {link}
+                </Box>
+              ))}
+            </Stack>
+          </Grid>
+
+          {/* Stats */}
+          <Grid item xs={6} md={3}>
+            <Typography
+              sx={{
+                color: '#1e293b',
+                fontWeight: 800,
+                fontSize: '0.65rem',
+                letterSpacing: 3,
+                mb: 3,
+                textTransform: 'uppercase',
+              }}
+            >
+              {profile.customData?.statsLabel || 'System Stats'}
+            </Typography>
+            <Stack spacing={3}>
+              <Stack spacing={0.5}>
+                <Stack direction="row" spacing={1.5} alignItems="center">
+                  <Users size={14} color="#e11d48" />
+                  <Typography
+                    sx={{
+                      color: '#e11d48',
+                      fontWeight: 900,
+                      fontSize: '1.3rem',
+                      fontFamily: 'Outfit',
+                    }}
+                  >
+                    {visitorCount.toLocaleString()}
+                  </Typography>
+                </Stack>
+                <Typography
+                  sx={{ color: '#334155', fontSize: '0.65rem', fontWeight: 700, letterSpacing: 1 }}
+                >
+                  {profile.customData?.visitorsLabel || 'TOTAL VISITORS'}
                 </Typography>
               </Stack>
-              <Typography
-                sx={{ color: '#64748b', fontWeight: 900, fontSize: '0.65rem', letterSpacing: 1 }}
+              <Stack spacing={0.5}>
+                <Stack direction="row" spacing={1.5} alignItems="center">
+                  <MapPin size={14} color="#94a3b8" />
+                  <Typography sx={{ color: 'white', fontWeight: 700, fontSize: '0.95rem' }}>
+                    {profile.location || config.origin || 'Remote / Chennai, India'}
+                  </Typography>
+                </Stack>
+                <Typography
+                  sx={{ color: '#334155', fontSize: '0.65rem', fontWeight: 700, letterSpacing: 1 }}
+                >
+                  LOCATION
+                </Typography>
+              </Stack>
+
+              <Stack spacing={0.5}>
+                <Typography
+                  sx={{
+                    color: 'white',
+                    fontWeight: 800,
+                    fontSize: '1rem',
+                    fontFamily: 'monospace',
+                  }}
+                >
+                  {currentTime}
+                </Typography>
+                <Typography
+                  sx={{ color: '#334155', fontSize: '0.65rem', fontWeight: 700, letterSpacing: 1 }}
+                >
+                  LOCAL TIME
+                </Typography>
+              </Stack>
+
+              <Stack spacing={1}>
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <Typography
+                    sx={{
+                      color: '#475569',
+                      fontSize: '0.65rem',
+                      fontWeight: 800,
+                      letterSpacing: 1,
+                    }}
+                  >
+                    PERFORMANCE
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: '#e11d48',
+                      fontSize: '0.7rem',
+                      fontWeight: 900,
+                      fontFamily: 'monospace',
+                    }}
+                  >
+                    {systemLoad.toFixed(1)}%
+                  </Typography>
+                </Stack>
+                <Box
+                  sx={{
+                    width: '100%',
+                    height: 2,
+                    bgcolor: 'rgba(255,255,255,0.03)',
+                    borderRadius: 1,
+                  }}
+                >
+                  <motion.div
+                    animate={{ width: `${systemLoad}%` }}
+                    transition={{ duration: 1 }}
+                    style={{ height: '100%', background: '#e11d48', borderRadius: 4 }}
+                  />
+                </Box>
+              </Stack>
+
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+                sx={{ pt: 1 }}
               >
-                {config.origin}
-              </Typography>
+                <Box>
+                  <Typography
+                    sx={{ color: '#334155', fontSize: '0.6rem', fontWeight: 800, letterSpacing: 1 }}
+                  >
+                    LATENCY
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: 'white',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      fontFamily: 'monospace',
+                    }}
+                  >
+                    {latency}MS
+                  </Typography>
+                </Box>
+                <Box sx={{ textAlign: 'right' }}>
+                  <Typography
+                    sx={{ color: '#334155', fontSize: '0.6rem', fontWeight: 800, letterSpacing: 1 }}
+                  >
+                    SESSION
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: 'white',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      fontFamily: 'monospace',
+                    }}
+                  >
+                    {sessionTime}
+                  </Typography>
+                </Box>
+              </Stack>
             </Stack>
-          </Box>
-        </Box>
+          </Grid>
+        </Grid>
+
+        {/* ── Bottom Bar ── */}
+        <Divider sx={{ borderColor: 'rgba(255,255,255,0.04)', mb: 4 }} />
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          justifyContent="space-between"
+          alignItems="center"
+          spacing={3}
+        >
+          <Typography sx={{ color: '#1e293b', fontSize: '0.75rem', fontWeight: 600 }}>
+            {profile.customData?.copyrightText ||
+              `© ${new Date().getFullYear()} ${name}. All rights reserved.`}
+          </Typography>
+
+          <Typography
+            sx={{
+              color: '#1e293b',
+              fontSize: '0.65rem',
+              fontWeight: 700,
+              fontFamily: 'monospace',
+              letterSpacing: 1,
+            }}
+          >
+            PORTFOLIO &nbsp;·&nbsp; MERN STACK
+          </Typography>
+
+          {/* Scroll to top */}
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+            <IconButton
+              onClick={scrollToTop}
+              sx={{
+                width: 44,
+                height: 44,
+                borderRadius: '12px',
+                bgcolor: 'rgba(255,255,255,0.02)',
+                border: '1px solid rgba(255,255,255,0.06)',
+                color: '#475569',
+                transition: '0.3s',
+                '&:hover': {
+                  bgcolor: 'rgba(225,29,72,0.15)',
+                  borderColor: 'rgba(225,29,72,0.4)',
+                  color: '#e11d48',
+                },
+              }}
+            >
+              <ArrowUp size={20} />
+            </IconButton>
+          </motion.div>
+        </Stack>
       </Container>
     </Box>
   );
-};
+});
 
-export default memo(Footer);
+export default Footer;

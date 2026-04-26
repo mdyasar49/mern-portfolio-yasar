@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
+const logger = require('../utils/logger');
 
 /**
- * [MongoDB Database Connection]
- * Configured with a 5-second timeout to prevent server "hangs" on Render.
- * If connection fails, the server will continue in PORTABLE_MODE.
+ * Connects to MongoDB with a timeout.
  */
 const connectDB = async () => {
   try {
@@ -15,14 +14,14 @@ const connectDB = async () => {
 
     const mongoUri = process.env.MONGO_URI;
     if (!mongoUri) {
-      console.warn('⚠️  MONGO_URI is not defined. Skipping DB connection.');
+      logger.warn('MONGO_URI not defined, using local data only.');
       return;
     }
 
     const conn = await mongoose.connect(mongoUri, options);
-    console.log(`✅ [MongoDB Layer] Connected: ${conn.connection.host}`);
+    logger.info(`MongoDB connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error(`❌ [MongoDB Layer] Connection Error: ${error.message}`);
+    logger.error('MongoDB connection error:', error);
     // Let the caller handle the fallback logic
     throw error;
   }

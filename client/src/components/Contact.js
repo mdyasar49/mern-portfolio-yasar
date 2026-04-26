@@ -1,13 +1,8 @@
 /**
- * Language: JavaScript (React.js)
- * Purpose of this file:
- * This component renders the "Contact Me" section of the website.
- * It contains a form that allows visitors to send messages directly to the admin.
- * It handles form state, input validation, and communication with the backend API.
+ * Contact section.
  */
 
 import React, { useState } from 'react';
-// Material UI components for form fields, layout, and notifications
 import {
   Box,
   Typography,
@@ -19,22 +14,12 @@ import {
   CircularProgress,
   Alert,
   Snackbar,
-  useMediaQuery,
-  useTheme,
 } from '@mui/material';
-// Icons for visual representation of contact methods
-import { Send, Mail, MapPin, ShieldCheck } from 'lucide-react';
-// Framer Motion for entrance animations
-import { motion } from 'framer-motion';
-// Import the API service function to send form data to the Node.js backend
-import { dispatchCommunication } from '../services/api';
+import { Mail, MapPin, Globe, Clock, User, MessageSquare } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { submitContactMessage, fetchMessageLogs } from '../services/api';
 
 const Contact = ({ profile }) => {
-  const theme = useTheme();
-  // Detect mobile devices for adjusting notification position
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-  // State to store the form inputs (name, email, profession, subject, message)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -42,480 +27,419 @@ const Contact = ({ profile }) => {
     subject: '',
     message: '',
   });
-  // State to track if the form is currently being submitted to the server
   const [loading, setLoading] = useState(false);
-  // State to store the success or error message from the server
   const [status, setStatus] = useState({ type: '', message: '' });
-  // State to control whether the notification snackbar is open
   const [open, setOpen] = useState(false);
 
-  /**
-   * [handleChange]
-   * Updates the local formData state as the user types into the input fields.
-   */
   const handleChange = (e) => {
-    // Dynamic update based on the 'name' attribute of the TextField
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  /**
-   * [handleSubmit]
-   * Sends the collected form data to the backend when the user clicks 'Send Message'.
-   */
-  const handleSubmit = async (e) => {
-    // Prevent the browser from refreshing the page
-    e.preventDefault();
-    // Show the loading spinner
-    setLoading(true);
+  const [messages, setMessages] = useState([]);
 
-    // Call the external API service function
-    const result = await dispatchCommunication(formData);
+  React.useEffect(() => {
+    loadMessages();
+  }, []);
 
-    // Hide the loading spinner
-    setLoading(false);
-    // If the message was sent successfully
-    if (result.success) {
-      // Set a positive status message
-      setStatus({
-        type: 'success',
-        message: result.message || 'Message sent successfully. I will get back to you soon!',
-      });
-      // Clear the form fields
-      setFormData({ name: '', email: '', profession: '', subject: '', message: '' });
-    } else {
-      // Check for spam protection specific message
-      const errorMsg = result.message || result.error || 'CRITICAL_TRANSMISSION_FAILURE';
-      setStatus({ type: 'error', message: `Communication Failure: ${errorMsg}` });
+  const loadMessages = async () => {
+    try {
+      const logs = await fetchMessageLogs();
+      if (logs && Array.isArray(logs)) {
+        setMessages(logs.slice(0, 5)); // Show last 5
+      } else if (logs?.payload) {
+        setMessages(logs.payload.slice(0, 5));
+      }
+    } catch (err) {
+      console.error('Failed to load message history');
     }
-    // Open the notification snackbar
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Basic Client-Side Validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setStatus({ type: 'error', message: 'Please enter a valid email address.' });
+      setOpen(true);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await submitContactMessage(formData);
+      setLoading(false);
+      if (result.success) {
+        setStatus({ type: 'success', message: 'Message received. I will reach out soon.' });
+        setFormData({ name: '', email: '', profession: '', subject: '', message: '' });
+        loadMessages(); // Refresh the list
+      } else {
+        setStatus({ type: 'error', message: result.message || 'Message failed to send.' });
+      }
+    } catch (err) {
+      setLoading(false);
+      setStatus({ type: 'error', message: 'Unable to connect to server. Please try again later.' });
+    }
     setOpen(true);
   };
 
-  /**
-   * [handleClose]
-   * Closes the notification snackbar.
-   */
-  const handleClose = () => setOpen(false);
-
-  // Reusable styling for the futuristic Material UI TextFields
   const inputStyles = {
     '& .MuiOutlinedInput-root': {
       color: 'white',
-      fontFamily: '"Inter", "Roboto", sans-serif',
       '& fieldset': {
-        borderColor: 'rgba(255,255,255,0.15)',
-        borderRadius: 3,
-        transition: 'all 0.3s ease',
+        borderColor: 'rgba(255,255,255,0.08)',
+        borderRadius: 2,
+        transition: '0.3s',
       },
-      // On hover, change the border color to pink
-      '&:hover fieldset': { borderColor: '#ec4899', backgroundColor: 'rgba(255,255,255,0.02)' },
-      // When clicked/focused, change to purple with a subtle glow
-      '&.Mui-focused fieldset': {
-        borderColor: '#8b5cf6',
-        boxShadow: '0 0 20px rgba(139, 92, 246, 0.2)',
-      },
-      backgroundColor: 'rgba(255,255,255,0.03)',
-      backdropFilter: 'blur(10px)',
+      '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.2)' },
+      '&.Mui-focused fieldset': { borderColor: '#e11d48' },
+      backgroundColor: 'rgba(255,255,255,0.01)',
     },
-    '& .MuiInputLabel-root': {
-      color: '#9ca3af',
-      fontFamily: '"Inter", "Roboto", sans-serif',
-      fontSize: '0.875rem',
-    },
-    '& .MuiInputLabel-root.Mui-focused': { color: '#e5e7eb' },
+    '& .MuiInputLabel-root': { color: '#64748b' },
+    '& .MuiInputLabel-root.Mui-focused': { color: 'white' },
     mb: 3,
   };
 
   return (
-    <Container maxWidth="lg" id="contact" sx={{ py: 15 }}>
-      {/* Header: Secure Protocol Identification */}
-      <Stack spacing={2} sx={{ mb: 10, textAlign: 'center' }}>
-        <Box
-          sx={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 2,
-            mb: 1,
-          }}
-        >
-          <Box sx={{ width: 40, height: 1, bgcolor: 'rgba(51, 204, 255, 0.3)' }} />
-          <Typography
-            variant="caption"
-            sx={{
-              color: '#00ffcc',
-              fontWeight: 900,
-              letterSpacing: 4,
-              fontFamily: 'Syncopate',
-              fontSize: '0.75rem',
-              textTransform: 'uppercase',
-            }}
-          >
-            CONTACT_INQUIRY
-          </Typography>
-          <Box sx={{ width: 40, height: 1, bgcolor: 'rgba(51, 204, 255, 0.3)' }} />
-        </Box>
-        <Typography
-          variant="h2"
-          sx={{
-            fontFamily: 'Syncopate',
-            fontWeight: 900,
-            letterSpacing: -2,
-            fontSize: { xs: '2.5rem', md: '4.5rem' },
-            textShadow: '0 0 40px rgba(255,255,255,0.05)',
-          }}
-        >
-          GET IN{' '}
-          <span style={{ color: '#ff3366', textShadow: '0 0 20px rgba(255, 51, 102, 0.4)' }}>
-            TOUCH
-          </span>
-        </Typography>
-      </Stack>
-
-      <Grid container spacing={8} alignItems="center">
-        {/* Left Column: Technical Contact Data */}
-        <Grid item xs={12} md={5}>
+    <Container maxWidth="xl" id="contact" sx={{ py: { xs: 15, md: 25 } }}>
+      <Grid container spacing={10}>
+        {/* Left: Content */}
+        <Grid item xs={12} lg={5}>
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1 }}
             viewport={{ once: true }}
           >
-            {/* Terminal Log Output */}
-            <Box
+            <Typography
+              variant="overline"
               sx={{
-                mb: 6,
-                p: 3,
-                bgcolor: 'rgba(0,0,0,0.4)',
-                borderRadius: 3,
-                borderLeft: '3px solid #00ffcc',
-                fontFamily: 'monospace',
+                color: 'primary.main',
+                fontWeight: 800,
+                letterSpacing: 3,
+                mb: 3,
+                display: 'block',
               }}
             >
-              <Typography sx={{ color: '#00ffcc', fontSize: '0.75rem', mb: 1 }}>
-                &gt; SYSTEM_READY... [OK]
-              </Typography>
-              <Typography sx={{ color: '#00ffcc', fontSize: '0.75rem', mb: 1 }}>
-                &gt; SECURE_PROTOCOL_ACTIVE... [AES_256]
-              </Typography>
-              <Typography sx={{ color: '#fff', fontSize: '0.85rem', fontWeight: 600, mt: 2 }}>
-                I am currently open to high-impact collaborations, enterprise-scale engineering
-                roles, and innovative architectural challenges.
-              </Typography>
-            </Box>
+              {profile?.customData?.contactOverline || 'CONTACT ME'}
+            </Typography>
+            <Typography
+              variant="h2"
+              sx={{
+                fontWeight: 900,
+                fontSize: { xs: '3rem', md: '5rem' },
+                lineHeight: 1,
+                mb: 6,
+                letterSpacing: -2,
+                color: 'white',
+              }}
+            >
+              {profile?.customData?.contactHeadline || "Let's build something great."}
+            </Typography>
 
             <Stack spacing={4}>
               {[
                 {
-                  icon: <Mail size={22} />,
-                  label: 'Email Address',
-                  val: profile.email,
-                  isLink: true,
-                  color: '#33ccff',
+                  icon: <Mail size={24} />,
+                  label: 'Email',
+                  val: profile?.email,
+                  link: `mailto:${profile?.email}`,
                 },
+                { icon: <MapPin size={24} />, label: 'Location', val: profile?.location },
                 {
-                  icon: <MapPin size={22} />,
-                  label: 'Base Location',
-                  val: profile.location,
-                  color: '#ff3366',
-                },
-                {
-                  icon: <ShieldCheck size={22} />,
-                  label: 'Availability Status',
-                  val: profile.additionalInfo?.availability || 'Ready to Join',
-                  color: '#00ffcc',
+                  icon: <Globe size={24} />,
+                  label: 'Availability',
+                  val: profile?.additionalInfo?.workPreference || 'Remote / Worldwide',
                 },
               ].map((item, i) => (
-                <Stack
+                <Box
                   key={i}
-                  direction="row"
-                  spacing={3}
-                  alignItems="center"
-                  // If it's the email, make it clickable
-                  component={item.isLink ? 'a' : 'div'}
-                  href={item.isLink ? `mailto:${item.val}` : undefined}
+                  component={item.link ? 'a' : 'div'}
+                  href={item.link}
                   sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 3,
                     textDecoration: 'none',
-                    cursor: item.isLink ? 'pointer' : 'default',
-                    transition: 'transform 0.3s ease',
-                    '&:hover': item.isLink ? { transform: 'translateX(8px)' } : {},
+                    color: 'inherit',
+                    transition: '0.3s',
+                    '&:hover': item.link
+                      ? { transform: 'translateX(10px)', color: 'primary.main' }
+                      : {},
                   }}
                 >
-                  {/* Icon Container with Gradient Border */}
                   <Box
                     sx={{
                       p: 2,
-                      borderRadius: 3,
-                      background:
-                        'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(236,72,153,0.15) 100%)',
-                      color: '#ec4899',
-                      border: '1px solid rgba(236,72,153,0.2)',
+                      borderRadius: '16px',
+                      bgcolor: 'rgba(255,255,255,0.02)',
+                      border: '1px solid rgba(255,255,255,0.05)',
+                      color: 'primary.main',
                     }}
                   >
                     {item.icon}
                   </Box>
                   <Box>
                     <Typography
-                      variant="subtitle2"
                       sx={{
-                        color: '#e5e7eb',
-                        fontWeight: 600,
-                        display: 'block',
-                        fontFamily: '"Inter", sans-serif',
+                        color: '#64748b',
+                        fontWeight: 700,
+                        fontSize: '0.75rem',
+                        textTransform: 'uppercase',
                       }}
                     >
                       {item.label}
                     </Typography>
-                    <Typography
-                      sx={{
-                        color: '#9ca3af',
-                        fontFamily: '"Inter", sans-serif',
-                        fontSize: '0.9rem',
-                        mt: 0.5,
-                      }}
-                    >
+                    <Typography sx={{ color: 'white', fontWeight: 600, fontSize: '1.1rem' }}>
                       {item.val}
                     </Typography>
                   </Box>
-                </Stack>
+                </Box>
               ))}
             </Stack>
           </motion.div>
         </Grid>
 
-        {/* Right Column: The Actual Contact Form */}
-        <Grid item xs={12} md={7}>
+        {/* Right: Form */}
+        <Grid item xs={12} lg={7}>
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1 }}
             viewport={{ once: true }}
           >
-            {/* [SECURITY_SHIELD_CONTAINER] */}
-            <Box sx={{ position: 'relative' }}>
-              {/* Ambient Glow Orbs behind the form */}
-              <Box
-                sx={{
-                  position: 'absolute',
-                  top: '-10%',
-                  right: '-5%',
-                  width: '300px',
-                  height: '300px',
-                  background: 'radial-gradient(circle, rgba(51, 204, 255, 0.15), transparent 70%)',
-                  filter: 'blur(60px)',
-                  zIndex: 0,
-                  animation: 'float 10s ease-in-out infinite',
-                }}
-              />
-              <Box
-                sx={{
-                  position: 'absolute',
-                  bottom: '-10%',
-                  left: '-5%',
-                  width: '250px',
-                  height: '250px',
-                  background: 'radial-gradient(circle, rgba(255, 51, 102, 0.1), transparent 70%)',
-                  filter: 'blur(50px)',
-                  zIndex: 0,
-                  animation: 'float 8s ease-in-out infinite reverse',
-                }}
-              />
+            <Box
+              component="form"
+              onSubmit={handleSubmit}
+              className="glass-card"
+              sx={{ p: { xs: 4, md: 8 } }}
+            >
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    sx={inputStyles}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Profession"
+                    name="profession"
+                    value={formData.profession}
+                    onChange={handleChange}
+                    sx={inputStyles}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Subject"
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    sx={inputStyles}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    sx={inputStyles}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Message"
+                    name="message"
+                    multiline
+                    rows={5}
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
+                    sx={inputStyles}
+                  />
+                </Grid>
+              </Grid>
 
-              {/* Semi-transparent Glassmorphic Form Card */}
-              <Box
-                component="form"
-                onSubmit={handleSubmit}
+              <Button
+                type="submit"
+                fullWidth
+                disabled={loading}
+                variant="contained"
                 sx={{
-                  p: { xs: 4, md: 6 },
-                  borderRadius: 4,
-                  background: 'rgba(15, 23, 42, 0.4)',
-                  backdropFilter: 'blur(30px) saturate(180%)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  zIndex: 1,
+                  py: 2.5,
+                  mt: 4,
+                  bgcolor: 'white',
+                  color: 'black',
+                  fontWeight: 900,
+                  fontSize: '1rem',
+                  borderRadius: '100px',
+                  textTransform: 'none',
+                  transition: '0.4s',
+                  '&:hover': {
+                    bgcolor: '#e11d48',
+                    color: 'white',
+                    boxShadow: '0 20px 40px rgba(225, 29, 72, 0.3)',
+                  },
                 }}
               >
-                {/* Holographic Scanline Overlay */}
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '2px',
-                    background:
-                      'linear-gradient(90deg, transparent, rgba(0, 255, 204, 0.3), transparent)',
-                    animation: 'scanLineMove 4s linear infinite',
-                    zIndex: 2,
-                    pointerEvents: 'none',
-                  }}
-                />
-
-                <Box sx={{ position: 'relative', zIndex: 1 }}>
-                  {/* Sub-Header: System Telemetry */}
-                  <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    sx={{ mb: 4, opacity: 0.6 }}
-                  >
-                    <Typography
-                      sx={{
-                        fontSize: '0.65rem',
-                        fontFamily: 'monospace',
-                        color: '#00ffcc',
-                        letterSpacing: 1,
-                      }}
-                    >
-                      [ DISPATCH_PROTOCOL_V4 ]
-                    </Typography>
-                    <Typography
-                      sx={{ fontSize: '0.65rem', fontFamily: 'monospace', color: '#fff' }}
-                    >
-                      SECURE_ENCRYPTION: AES_256
-                    </Typography>
-                  </Stack>
-
-                  <Grid container spacing={2}>
-                    {/* Name Input */}
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        label="Name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                        sx={inputStyles}
-                      />
-                    </Grid>
-                    {/* Profession Input */}
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        label="Profession / Role"
-                        name="profession"
-                        value={formData.profession}
-                        onChange={handleChange}
-                        sx={inputStyles}
-                      />
-                    </Grid>
-                    {/* Email Input */}
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        label="Email Address"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                        sx={inputStyles}
-                      />
-                    </Grid>
-                    {/* Subject Input */}
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        label="Inquiry Subject"
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleChange}
-                        sx={inputStyles}
-                      />
-                    </Grid>
-                    {/* Message Input (Multi-line) */}
-                    <Grid item xs={12}>
-                      <TextField
-                        fullWidth
-                        label="Message Details"
-                        name="message"
-                        multiline
-                        rows={5}
-                        value={formData.message}
-                        onChange={handleChange}
-                        required
-                        sx={inputStyles}
-                      />
-                    </Grid>
-                  </Grid>
-
-                  {/* Submit Button */}
-                  <Button
-                    type="submit"
-                    fullWidth
-                    disabled={loading}
-                    variant="contained"
-                    endIcon={
-                      loading ? <CircularProgress size={20} color="inherit" /> : <Send size={20} />
-                    }
-                    sx={{
-                      py: 2.5,
-                      mt: 2,
-                      background: 'linear-gradient(135deg, #00ffcc 0%, #33ccff 100%)',
-                      color: '#000',
-                      fontWeight: 900,
-                      fontFamily: 'Syncopate',
-                      fontSize: '0.8rem',
-                      letterSpacing: 2,
-                      borderRadius: 2,
-                      textTransform: 'none',
-                      boxShadow: '0 0 30px rgba(0, 255, 204, 0.2)',
-                      transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                      '&:hover': {
-                        background: '#00ffcc',
-                        transform: 'translateY(-3px) scale(1.01)',
-                        boxShadow: '0 15px 40px rgba(0, 255, 204, 0.4)',
-                      },
-                      '&.Mui-disabled': { bgcolor: 'rgba(255,255,255,0.05)', color: '#444' },
-                    }}
-                  >
-                    {loading ? 'INITIALIZING DISPATCH...' : 'ESTABLISH CONNECTION'}
-                  </Button>
-
-                  <Typography
-                    sx={{
-                      mt: 3,
-                      textAlign: 'center',
-                      fontSize: '0.6rem',
-                      color: 'rgba(255,255,255,0.3)',
-                      fontFamily: 'monospace',
-                    }}
-                  >
-                    * BY INITIATING THIS TRANSMISSION, YOU AGREE TO AUTHENTICATED LOGGING OF YOUR IP
-                    AND METADATA.
-                  </Typography>
-                </Box>
-              </Box>
+                {loading ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  profile.customData?.contactActionLabel || 'Send Message'
+                )}
+              </Button>
             </Box>
           </motion.div>
         </Grid>
       </Grid>
 
-      {/* Notification Popup (Snackbar) shown after submission */}
-      <Snackbar
-        open={open}
-        autoHideDuration={6000}
-        onClose={handleClose}
-        anchorOrigin={{
-          vertical: isMobile ? 'top' : 'bottom',
-          horizontal: isMobile ? 'center' : 'right',
-        }}
-      >
-        <Alert
-          onClose={handleClose}
-          severity={status.type}
-          sx={{
-            width: '100%',
-            bgcolor: 'rgba(15, 23, 42, 0.9)',
-            color: 'white',
-            // Green border for success, red for error
-            border: `1px solid ${status.type === 'success' ? '#10b981' : '#ef4444'}`,
-            borderRadius: 3,
-            backdropFilter: 'blur(10px)',
-            fontFamily: '"Inter", sans-serif',
-          }}
+      {/* Recent Messages History */}
+      <Box sx={{ mt: 15 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+          viewport={{ once: true }}
         >
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 800,
+              color: 'white',
+              mb: 6,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              letterSpacing: -1,
+            }}
+          >
+            <Clock size={32} className="text-primary" /> RECENT INQUIRIES
+          </Typography>
+
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <AnimatePresence mode="popLayout">
+              {messages.length > 0 ? (
+                messages.map((msg, idx) => (
+                  <motion.div
+                    key={msg._id || idx}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ delay: idx * 0.1 }}
+                  >
+                    <Box
+                      className="glass-card"
+                      sx={{
+                        p: 4,
+                        borderLeft: '4px solid',
+                        borderColor: 'primary.main',
+                        display: 'grid',
+                        gridTemplateColumns: { xs: '1fr', md: '1.5fr 1.5fr 3fr 1fr' },
+                        gap: 3,
+                        alignItems: 'center',
+                        transition: '0.3s',
+                        '&:hover': {
+                          bgcolor: 'rgba(255,255,255,0.03)',
+                          transform: 'translateX(5px)',
+                        },
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <User size={18} className="text-slate-500" />
+                        <Box>
+                          <Typography sx={{ color: 'white', fontWeight: 700, fontSize: '0.9rem' }}>
+                            {msg.name}
+                          </Typography>
+                          <Typography
+                            sx={{
+                              color: 'primary.main',
+                              fontSize: '0.7rem',
+                              fontWeight: 800,
+                              textTransform: 'uppercase',
+                            }}
+                          >
+                            {msg.profession}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Mail size={18} className="text-slate-500" />
+                        <Typography sx={{ color: 'slate.400', fontSize: '0.85rem' }}>
+                          {msg.email}
+                        </Typography>
+                      </Box>
+
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <MessageSquare size={18} className="text-slate-500" />
+                        <Box>
+                          <Typography sx={{ color: 'white', fontWeight: 600, fontSize: '0.85rem' }}>
+                            {msg.subject}
+                          </Typography>
+                          <Typography
+                            sx={{
+                              color: 'slate.500',
+                              fontSize: '0.8rem',
+                              display: '-webkit-box',
+                              WebkitLineClamp: 1,
+                              WebkitBoxOrient: 'vertical',
+                              overflow: 'hidden',
+                            }}
+                          >
+                            {msg.message}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      <Box sx={{ textAlign: { xs: 'left', md: 'right' } }}>
+                        <Typography
+                          sx={{ color: 'slate.600', fontSize: '0.75rem', fontWeight: 700 }}
+                        >
+                          {new Date(msg.createdAt).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </Typography>
+                        <Typography sx={{ color: 'slate.700', fontSize: '0.65rem' }}>
+                          {new Date(msg.createdAt).toLocaleDateString()}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </motion.div>
+                ))
+              ) : (
+                <Typography
+                  sx={{
+                    color: 'slate.500',
+                    textAlign: 'center',
+                    py: 10,
+                    border: '1px dashed rgba(255,255,255,0.1)',
+                    borderRadius: 4,
+                  }}
+                >
+                  No recent messages found.
+                </Typography>
+              )}
+            </AnimatePresence>
+          </Box>
+        </motion.div>
+      </Box>
+
+      <Snackbar open={open} autoHideDuration={6000} onClose={() => setOpen(false)}>
+        <Alert severity={status.type || 'info'} sx={{ borderRadius: 2 }}>
           {status.message}
         </Alert>
       </Snackbar>

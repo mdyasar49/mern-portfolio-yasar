@@ -1,9 +1,5 @@
 /**
- * Language: JavaScript (Node.js/Mongoose)
- * Purpose of this file:
- * This file defines the database schema and model for "Stats" (system statistics).
- * It tracks the total number of visitors, keeps a daily history log of visits,
- * and stores the current global "maintenance mode" toggle state for the website.
+ * Mongoose schema for tracking system statistics and visitors.
  */
 
 // Import the mongoose library to define the schema and interact with MongoDB
@@ -33,13 +29,6 @@ const statsSchema = new mongoose.Schema({
     type: Date,
     // Automatically set to the current time initially
     default: Date.now,
-  },
-  // A global flag indicating whether the site is currently locked in maintenance mode
-  maintenanceMode: {
-    // Must be a True/False boolean
-    type: Boolean,
-    // Site is NOT in maintenance mode by default
-    default: false,
   },
 });
 

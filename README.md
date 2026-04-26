@@ -1,107 +1,108 @@
-# 🚀 MERN Full-Stack Engineering Showcase (Data-Agnostic v4.2)
+# 🚀 A. Mohamed Yasar | Full-Stack MERN Portfolio
 
-### Engineered by [Mohamed Yasar](https://github.com/mdyasar49)
-
-![Architecture](https://img.shields.io/badge/Architecture-Atomic%20Decoupled-blueviolet?style=for-the-badge)
-![Security](https://img.shields.io/badge/Security-Hardened%20CSP-success?style=for-the-badge)
-![Data](https://img.shields.io/badge/Data-Dynamic%20Calculated-orange?style=for-the-badge)
-![UI](https://img.shields.io/badge/UI-Premium%20Cyberpunk%20Aesthetic-8A2BE2?style=for-the-badge)
+A high-performance Full-Stack Portfolio built with the MERN stack (MongoDB, Express, React, Node.js). Featuring a modern design, real-time system metrics, and automated email notifications.
 
 ---
 
-## 💎 The Engineering Objective
+## 🏗️ How it works
 
-This isn't just a portfolio; it's a **Zero-Hardcoding Production Framework**. Unlike traditional portfolios, this system is 100% data-driven. The frontend is a "dumb" presentation layer that consumes a highly sophisticated, atomized backend API. Every string, metric, and professional detail is dynamically calculated and injected at runtime.
+I built this project with a **decoupled architecture**, where the Frontend and Backend work separately:
 
-> **Goal:** To demonstrate architectural decoupling, professional-grade security, and automated data integrity.
+1.  **Frontend (Client):** A React app in the `/client` folder that handles the UI and animations.
+2.  **Backend (Server):** A Node.js/Express app in the `/server` folder that handles the data and security.
 
----
-
-## 🛠️ Key Architectural Highlights
-
-| Feature                  | Engineering Solution                                                                                                                                                         | Impact                                                                                      |
-| :----------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------ |
-| **Atomic Data Pipeline** | **Fragmented JSON Architecture**. Portfolio content is split into 8 independent modules (`basic_info`, `skills`, `experience`, etc.) merged by a backend aggregation engine. | Extreme maintainability and structural clarity; updates require zero frontend code changes. |
-| **Dynamic Calculation**  | **Real-Time Duration Engine**. Professional tenure (Years/Months) is computed on-the-fly using a `careerStartDate` logic.                                                    | Guarantees 100% accuracy in professional metrics without manual updates.                    |
-| **Security Perimeter**   | **Hardened Production Shield**. Implements strict CORS whitelisting, Helmet (CSP), Rate Limiting, and a "Direct Access Shield" for API endpoints.                            | Enterprise-grade protection against XSS, DDoS, and information leakage.                     |
-| **Holographic HUDs**     | **Data-Driven Interface Modules**. Features specialized `DocumentationHUD` and `RecruiterHUD` that dynamically adapt based on backend telemetry.                             | Professional, recruiter-first presentation with real-time technical specifications.         |
-| **Data Resilience**      | **Zero-Downtime Hybrid Layer**. Automatically falls back to the atomic JSON store if the MongoDB primary connection experiences latency.                                     | Ensures the portfolio remains 100% functional and production-ready at all times.            |
-
----
-
-## 🏗️ System Architecture Overview
+### 🔄 How They Communicate?
 
 ```mermaid
-graph TD
-    User((User)) -->|HTTPS| React[React Interface :2003]
-    subgraph "Logic Layer"
-        React -->|Secure API| Express[Express Aggregator :5001]
-        Express -->|Calculation| Calc[Dynamic Duration Engine]
+graph LR
+    subgraph "Frontend Layer"
+        React[React.js Client]
+        UI[Material UI / Framer]
     end
-    subgraph "Data Persistence (Atomic)"
-        Express -->|Primary| Mongo[(MongoDB Atlas)]
-        Express -.->|Failover| JSON[Data Fragments/*.json]
+
+    subgraph "Communication Layer"
+        Axios[Axios / REST API]
     end
-    Express -->|Telemetery| Logs[System Log Stream]
+
+    subgraph "Backend Layer"
+        Node[Node.js / Express]
+        Logic[Controllers]
+    end
+
+    subgraph "Database Layer"
+        DB[(MongoDB / JSON)]
+    end
+
+    React --> Axios
+    Axios --> Node
+    Node --> Logic
+    Logic --> DB
 ```
+
+The two layers are linked via a **REST API Bridge**:
+- **Protocol:** I used **Axios** for sending requests from the frontend to the server.
+- **Data:** The server responds with **JSON data** which the React frontend then displays.
+- **Example:** When you click "Projects", the frontend asks for `/api/fragments/projects`, the server gets the data, and shows it on the screen.
 
 ---
 
-## 📁 Repository DNA
+## ✨ Features
 
-```text
+-   **Modular Data Loading:** Fragment-based progressive loading for optimal performance.
+-   **Modern UI/UX:** Responsive design using Material UI and Framer Motion.
+-   **Data Resilience:** Fallback local storage (JSON) when database connectivity is unavailable.
+-   **Automated Communication:** Integrated email system for contact form notifications and auto-replies.
+-   **System Status:** Live tracking of system health and performance metrics.
+-   **Admin Dashboard:** Secure JWT-protected management interface for content updates.
+
+## 🛠️ Technology Stack
+
+-   **Frontend:** React.js, Material UI (MUI), Lucide Icons, Framer Motion.
+-   **Backend:** Node.js, Express.js, Nodemailer, JWT.
+-   **Database:** MongoDB (with Local JSON Fallback).
+-   **Utilities:** Axios, Dotenv, CORS, Helmet, Compression.
+
+## 📦 Project Structure
+
+```bash
 mern-portfolio-yasar/
-├── 🌐 client/               # React Presentation Layer (Zero Hardcoding)
-│   ├── src/components/      # Data-Consuming HUDs, HUD Containers, HUD Logic
-│   ├── src/pages/           # Dynamic Assemblers (Portfolio, Resume)
-│   └── src/config.js        # Environment-Aware API Bridge
-└── ⚙️ server/               # Node.js Data Engine (Business Logic)
-    ├── controllers/         # Atomic Aggregator & Duration Logic
-    ├── data/                # Specialized Data Fragments (JSON Modules)
-    ├── middleware/          # Security (CORS, Helmet, RateLimit, Direct-Shield)
-    └── app.js               # Production-Grade Middleware Pipeline
+├── 🌐 client/          # React.js Frontend (View Layer)
+│   ├── src/
+│   │   ├── components/  # Modular UI Fragments
+│   │   ├── services/    # API Consumer (Axios)
+│   │   └── config.js    # Client-side settings
+└── ⚙️ server/          # Node.js Backend (Logic Layer)
+    ├── controllers/    # Request Handling logic
+    ├── routes/         # API Route definitions
+    ├── services/       # Email & Logic Utilities
+    └── models/         # Data Schema Architecture
 ```
 
----
+## 🚀 Rapid Deployment
 
-## 🚀 Rapid Deployment Guide
+1.  **Environment Setup:** Create a `.env` file in the `server` directory.
+    ```env
+    PORT=5001
+    EMAIL_USER=your-email@gmail.com
+    EMAIL_PASS=your-app-password
+    RECEIVER_EMAIL=your-email@gmail.com
+    ```
+2.  **Server Initialization:**
+    ```bash
+    cd server
+    npm install
+    npm run dev
+    ```
+3.  **Client Initialization:**
+    ```bash
+    cd client
+    npm install
+    npm start
+    ```
 
-### 1. Backend Engine
+## 📜 License
 
-```bash
-cd server
-npm install
-# Create .env: PORT=5001, MONGO_URI, CLIENT_URL, NODE_ENV=production, EMAIL_USER, EMAIL_PASS
-npm run dev
-```
-
-### 2. Frontend Interface
-
-```bash
-cd client
-npm install
-# Create .env: REACT_APP_API_BASE_URL (Optional in Production)
-npm start
-```
-
----
-
-## 📡 Core API Endpoints
-
-| Method | Endpoint | Purpose | Intelligence |
-| :----- | :------- | :------ | :----------- |
-
-- [ ] **Enhanced Testing Suite:** Implementing Jest and Cypress for 100% core logic coverage.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
-
-## 🤝 Let's Connect
-
-I am always looking for challenges that push the boundaries of what is possible on the web.
-
-- **GitHub:** [@mdyasar49](https://github.com/mdyasar49)
-- **LinkedIn:** [Mohamed Yasar](https://linkedin.com/in/mdyasar49)
-
----
-
-_"Clean code is not just written; it's engineered."_
+Built with ❤️ by **A. Mohamed Yasar**

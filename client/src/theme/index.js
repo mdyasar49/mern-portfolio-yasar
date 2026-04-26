@@ -1,112 +1,72 @@
 /**
- * [Material UI Design System - UHD/16K Enhancement]
- * This file defines all colors, typography, and styling tokens for your app.
- * Scaled and optimized for Ultra-High-Definition (16K) viewing experiences.
+ * [Material UI Design System - MY. Brand Identity]
+ * Color palette sourced from og-image.png:
+ *   Orange #f97316 → Red #e11d48 → Pink #ec4899 → Magenta #c026d3
+ *   Accent Glow: Cyan #00e5ff
+ *   Background: Pure dark #050507
  */
 import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
-  // ── [Ultra-High-Resolution Breakpoints] ──
   breakpoints: {
-    values: {
-      xs: 0,
-      sm: 600,
-      md: 960,
-      lg: 1280,
-      xl: 1920, // Standard Desktop
-      '2xl': 2560, // 2K/4K Monitors
-      '3xl': 3840, // 8K/16K Extreme Displays
-    },
+    values: { xs: 0, sm: 600, md: 960, lg: 1280, xl: 1920 },
   },
   palette: {
     mode: 'dark',
     primary: {
-      main: '#33ccff', // Engineering Cyan
-      light: '#70e0ff',
-      dark: '#0099cc',
+      main: '#e11d48', // Rose — the gradient midpoint
+      light: '#ec4899', // Pink
+      dark: '#f97316', // Orange
     },
     secondary: {
-      main: '#ff3366', // Crimson Accent
+      main: '#00e5ff', // Cyan glow accent
     },
     background: {
-      default: '#010409', // Deepest Obsidian
-      paper: 'rgba(13, 17, 23, 0.7)',
+      default: '#050507',
+      paper: '#0d0d10',
     },
     text: {
-      primary: '#f0f6fc',
+      primary: '#f8fafc',
       secondary: '#94a3b8',
     },
   },
   typography: {
     fontFamily: '"Outfit", "Inter", sans-serif',
-    // FLUID TYPOGRAPHY: Scaling fonts proportionally for massive resolutions
     h1: {
-      fontFamily: '"Syncopate", sans-serif',
-      fontWeight: 900,
-      letterSpacing: '-2px',
-      fontSize: 'clamp(3rem, 8vw, 12rem)',
+      fontFamily: '"Outfit", sans-serif',
+      fontWeight: 800,
+      letterSpacing: '-0.02em',
+      fontSize: 'clamp(2.5rem, 5vw, 5rem)',
     },
     h2: {
-      fontFamily: '"Syncopate", sans-serif',
-      fontWeight: 900,
-      letterSpacing: '-1px',
-      fontSize: 'clamp(2rem, 5vw, 6rem)',
+      fontFamily: '"Outfit", sans-serif',
+      fontWeight: 700,
+      letterSpacing: '-0.01em',
+      fontSize: 'clamp(2rem, 4vw, 3.5rem)',
     },
     h3: {
-      fontFamily: '"Syncopate", sans-serif',
-      fontWeight: 800,
-      fontSize: 'clamp(1.5rem, 3vw, 4rem)',
+      fontFamily: '"Outfit", sans-serif',
+      fontWeight: 700,
+      fontSize: 'clamp(1.5rem, 3vw, 2.5rem)',
     },
-    h4: {
-      fontFamily: '"Syncopate", sans-serif',
-      fontWeight: 800,
-      fontSize: 'clamp(1.2rem, 2.5vw, 3rem)',
-    },
-    body1: {
-      fontSize: 'clamp(1rem, 1.2vw, 1.5rem)',
-      lineHeight: 1.8,
-    },
-    button: {
-      fontFamily: '"Syncopate", sans-serif',
-      fontWeight: 900,
-      letterSpacing: '1px',
-      fontSize: 'clamp(0.7rem, 0.9vw, 1rem)',
-    },
+    body1: { fontSize: '1rem', lineHeight: 1.6 },
+    button: { fontFamily: '"Outfit", sans-serif', fontWeight: 600, textTransform: 'none' },
   },
-  shape: {
-    borderRadius: 16,
-  },
+  shape: { borderRadius: 12 },
   components: {
-    MuiContainer: {
-      styleOverrides: {
-        root: {
-          // Allowing containers to expand for extreme widths while maintaining center alignment
-          '@media (min-width: 1921px)': {
-            maxWidth: '1800px !important',
-          },
-          '@media (min-width: 2561px)': {
-            maxWidth: '2400px !important',
-          },
-          '@media (min-width: 3841px)': {
-            maxWidth: '3200px !important',
-          },
-        },
-      },
-    },
     MuiButton: {
       styleOverrides: {
         root: {
-          textTransform: 'uppercase',
-          padding: '12px 28px',
-          borderRadius: 12,
-          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          padding: '10px 24px',
+          borderRadius: 8,
+          transition: 'all 0.2s ease',
+          boxShadow: 'none',
+          '&:hover': { boxShadow: 'none', transform: 'translateY(-1px)' },
         },
         containedPrimary: {
-          background: 'linear-gradient(45deg, #00F2FE 0%, #4FACFE 100%)',
-          boxShadow: '0 10px 20px -10px rgba(0, 242, 254, 0.5)',
+          background: 'linear-gradient(135deg, #f97316, #e11d48)',
           '&:hover': {
-            boxShadow: '0 15px 30px -10px rgba(0, 242, 254, 0.6)',
-            transform: 'translateY(-2px)',
+            background: 'linear-gradient(135deg, #ea6a0e, #c41940)',
           },
         },
       },
@@ -115,7 +75,6 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
-          backdropFilter: 'blur(20px)',
           border: '1px solid rgba(255, 255, 255, 0.05)',
         },
       },
