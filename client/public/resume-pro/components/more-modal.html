@@ -49,7 +49,7 @@
       </button>
 
       <!-- Download Asset -->
-      <button class="share-opt" onclick="window.downloadAsPDF()">
+      <button class="share-opt" onclick="window.downloadAsPDFWithOverlay()">
         <div class="opt-icon" style="color: #94a3b8">
           <svg viewBox="0 0 24 24" width="22">
             <path fill="currentColor" d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z" />
@@ -99,12 +99,12 @@
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
             <polyline points="14 2 14 8 20 8" />
           </svg>
-          <span>DOWNLOAD PDF</span>
+          <span>SHARE PDF</span>
         </button>
         <button class="share-opt-grid" onclick="window.executeDownloadProtocol('link')">
           <svg viewBox="0 0 24 24" width="24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
           </svg>
           <span>COPY LINK</span>
         </button>

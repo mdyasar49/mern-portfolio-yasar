@@ -25,7 +25,7 @@
   ],
   "resumeConfig": {
     "version": "v4.2.0",
-    "filename": "A_MOHAMED_YASAR_RESUME.pdf",
+    "filename": "A. Mohamed Yasar - Resume.pdf",
     "sharingTemplate": {
       "subject": "{{NAME}} | Portfolio",
       "body": "Hi, I'm {{NAME}}. You can view my professional portfolio and download my resume here:\n\n[ VIEW PORTFOLIO ]\n{{URL}}\n\nBuilt with MERN Stack"

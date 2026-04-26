@@ -374,6 +374,10 @@ async function init() {
 }
 
 // --- [GLOBAL_PDF_ORCHESTRATION] ---
+// Adapted from onPresignedUrlDownload / doPdfAction patterns:
+// All actions share a single blob source and use createObjectURL + anchor.
+
+const PDF_FILENAME = 'A. Mohamed Yasar - Resume.pdf';
 
 function getPDFEngine() {
   const engine = window.html2pdf;
@@ -385,57 +389,96 @@ function getPDFEngine() {
 }
 
 /**
- * downloadAsPDF
- * @desc Transforms the active DOM into a high-resolution PDF document
- * using a virtual canvas snapshot.
+ * buildPDFBlob  [Single blob source — shared by download, share, and copy actions]
+ * @desc Applies pdf-capture CSS, renders the resume DOM to a PDF blob via html2pdf,
+ * then removes the capture class. All callers receive the same Blob.
  */
-async function downloadAsPDF() {
+async function buildPDFBlob() {
   document.body.classList.add('pdf-capture');
-  await sleep(100);
+  await sleep(400); // allow pdf-capture CSS to fully apply
+
+  const el = UI.main;
+
+  // A4 at 96 dpi ≈ 794px wide. Telling html2canvas the window is exactly
+  // that wide makes the captured layout match what you see on screen.
+  const A4_PX = 794;
+
   const opt = {
-    margin: 0,
-    filename: 'A_MOHAMED_YASAR_RESUME.pdf',
-    image: { type: 'jpeg', quality: 1.0 }, // Maximum Quality
+    margin: [10, 10, 10, 10], // mm: top right bottom left — small bleed so content isn't cut
+    filename: PDF_FILENAME,
+    image: { type: 'jpeg', quality: 0.98 },
     html2canvas: {
-      scale: 4, // 16K Clarity Level
+      scale: 2,
       useCORS: true,
       logging: false,
       letterRendering: true,
-      windowWidth: 2480, // A4 @ 300DPI equivalent
-      windowHeight: 3508,
+      scrollX: 0,
+      scrollY: 0,
+      windowWidth: A4_PX,
+      onclone: (clonedDoc) => {
+        const clonedBody = clonedDoc.body;
+        const clonedEl   = clonedDoc.getElementById('main-resume');
+        clonedBody.style.height    = 'auto';
+        clonedBody.style.overflow  = 'visible';
+        clonedBody.style.minHeight = 'unset';
+        clonedBody.style.width     = A4_PX + 'px';
+        if (clonedEl) {
+          clonedEl.style.height   = 'auto';
+          clonedEl.style.overflow = 'visible';
+          clonedEl.style.maxWidth = '100%';
+        }
+      },
     },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+    pagebreak: { mode: ['css', 'legacy'], avoid: ['.exp-item', 'li'] },
   };
+
   try {
-    await getPDFEngine()().set(opt).from(UI.main).save();
+    return await getPDFEngine()().set(opt).from(el).output('blob');
   } finally {
     document.body.classList.remove('pdf-capture');
   }
 }
-window.downloadAsPDF = downloadAsPDF;
 
-async function getPDFBlob() {
-  document.body.classList.add('pdf-capture');
-  await sleep(100);
-  const opt = {
-    margin: 0,
-    image: { type: 'jpeg', quality: 1.0 },
-    html2canvas: {
-      scale: 4, // 16K Quality Calibration
-      useCORS: true,
-      logging: false,
-      windowWidth: 2480,
-      windowHeight: 3508,
-    },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
-  };
+/**
+ * downloadAsPDF  [onPresignedUrlDownload pattern]
+ * @desc Gets the PDF blob → createObjectURL → anchor with download attr → click → revoke.
+ * Filename is set on the <a> element so the browser always saves with the correct name.
+ */
+async function downloadAsPDF() {
+  const blob = await buildPDFBlob();
+  const fileUrl = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = fileUrl;
+  a.download = PDF_FILENAME;
+  a.click();
+  window.URL.revokeObjectURL(fileUrl); // free memory
+}
+
+/**
+ * downloadAsPDFWithOverlay
+ * @desc Public-facing download: closes modal, shows overlay, runs downloadAsPDF, hides overlay.
+ */
+async function downloadAsPDFWithOverlay() {
+  if (UI.shareModal) UI.shareModal.classList.add('hidden');
+  const overlay = UI.downloadOverlay || document.getElementById('download-overlay');
+  if (overlay) overlay.classList.remove('hidden');
   try {
-    return await getPDFEngine()().set(opt).from(UI.main).output('blob');
+    await downloadAsPDF();
   } finally {
-    document.body.classList.remove('pdf-capture');
+    if (overlay) overlay.classList.add('hidden');
   }
+}
+window.downloadAsPDF = downloadAsPDF;
+window.downloadAsPDFWithOverlay = downloadAsPDFWithOverlay;
+
+/**
+ * getPDFBlob  [Exposed to parent iframe for React Resume.js to consume]
+ * @desc Returns the raw PDF Blob so the React parent can apply its own
+ * onPresignedUrlDownload / navigator.share logic with full filename control.
+ */
+async function getPDFBlob() {
+  return buildPDFBlob();
 }
 window.getPDFBlob = getPDFBlob;
 
@@ -467,35 +510,45 @@ function toggleShareMode(mode) {
 window.toggleShareMode = toggleShareMode;
 
 async function executeDownloadProtocol(type = 'file') {
-  UI.shareModal.classList.add('hidden');
+  if (UI.shareModal) UI.shareModal.classList.add('hidden');
   toggleShareMode('menu'); // Reset UI
 
+  const overlay = UI.downloadOverlay || document.getElementById('download-overlay');
+
   if (type === 'file') {
-    UI.downloadOverlay.classList.remove('hidden');
+    if (overlay) overlay.classList.remove('hidden');
     try {
-      const blob = await getPDFBlob();
-      const file = new File([blob], 'A_MOHAMED_YASAR_RESUME.pdf', { type: 'application/pdf' });
+      const blob = await buildPDFBlob();
+      const file = new File([blob], PDF_FILENAME, { type: 'application/pdf' });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ title: 'A. Mohamed Yasar Resume', files: [file] });
+        await navigator.share({ title: 'A. Mohamed Yasar - Resume', files: [file] });
       } else {
-        downloadAsPDF();
+        // Fallback: blob URL + anchor download
+        const fileUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = fileUrl;
+        a.download = PDF_FILENAME;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(fileUrl);
       }
     } catch (e) {
-      downloadAsPDF();
+      if (e.name !== 'AbortError') {
+        await downloadAsPDF();
+      }
     } finally {
-      UI.downloadOverlay.classList.add('hidden');
+      if (overlay) overlay.classList.add('hidden');
     }
-  } else {
-    // Share Link
+
+  } else if (type === 'link') {
     const url = window.location.origin + window.location.pathname;
-    if (navigator.share) {
-      await navigator.share({
-        title: 'A. Mohamed Yasar - Resume',
-        text: 'View the professional resume of A. Mohamed Yasar.',
-        url: url,
-      });
-    } else {
-      window.shareToWhatsApp();
+    try {
+      await navigator.clipboard.writeText(url);
+      showNotification('✓ Link Copied to Clipboard');
+    } catch {
+      // Clipboard API unavailable — show prompt as last resort
+      window.prompt('Copy this link:', url);
     }
   }
 }
@@ -507,7 +560,7 @@ window.shareToWhatsApp = () => {
     `View the Professional Portfolio & Resume of A. Mohamed Yasar: ${url}`,
   );
   window.open(`https://wa.me/?text=${text}`, '_blank');
-  UI.shareModal.classList.add('hidden');
+  if (UI.shareModal) UI.shareModal.classList.add('hidden');
 };
 
 function showNotification(message) {
@@ -534,10 +587,13 @@ function showNotification(message) {
 
 window.copyPortfolioLink = () => {
   const url = window.location.origin + window.location.pathname;
-  navigator.clipboard.writeText(url).then(() => {
-    showNotification('Link Copied');
-    UI.shareModal.classList.add('hidden');
-  });
+  navigator.clipboard
+    .writeText(url)
+    .then(() => {
+      showNotification('✓ Link Copied to Clipboard');
+      if (UI.shareModal) UI.shareModal.classList.add('hidden');
+    })
+    .catch(() => window.prompt('Copy this link:', url));
 };
 
 window.runSystemAudit = async () => {

@@ -22,6 +22,7 @@ const Resume = () => {
 
   const [isDispatching, setIsDispatching] = useState(false);
   const [isSelectorOpen, setIsSelectorOpen] = useState(false);
+  const [copyConfirmed, setCopyConfirmed] = useState(false);
 
   const iframeSrc = '/resume-pro/index.html';
 
@@ -44,17 +45,52 @@ const Resume = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('system_dispatch') === 'true') {
-      setIsDispatching(true);
+      // Delay then trigger blob-based download
       setTimeout(() => handleDownload(), 2500);
     }
   }, []);
 
-  const handleDownload = () => {
-    const frame = document.getElementById('resume-frame');
-    if (frame && frame.contentWindow.downloadAsPDF) {
-      frame.contentWindow.downloadAsPDF();
-    } else {
-      window.open('/resume-pro/A_MOHAMED_YASAR_RESUME.pdf', '_blank');
+  /**
+   * handleDownload
+   * Blob-based download pattern (adapted from useFileApi → onPresignedUrlDownload):
+   * 1. Show dispatch overlay
+   * 2. Get PDF blob from the iframe's getPDFBlob()
+   * 3. Create an object URL → anchor → click → revoke
+   * Filename is set on the <a> element so the browser saves it correctly.
+   */
+  const handleDownload = async () => {
+    const FILENAME = 'A. Mohamed Yasar - Resume.pdf';
+    setIsDispatching(true);
+    try {
+      const frame = document.getElementById('resume-frame');
+      let blob = null;
+
+      if (frame && frame.contentWindow.getPDFBlob) {
+        blob = await frame.contentWindow.getPDFBlob();
+      }
+
+      if (blob) {
+        // ✅ Proper blob URL download — filename is set on the anchor
+        const fileUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = fileUrl;
+        a.download = FILENAME;
+        a.click();
+        window.URL.revokeObjectURL(fileUrl); // cleanup memory
+      } else {
+        // Fallback: ask iframe to do the download internally
+        if (frame && frame.contentWindow.downloadAsPDF) {
+          frame.contentWindow.downloadAsPDF();
+        }
+      }
+    } catch {
+      // Silent fail — iframe may handle it
+      const frame = document.getElementById('resume-frame');
+      if (frame && frame.contentWindow.downloadAsPDF) {
+        frame.contentWindow.downloadAsPDF();
+      }
+    } finally {
+      setIsDispatching(false);
     }
   };
 
@@ -72,48 +108,21 @@ const Resume = () => {
 
   const executeAssetExtraction = async (type = 'file') => {
     setIsSelectorOpen(false);
-    setIsDispatching(true);
-    try {
-      const frame = document.getElementById('resume-frame');
-      let pdfBlob;
-      if (frame && frame.contentWindow.getPDFBlob) {
-        pdfBlob = await frame.contentWindow.getPDFBlob();
-      }
-      if (!pdfBlob) {
-        handleDownload();
-        return;
-      }
 
-      if (type === 'file') {
-        const file = new File([pdfBlob], 'Mohamed_Yasar_Resume.pdf', { type: 'application/pdf' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            title: 'Mohamed Yasar - Resume',
-            files: [file],
-          });
-        } else {
-          handleDownload();
-        }
-      } else {
-        // Share Link
-        const shareUrl = window.location.origin + '/resume';
-        if (navigator.share) {
-          await navigator.share({
-            title: 'Mohamed Yasar - Portfolio & Resume',
-            text: 'View the professional portfolio and resume of Mohamed Yasar.',
-            url: shareUrl,
-          });
-        } else {
-          window.open(
-            `https://wa.me/?text=${encodeURIComponent('View Mohamed Yasar Resume: ' + shareUrl)}`,
-            '_blank',
-          );
-        }
-      }
-    } catch (error) {
-      if (type === 'file') handleDownload();
-    } finally {
-      setIsDispatching(false);
+    if (type === 'file') {
+      // Blob-based download — shows overlay, sets correct filename on the anchor
+      await handleDownload();
+      return;
+    }
+
+    // type === 'link' — Copy resume URL to clipboard
+    const shareUrl = window.location.origin + '/resume';
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopyConfirmed(true);
+      setTimeout(() => setCopyConfirmed(false), 2500);
+    } catch {
+      window.prompt('Copy this link:', shareUrl);
     }
   };
 
@@ -274,13 +283,14 @@ const Resume = () => {
                       sx={{
                         py: 2,
                         px: 3,
-                        bgcolor: 'rgba(255,255,255,0.02)',
-                        border: '1px solid rgba(255,255,255,0.08)',
+                        bgcolor: copyConfirmed ? 'rgba(51,204,51,0.08)' : 'rgba(255,255,255,0.02)',
+                        border: copyConfirmed ? '1px solid rgba(51,204,51,0.4)' : '1px solid rgba(255,255,255,0.08)',
                         borderRadius: '16px',
                         color: 'white',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'flex-start',
+                        transition: 'all 0.3s ease',
                         '&:hover': { bgcolor: 'rgba(51, 204, 255, 0.05)', borderColor: '#33ccff' },
                       }}
                     >
@@ -293,10 +303,11 @@ const Resume = () => {
                           gap: 1.5,
                         }}
                       >
-                        <LinkIcon size={18} color="#33ccff" /> Copy Share Link
+                        <LinkIcon size={18} color={copyConfirmed ? '#33cc33' : '#33ccff'} />
+                        {copyConfirmed ? '✓ Link Copied!' : 'Copy Share Link'}
                       </Typography>
                       <Typography variant="caption" sx={{ color: '#64748b', ml: 4 }}>
-                        Export via system share protocol
+                        {copyConfirmed ? 'Resume URL copied to clipboard' : 'Copy resume link to clipboard'}
                       </Typography>
                     </Button>
 
