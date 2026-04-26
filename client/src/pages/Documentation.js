@@ -320,6 +320,58 @@ const Documentation = memo(({ profile }) => {
                     ))}
                   </Grid>
                 </Box>
+
+                {/* New Handover Status Section */}
+                <Box 
+                  className="glass-card" 
+                  sx={{ 
+                    p: 4, 
+                    background: 'linear-gradient(135deg, rgba(225, 29, 72, 0.05) 0%, rgba(5, 5, 7, 0.5) 100%)',
+                    border: '1px solid rgba(225, 29, 72, 0.1)'
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      color: 'primary.main',
+                      fontWeight: 900,
+                      fontSize: '0.7rem',
+                      letterSpacing: 3,
+                      mb: 3,
+                      textTransform: 'uppercase'
+                    }}
+                  >
+                    Project Handover Status
+                  </Typography>
+                  <Stack spacing={2}>
+                    {[
+                      { label: 'Real-time Engine', status: 'ACTIVE', color: '#00ffcc' },
+                      { label: 'Humanization Sweep', status: 'COMPLETE', color: '#33ccff' },
+                      { label: 'Production Build', status: 'READY', color: '#ff3366' },
+                      { label: 'System Documentation', status: 'UPDATED', color: '#a855f7' }
+                    ].map((item, i) => (
+                      <Box key={i} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography sx={{ color: '#94a3b8', fontSize: '0.8rem', fontWeight: 700 }}>
+                          {item.label}
+                        </Typography>
+                        <Typography
+                          sx={{
+                            color: item.color,
+                            fontSize: '0.65rem',
+                            fontWeight: 900,
+                            letterSpacing: 1,
+                            bgcolor: `${item.color}11`,
+                            px: 1.5,
+                            py: 0.5,
+                            borderRadius: '4px',
+                            border: `1px solid ${item.color}33`
+                          }}
+                        >
+                          {item.status}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Stack>
+                </Box>
               </Stack>
             </Grid>
           </Grid>
