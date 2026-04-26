@@ -111,8 +111,7 @@ body {
   background: #ffffff;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
   border-radius: 2px;
-  border-top: 4px solid #1a1a1a;
-  /* Use Inter on screen for crisp rendering; PDF forces Calibri */
+  /* No top border — full-width separator is on header-container instead */
   font-family: 'Inter', 'Calibri', 'Arial', sans-serif;
 }
 
@@ -121,6 +120,11 @@ body {
   text-align: left;
   margin-bottom: 22px;
   padding-bottom: 16px;
+  /* Bleed the separator out to the full container width (overrides side padding) */
+  margin-left: -64px;
+  margin-right: -64px;
+  padding-left: 64px;
+  padding-right: 64px;
   border-bottom: 1.5px solid #1a1a1a;
 }
 
@@ -465,7 +469,7 @@ body.dark-mode-interactive b {
   padding: 52px 64px !important;
   background: #ffffff !important;
   box-shadow: none !important;
-  border-top: 4px solid #1a1a1a !important;
+  border-top: none !important;
   border-radius: 0 !important;
   transform: none !important;
   color: #1a1a1a !important;
@@ -502,11 +506,15 @@ body.dark-mode-interactive b {
 .pdf-capture li::before        { content: none !important; }
 .pdf-capture ul                { list-style-type: disc !important; padding-left: 18px !important; }
 
-/* Header separator */
+/* Header separator — full-width bleed (matches screen behaviour) */
 .pdf-capture .header-container {
   border-bottom: 1.5px solid #1a1a1a !important;
   padding-bottom: 16px !important;
   margin-bottom: 22px !important;
+  margin-left: -64px !important;
+  margin-right: -64px !important;
+  padding-left: 64px !important;
+  padding-right: 64px !important;
 }
 
 /* Remove screen-only left accent border from exp-items */
@@ -705,6 +713,13 @@ body.dark-mode-interactive b {
     margin: 0;
     padding: 20px 15px;
     box-shadow: none;
+  }
+  /* Recalculate header bleed to match reduced padding */
+  .header-container {
+    margin-left: -15px;
+    margin-right: -15px;
+    padding-left: 15px;
+    padding-right: 15px;
   }
 }
 

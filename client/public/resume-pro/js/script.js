@@ -404,7 +404,7 @@ async function buildPDFBlob() {
   const A4_PX = 794;
 
   const opt = {
-    margin: [10, 10, 10, 10], // mm: top right bottom left — small bleed so content isn't cut
+    margin: 0,
     filename: PDF_FILENAME,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: {
