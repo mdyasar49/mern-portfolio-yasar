@@ -10,10 +10,16 @@ const transporter = nodemailer.createTransport({
     // Cleanse the password of any accidental spaces from the .env file
     pass: (process.env.EMAIL_PASS || '').replace(/\s+/g, ''),
   },
+  connectionTimeout: 15000,
+  greetingTimeout: 15000,
+  socketTimeout: 15000,
 });
+
+logger.info(`SMTP Config: User=${process.env.EMAIL_USER || 'NOT SET'}`);
 
 // Verify connection on startup
 if (process.env.NODE_ENV !== 'test') {
+  logger.info('Verifying SMTP connection...');
   transporter.verify((error, success) => {
     if (error) {
       logger.error('SMTP Verification Failed:', error);
@@ -30,14 +36,15 @@ exports.sendContactAlert = async (contactData) => {
   try {
     const { name, email, profession, subject, message } = contactData;
 
-    if (!process.env.RECEIVER_EMAIL) {
-      logger.warn('No RECEIVER_EMAIL defined, skipping alert.');
+    const receiver = process.env.RECEIVER_EMAIL || process.env.EMAIL_USER;
+    if (!receiver) {
+      logger.warn('No RECEIVER_EMAIL or EMAIL_USER defined, skipping alert.');
       return false;
     }
 
     const mailOptions = {
       from: `"Portfolio Notification" <${process.env.EMAIL_USER}>`,
-      to: process.env.RECEIVER_EMAIL,
+      to: receiver,
       subject: `Portfolio Inquiry: ${name} [${profession || 'PRO'}]`,
       html: `
                 <div style="background-color: #030303; color: #ffffff; padding: 40px; font-family: 'Inter', sans-serif; max-width: 650px; margin: 0 auto; border-radius: 20px; border: 1px solid #1a1a1a; box-shadow: 0 50px 100px rgba(0,0,0,0.8);">
@@ -82,11 +89,17 @@ exports.sendContactAlert = async (contactData) => {
             `,
     };
 
+    logger.info(`Sending contact alert email to ${receiver}...`);
     const info = await transporter.sendMail(mailOptions);
     logger.info(`Contact alert sent: ${info.messageId}`);
     return true;
   } catch (error) {
-    logger.error('Contact alert failed:', error);
+    logger.error('Contact alert failed:', {
+      message: error.message,
+      code: error.code,
+      command: error.command,
+      stack: error.stack
+    });
     return false;
   }
 };
@@ -135,11 +148,17 @@ exports.sendAcknowledgmentEmail = async (contactData) => {
             `,
     };
 
+    logger.info(`Sending acknowledgment email to ${email}...`);
     const info = await transporter.sendMail(mailOptions);
     logger.info(`Acknowledgment sent to ${email}`);
     return true;
   } catch (error) {
-    logger.error('Acknowledgment email failed:', error);
+    logger.error('Acknowledgment email failed:', {
+      message: error.message,
+      code: error.code,
+      command: error.command,
+      stack: error.stack
+    });
     return false;
   }
 };

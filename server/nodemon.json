@@ -1,0 +1,9 @@
+{
+  "ignore": [
+    "**/logs/**",
+    "**/contacts.json",
+    "**/stats.json",
+    "**/node_modules/**"
+  ],
+  "delay": "2500"
+}
