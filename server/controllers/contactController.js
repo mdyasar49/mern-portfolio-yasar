@@ -102,6 +102,10 @@ exports.submitContactForm = asyncHandler(async (req, res, next) => {
     success: true,
     message: 'Your message has been sent successfully.',
   });
+
+  // Emit real-time update
+  const io = req.app.get('io');
+  if (io) io.emit('newInquiry', contactData);
 });
 
 /**

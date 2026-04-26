@@ -28,6 +28,9 @@ import CustomCursor from './components/CustomCursor';
 import RecruiterHUD from './components/RecruiterHUD';
 import LoadingScreen from './components/LoadingScreen';
 import DocumentationHUD from './components/DocumentationHUD';
+import { Toaster, toast } from 'react-hot-toast';
+import { io } from 'socket.io-client';
+import { API_BASE_URL } from './config';
 
 // ─── Lazy Loaded Modules (Optimization) ──────────────────────────────────
 // These pages are only downloaded when the user actually navigates to them,
@@ -251,13 +254,47 @@ const App = () => {
       document.documentElement.style.setProperty('--y', `${e.clientY}px`);
     };
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+
+    // Global Socket Connection Monitoring
+    const socket = io(API_BASE_URL);
+    
+    socket.on('connect', () => {
+      // Don't show toast on initial connect, only on reconnect
+      if (socket.recovered || (window.sc_count > 0)) {
+        toast.success('System reconnected', {
+          style: { background: '#0f172a', color: '#00ffcc', border: '1px solid #00ffcc33' },
+          iconTheme: { primary: '#00ffcc', secondary: '#0f172a' }
+        });
+      }
+      window.sc_count = (window.sc_count || 0) + 1;
+    });
+
+    socket.on('disconnect', (reason) => {
+      if (reason === 'io server disconnect' || reason === 'transport close') {
+        toast.error('Real-time connection lost', {
+          style: { background: '#0f172a', color: '#e11d48', border: '1px solid #e11d4833' },
+          iconTheme: { primary: '#e11d48', secondary: '#0f172a' },
+          duration: 4000
+        });
+      }
+    });
+
+    socket.on('connect_error', () => {
+      // Silence persistent error toasts to avoid spam, just log
+      console.warn('Socket connection error');
+    });
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      socket.disconnect();
+    };
   }, []);
 
   return (
     // Wrap the entire app in the Material UI theme provider
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <Toaster position="bottom-right" reverseOrder={false} />
       <AnimatePresence mode="wait">
         {loading ? (
           <LoadingScreen key="loader" onComplete={() => setLoading(false)} />

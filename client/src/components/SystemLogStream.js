@@ -5,7 +5,9 @@
 import React, { useState, useEffect, memo } from 'react';
 import { Box, Typography, Container, Stack, Grid } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Terminal, Zap } from 'lucide-react';
+import { Terminal, Zap, Users, MessageSquare } from 'lucide-react';
+import { io } from 'socket.io-client';
+import { API_BASE_URL } from '../config';
 
 const SystemLogStream = memo(({ profile }) => {
   const [logs, setLogs] = useState([]);
@@ -13,26 +15,36 @@ const SystemLogStream = memo(({ profile }) => {
     profile?.documentation?.engineeringObjective || 'Optimizing digital ecosystems for scale.';
 
   useEffect(() => {
-    const logPool = [
-      'Initializing core services',
-      'Hydrating data fragments',
-      'Establishing secure connection',
-      'Optimizing component load',
-      'Synchronizing state buffers',
-      'Validating endpoint integrity',
-    ];
+    // Socket.io for real-time activity
+    const socket = io(API_BASE_URL);
 
-    const interval = setInterval(() => {
+    const addLog = (text, icon = <Zap size={14} />, color = 'primary.main') => {
       const newLog = {
-        id: Date.now(),
-        text: logPool[Math.floor(Math.random() * logPool.length)],
+        id: Date.now() + Math.random(),
+        text,
         time: new Date().toLocaleTimeString(),
-        icon: <Zap size={14} />,
+        icon,
+        color
       };
-      setLogs((prev) => [newLog, ...prev].slice(0, 5));
-    }, 3000);
+      setLogs((prev) => [newLog, ...prev].slice(0, 6));
+    };
 
-    return () => clearInterval(interval);
+    // Listen for visitor updates
+    socket.on('visitorUpdate', (data) => {
+      addLog(`Visitor count updated: ${data.count}`, <Users size={14} />, '#00ffcc');
+    });
+
+    // Listen for new inquiries
+    socket.on('newInquiry', (data) => {
+      addLog(`Message received from: ${data.name}`, <MessageSquare size={14} />, '#33ccff');
+    });
+
+    // Initial logs
+    addLog('System protocols established');
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   return (

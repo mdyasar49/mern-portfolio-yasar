@@ -362,6 +362,10 @@ exports.getVisitors = asyncHandler(async (req, res, next) => {
       if (dayRecord) dayRecord.count += 1;
       else stats.history.push({ date: today, count: 1 });
       saveLocalStats(stats);
+
+      // Emit real-time update
+      const io = req.app.get('io');
+      if (io) io.emit('visitorUpdate', { count: stats.visitors, history: stats.history });
     }
 
     return res.status(200).json({
@@ -386,6 +390,10 @@ exports.getVisitors = asyncHandler(async (req, res, next) => {
       else stats.history.push({ date: today, count: 1 });
       stats.lastUpdated = Date.now();
       await stats.save();
+
+      // Emit real-time update
+      const io = req.app.get('io');
+      if (io) io.emit('visitorUpdate', { count: stats.visitors, history: stats.history });
     }
 
     res.status(200).json({

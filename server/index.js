@@ -18,6 +18,25 @@ const PORT = process.env.PORT || 5001;
 // Create an HTTP server instance using the Express 'app'
 const server = http.createServer(app);
 
+// Initialize Socket.io
+const { Server } = require('socket.io');
+const io = new Server(server, {
+  cors: {
+    origin: process.env.CLIENT_URL || '*',
+    methods: ['GET', 'POST'],
+  },
+});
+
+// Attach io to app for access in controllers
+app.set('io', io);
+
+io.on('connection', (socket) => {
+  logger.info(`Client connected: ${socket.id}`);
+  socket.on('disconnect', () => {
+    logger.info(`Client disconnected: ${socket.id}`);
+  });
+});
+
 /**
  * Start the server and connect to DB.
  */
