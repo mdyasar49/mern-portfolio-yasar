@@ -473,6 +473,14 @@ window.downloadAsPDF = downloadAsPDF;
 window.downloadAsPDFWithOverlay = downloadAsPDFWithOverlay;
 
 /**
+ * printResume  — saves PDF directly (same as download, no print dialog)
+ */
+function printResume() {
+  downloadAsPDFWithOverlay();
+}
+window.printResume = printResume;
+
+/**
  * getPDFBlob  [Exposed to parent iframe for React Resume.js to consume]
  * @desc Returns the raw PDF Blob so the React parent can apply its own
  * onPresignedUrlDownload / navigator.share logic with full filename control.
