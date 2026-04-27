@@ -213,6 +213,7 @@ const RenderEngine = {
       { l: 'Backend',   v: safeArr(s.backend).map(sanitizeSkill).join(', ') },
       { l: 'Database',  v: safeArr(s.database).map(sanitizeSkill).join(', ') },
       { l: 'Tools',     v: safeArr(s.tools).map(sanitizeSkill).join(', ') },
+      { l: 'Ecosystem', v: safeArr(s.productivityTools).map(sanitizeSkill).join(', ') },
       { l: 'AI & ML',   v: safeArr(s.aiTools).map(sanitizeSkill).join(', ') },
       { l: 'Expertise', v: safeArr(s.other).map(sanitizeSkill).join(', ') },
     ]
@@ -401,22 +402,29 @@ async function buildPDFBlob() {
   const A4_PX = 794; // A4 at 96 DPI
 
   const opt = {
-    margin: [10, 12, 12, 12], // Reduced top margin for cleaner start
+    margin: 10, // Reverted to equal margins to fix clipping and excessive right-side gap
     filename: PDF_FILENAME,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: {
       scale: 2,
       useCORS: true,
       letterRendering: true,
+      scrollX: 0,
+      scrollY: 0,
       windowWidth: A4_PX,
       onclone: (clonedDoc) => {
         const clonedBody = clonedDoc.body;
+        const clonedHtml = clonedDoc.documentElement;
         const clonedEl   = clonedDoc.getElementById('main-resume');
         
+        // Absolute Reset for PDF Engine
+        clonedHtml.style.margin = '0';
+        clonedHtml.style.padding = '0';
         clonedBody.style.margin     = '0';
         clonedBody.style.padding    = '0';
         clonedBody.style.background = '#ffffff';
         clonedBody.style.width      = A4_PX + 'px';
+        clonedBody.style.overflowX  = 'hidden';
         
         if (clonedEl) {
           clonedEl.style.width   = '100%';
