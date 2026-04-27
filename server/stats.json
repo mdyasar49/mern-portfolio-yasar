@@ -1,9 +1,13 @@
 {
-  "visitors": 6,
+  "visitors": 8,
   "history": [
     {
       "date": "2026-04-26",
       "count": 6
+    },
+    {
+      "date": "2026-04-27",
+      "count": 2
     }
   ]
 }

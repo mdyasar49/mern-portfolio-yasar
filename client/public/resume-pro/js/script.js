@@ -193,7 +193,7 @@ const RenderEngine = {
       processTemplate(tpl, {
         name: safeStr(p.name, 'A. MOHAMED YASAR'),
         title: safeStr(p.title, 'Full Stack Engineer | React.js | MERN Stack'),
-        location: safeStr(p.location, 'Chennai, TN'),
+        location: safeStr(p.location, 'Chennai, India').replace(/Remote\s*\/\s*/gi, ''),
         phone: safeStr(p.phone, '+91-9025943184'),
         email: safeStr(p.email, 'mohamedyasar081786@gmail.com'),
         linkedinId,
@@ -395,46 +395,51 @@ function getPDFEngine() {
  */
 async function buildPDFBlob() {
   document.body.classList.add('pdf-capture');
-  await sleep(400); // allow pdf-capture CSS to fully apply
+  await sleep(300); // allow styles to apply
 
   const el = UI.main;
-
-  // A4 at 96 dpi ≈ 794px wide. Telling html2canvas the window is exactly
-  // that wide makes the captured layout match what you see on screen.
-  const A4_PX = 794;
+  const A4_PX = 794; // A4 at 96 DPI
 
   const opt = {
-    margin: 0,
+    margin: [10, 12, 12, 12], // Reduced top margin for cleaner start
     filename: PDF_FILENAME,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: {
       scale: 2,
       useCORS: true,
-      logging: false,
       letterRendering: true,
-      scrollX: 0,
-      scrollY: 0,
       windowWidth: A4_PX,
       onclone: (clonedDoc) => {
         const clonedBody = clonedDoc.body;
         const clonedEl   = clonedDoc.getElementById('main-resume');
-        clonedBody.style.height    = 'auto';
-        clonedBody.style.overflow  = 'visible';
-        clonedBody.style.minHeight = 'unset';
-        clonedBody.style.width     = A4_PX + 'px';
+        
+        clonedBody.style.margin     = '0';
+        clonedBody.style.padding    = '0';
+        clonedBody.style.background = '#ffffff';
+        clonedBody.style.width      = A4_PX + 'px';
+        
         if (clonedEl) {
-          clonedEl.style.height   = 'auto';
-          clonedEl.style.overflow = 'visible';
-          clonedEl.style.maxWidth = '100%';
+          clonedEl.style.width   = '100%';
+          clonedEl.style.padding = '0';
+          clonedEl.style.margin  = '0';
         }
-      },
+        
+        const container = clonedDoc.querySelector('.resume-container');
+        if (container) {
+          container.style.padding = '0';
+          container.style.margin  = '0';
+          container.style.width   = '100%';
+          container.style.maxWidth = '100%';
+        }
+      }
     },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['css', 'legacy'], avoid: ['.exp-item', 'li'] },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
+    pagebreak: { mode: ['css', 'legacy'], avoid: ['.exp-item', 'li', '.section-header'] }
   };
 
   try {
-    return await getPDFEngine()().set(opt).from(el).output('blob');
+    const worker = getPDFEngine()().set(opt).from(el);
+    return await worker.output('blob');
   } finally {
     document.body.classList.remove('pdf-capture');
   }

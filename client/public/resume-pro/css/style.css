@@ -400,14 +400,14 @@ body.dark-mode-interactive b {
 
 /* ──────────────────────────────────────────────
    PRINT & PDF CAPTURE — FULLY ATS COMPLIANT
-   No colors, no decorative elements.
-   Pure black text on white background.
+   Strictly optimized for Applicant Tracking Systems.
+   Standard fonts, no colors, pure machine-readability.
 ────────────────────────────────────────────── */
 @media print {
   body {
-    background: #fff !important;
-    color: #000 !important;
-    font-family: 'Calibri', 'Arial', sans-serif !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: 'Calibri', 'Arial', 'Helvetica', sans-serif !important;
     margin: 0;
     padding: 0;
   }
@@ -416,35 +416,62 @@ body.dark-mode-interactive b {
     max-width: none !important;
     padding: 0 !important;
     margin: 0 !important;
-    color: #000 !important;
-    background: #fff !important;
+    color: #000000 !important;
+    background: #ffffff !important;
     border: none !important;
     box-shadow: none !important;
   }
   #loading-overlay,
   #resume-actions,
   .hidden-print,
-  .action-btn {
+  .action-btn,
+  .modal,
+  #rp-cursor-dot,
+  #rp-cursor-ring {
     display: none !important;
   }
   .section-header {
-    color: #000 !important;
-    border-bottom: 1px solid #000 !important;
-    border-top: none !important;
-    background: none !important;
+    color: #000000 !important;
+    border-bottom: 1pt solid #000000 !important;
     letter-spacing: 1px !important;
+    font-family: 'Calibri', 'Arial', sans-serif !important;
+    text-transform: uppercase !important;
+    font-weight: bold !important;
   }
-  .name { color: #000 !important; }
-  .job-title { color: #000 !important; font-style: normal !important; }
-  .contact-line { color: #000 !important; }
-  .exp-top { color: #000 !important; }
-  .exp-sub { color: #333 !important; }
-  .summary-text { color: #000 !important; }
-  .skill-item { color: #000 !important; }
-  .skill-item b { color: #000 !important; }
-  li { color: #000 !important; }
-  li::before { content: none !important; }
-  ul { list-style-type: disc !important; }
+  .name {
+    color: #000000 !important;
+    font-family: 'Calibri', 'Arial', sans-serif !important;
+    font-size: 24pt !important;
+    font-weight: bold !important;
+  }
+  .job-title {
+    color: #333333 !important;
+    font-size: 11pt !important;
+    font-weight: bold !important;
+  }
+  .contact-line {
+    color: #000000 !important;
+    font-size: 9pt !important;
+  }
+  .contact-line a {
+    color: #000000 !important;
+    text-decoration: none !important;
+  }
+  .exp-top {
+    color: #000000 !important;
+    font-weight: bold !important;
+  }
+  .exp-sub {
+    color: #333333 !important;
+    font-style: italic !important;
+  }
+  .summary-text, .skill-item, li {
+    color: #000000 !important;
+    font-size: 10pt !important;
+  }
+  ul {
+    list-style-type: disc !important;
+  }
   .fade-in {
     animation: none !important;
     opacity: 1 !important;
@@ -453,75 +480,111 @@ body.dark-mode-interactive b {
 }
 
 /* ──────────────────────────────────────────────
-   PDF CAPTURE — Screen-faithful template rendering
-   Preserves the visual design of the resume-pro page.
-   Only UI chrome (buttons, modals, cursor) is hidden.
+   PDF CAPTURE — ATS Optimized Engine Interface
+   This block specifically overrides styles when the 
+   'pdf-capture' class is active for file generation.
 ────────────────────────────────────────────── */
 .pdf-capture {
-  /* White page so the resume card sits cleanly */
   background: #ffffff !important;
 }
 
-/* Resume card: keep all its styling, just remove shadow/border-radius for clean A4 edge */
 .pdf-capture .resume-container {
-  max-width: 820px !important;
-  margin: 0 auto !important;
-  padding: 52px 64px !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important; /* Spacing handled by PDF engine margins */
   background: #ffffff !important;
   box-shadow: none !important;
-  border-top: none !important;
+  border: none !important;
   border-radius: 0 !important;
-  transform: none !important;
-  color: #1a1a1a !important;
-  font-family: 'Inter', 'Calibri', 'Arial', sans-serif !important;
+  color: #000000 !important;
+  font-family: 'Calibri', 'Arial', sans-serif !important;
 }
 
-/* Freeze animations so html2canvas sees the final state */
+.pdf-capture .header-container {
+  border-bottom: 1pt solid #000000 !important;
+  padding-bottom: 10px !important;
+  margin-bottom: 15px !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.pdf-capture .name {
+  color: #000000 !important;
+  font-size: 24pt !important;
+  font-weight: bold !important;
+  margin-bottom: 2pt !important;
+}
+
+.pdf-capture .job-title {
+  color: #333333 !important;
+  font-size: 11pt !important;
+  font-weight: bold !important;
+  margin-bottom: 8pt !important;
+}
+
+.pdf-capture .contact-line {
+  color: #000000 !important;
+  font-size: 9pt !important;
+  margin-bottom: 2pt !important;
+}
+
+.pdf-capture .contact-line a,
+.pdf-capture a {
+  color: #000000 !important;
+  text-decoration: none !important;
+}
+
+.pdf-capture .section-header {
+  color: #000000 !important;
+  border-bottom: 1pt solid #000000 !important;
+  font-size: 10pt !important;
+  margin-top: 15pt !important;
+  margin-bottom: 8pt !important;
+  padding-bottom: 2pt !important;
+  font-weight: bold !important;
+  text-transform: uppercase !important;
+}
+
+.pdf-capture .exp-item {
+  border-left: none !important;
+  padding-left: 0 !important;
+  margin-bottom: 12pt !important;
+}
+
+.pdf-capture .exp-top {
+  color: #000000 !important;
+  font-size: 10pt !important;
+  font-weight: bold !important;
+}
+
+.pdf-capture .exp-sub {
+  color: #333333 !important;
+  font-size: 9pt !important;
+  font-style: italic !important;
+  margin-bottom: 4pt !important;
+}
+
+.pdf-capture .summary-text,
+.pdf-capture .skill-item,
+.pdf-capture li {
+  color: #000000 !important;
+  font-size: 10pt !important;
+  line-height: 1.4 !important;
+}
+
+.pdf-capture ul {
+  list-style-type: disc !important;
+  padding-left: 18pt !important;
+  margin-top: 4pt !important;
+}
+
 .pdf-capture .fade-in {
   opacity: 1 !important;
   animation: none !important;
   transform: none !important;
-}
-
-/* Preserve all text at their normal screen colours */
-.pdf-capture .name {
-  color: #1a1a1a !important;
-  font-size: 2.4rem !important;
-}
-.pdf-capture .job-title        { color: #444444 !important; }
-.pdf-capture .contact-line     { color: #333333 !important; }
-.pdf-capture .contact-line a   { color: #1a1a1a !important; text-decoration: none !important; }
-.pdf-capture .section-header {
-  color: #1a1a1a !important;
-  border-bottom: 1.5px solid #1a1a1a !important;
-  background: none !important;
-}
-.pdf-capture .exp-top          { color: #1a1a1a !important; }
-.pdf-capture .exp-sub          { color: #444444 !important; font-style: italic; }
-.pdf-capture .exp-sub span     { color: #374151 !important; }
-.pdf-capture .summary-text     { color: #222222 !important; }
-.pdf-capture .skill-item       { color: #222222 !important; }
-.pdf-capture .skill-item b     { color: #1a1a1a !important; }
-.pdf-capture li                { color: #333333 !important; }
-.pdf-capture li::before        { content: none !important; }
-.pdf-capture ul                { list-style-type: disc !important; padding-left: 18px !important; }
-
-/* Header separator — full-width bleed (matches screen behaviour) */
-.pdf-capture .header-container {
-  border-bottom: 1.5px solid #1a1a1a !important;
-  padding-bottom: 16px !important;
-  margin-bottom: 22px !important;
-  margin-left: -64px !important;
-  margin-right: -64px !important;
-  padding-left: 64px !important;
-  padding-right: 64px !important;
-}
-
-/* Remove screen-only left accent border from exp-items */
-.pdf-capture .exp-item {
-  border-left: none !important;
-  padding-left: 0 !important;
-  margin-bottom: 14px !important;
 }
 
 /* Ensure opacity/transform reset on all children */
