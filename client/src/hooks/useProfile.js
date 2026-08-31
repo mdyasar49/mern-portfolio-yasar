@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import fallbackProfile from '../data/fallbackProfile';
 import {
   fetchBasicDetails,
   fetchSkills,
@@ -14,29 +15,24 @@ import {
 
 /**
  * Hook to manage profile data loading.
+ * Initializes with fallback data for instant 0ms screen rendering,
+ * then hydrates with live API data in background.
  */
 const useProfile = () => {
-  const [profile, setProfile] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [errorType, setErrorType] = useState(null);
+  // Initialize profile with instant fallback data to guarantee immediate rendering
+  const [profile, setProfile] = useState(fallbackProfile);
 
   const hydrateFragment = (fragment) => {
     setProfile((prev) => ({ ...prev, ...fragment }));
   };
 
   const fetchAllData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
     try {
       // Load basic layout first
       const layout = await fetchCommonLayout();
-
-      setProfile((prev) => ({ ...prev, ...layout }));
-
-      // Initial load is "complete" once we have basic layout
-      setLoading(false);
+      if (layout) {
+        setProfile((prev) => ({ ...prev, ...layout }));
+      }
 
       // Load remaining data in background
       const fragments = [
@@ -56,20 +52,16 @@ const useProfile = () => {
         try {
           const data = await frag.fetcher();
           if (data) {
-            // Logic: If the backend returns a direct array (like Projects or Experience),
-            // or if it's the documentation fragment, we must wrap it in the correct key.
             const fragmentToMerge =
               Array.isArray(data) || frag.key === 'documentation' ? { [frag.key]: data } : data;
             hydrateFragment(fragmentToMerge);
           }
         } catch (err) {
-          // Individual module failure shouldn't break the app
+          console.warn(`Fragment [${frag.key}] fetch warning:`, err.message);
         }
       }
     } catch (err) {
-      setError(err);
-      setErrorType('network');
-      setLoading(false);
+      console.warn('API sync warning (using fallback profile data):', err.message);
     }
   }, []);
 
@@ -77,7 +69,7 @@ const useProfile = () => {
     fetchAllData();
   }, [fetchAllData]);
 
-  return { profile, loading, error, errorType, retry: fetchAllData };
+  return { profile, loading: false, error: null, errorType: null, retry: fetchAllData };
 };
 
 export default useProfile;
