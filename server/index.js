@@ -1,5 +1,5 @@
 /**
- * Main entry point for the backend server.
+ * Main entry point for the backend server with WebSocket Data Engine.
  */
 
 require('dotenv').config();
@@ -9,9 +9,9 @@ const connectDB = require('./config/db');
 const validateEnv = require('./config/envValidator');
 const http = require('http');
 const logger = require('./utils/logger');
+const portfolioController = require('./controllers/portfolioController');
 
 // Check environment variables
-
 validateEnv();
 
 const PORT = process.env.PORT || 5001;
@@ -36,6 +36,22 @@ app.set('io', io);
 
 io.on('connection', (socket) => {
   logger.info(`Client connected: ${socket.id}`);
+
+  // High-performance WebSocket profile data delivery
+  socket.on('requestProfile', () => {
+    try {
+      const dataDir = require('path').join(__dirname, 'data');
+      const fs = require('fs');
+      const basicPath = require('path').join(dataDir, 'basic_info.json');
+      if (fs.existsSync(basicPath)) {
+        const basic = JSON.parse(fs.readFileSync(basicPath, 'utf-8'));
+        socket.emit('profileData', basic);
+      }
+    } catch (err) {
+      logger.error('WebSocket profile emit error:', err);
+    }
+  });
+
   socket.on('disconnect', () => {
     logger.info(`Client disconnected: ${socket.id}`);
   });

@@ -29,7 +29,7 @@ const About = memo(({ profile }) => {
   ];
 
   return (
-    <Box id="about" sx={{ py: { xs: 15, md: 25 }, position: 'relative' }}>
+    <Box id="about" sx={{ py: { xs: 6, md: 8 }, position: 'relative' }}>
       <Container maxWidth="xl">
         <Grid container spacing={10} alignItems="flex-start">
           {/* Left: Section Header & Narrative */}

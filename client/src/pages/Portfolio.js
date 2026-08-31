@@ -58,7 +58,7 @@ const Portfolio = memo(({ profile, loading }) => {
 
       {/* Content */}
 
-      <Container maxWidth="xl" sx={{ pt: 12, pb: 10 }}>
+      <Container maxWidth="xl" sx={{ pt: 4, pb: 4 }}>
         {/* Sections are rendered as soon as their specific data arrives */}
         {(profile.name || profile.summary) && <Hero profile={profile} />}
         {profile.summary && <About profile={profile} />}

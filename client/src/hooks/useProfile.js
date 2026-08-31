@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import fallbackProfile from '../data/fallbackProfile';
+import socket from '../services/socket';
 import {
   fetchBasicDetails,
   fetchSkills,
@@ -14,17 +15,17 @@ import {
 } from '../services/api';
 
 /**
- * Hook to manage profile data loading.
+ * Hook to manage profile data loading via WebSockets & API.
  * Initializes with fallback data for instant 0ms screen rendering,
- * then hydrates with live API data in background.
+ * then hydrates with live WebSocket/API data in background.
  */
 const useProfile = () => {
   // Initialize profile with instant fallback data to guarantee immediate rendering
   const [profile, setProfile] = useState(fallbackProfile);
 
-  const hydrateFragment = (fragment) => {
+  const hydrateFragment = useCallback((fragment) => {
     setProfile((prev) => ({ ...prev, ...fragment }));
-  };
+  }, []);
 
   const fetchAllData = useCallback(async () => {
     try {
@@ -63,11 +64,28 @@ const useProfile = () => {
     } catch (err) {
       console.warn('API sync warning (using fallback profile data):', err.message);
     }
-  }, []);
+  }, [hydrateFragment]);
 
   useEffect(() => {
+    // 1. Initial REST API sync
     fetchAllData();
-  }, [fetchAllData]);
+
+    // 2. High-speed WebSocket Real-time Sync
+    if (socket) {
+      socket.emit('requestProfile');
+      socket.on('profileData', (wsData) => {
+        if (wsData) {
+          hydrateFragment(wsData);
+        }
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket.off('profileData');
+      }
+    };
+  }, [fetchAllData, hydrateFragment]);
 
   return { profile, loading: false, error: null, errorType: null, retry: fetchAllData };
 };

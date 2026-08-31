@@ -113,9 +113,9 @@ const EducationHistory = memo(({ profile, education }) => {
   if (!education) return null;
 
   return (
-    <Box id="education" sx={{ py: { xs: 15, md: 25 } }}>
+    <Box id="education" sx={{ py: { xs: 6, md: 8 } }}>
       <Container maxWidth="xl">
-        <Box sx={{ mb: { xs: 10, md: 15 }, textAlign: 'center' }}>
+        <Box sx={{ mb: { xs: 4, md: 6 }, textAlign: 'center' }}>
           <Typography
             variant="overline"
             sx={{

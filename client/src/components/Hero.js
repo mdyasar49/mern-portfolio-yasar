@@ -13,12 +13,13 @@ const Hero = memo(({ profile }) => {
     <Box
       id="hero"
       sx={{
-        minHeight: '100vh',
+        minHeight: { xs: 'auto', md: '70vh' },
         display: 'flex',
         alignItems: 'center',
         position: 'relative',
         overflow: 'hidden',
-        pt: { xs: 8, md: 12 },
+        pt: { xs: 4, md: 6 },
+        pb: { xs: 4, md: 6 },
       }}
     >
       {/* Background Watermark - Minimalist Style */}

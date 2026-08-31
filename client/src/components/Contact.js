@@ -134,7 +134,7 @@ const Contact = ({ profile }) => {
   };
 
   return (
-    <Container maxWidth="xl" id="contact" sx={{ py: { xs: 15, md: 25 } }}>
+    <Container maxWidth="xl" id="contact" sx={{ py: { xs: 6, md: 8 } }}>
       <Grid container spacing={10}>
         {/* Left: Content */}
         <Grid item xs={12} lg={5}>

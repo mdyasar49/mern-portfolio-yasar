@@ -53,7 +53,7 @@ const SystemLogStream = memo(({ profile }) => {
   }, []);
 
   return (
-    <Box id="logs" sx={{ py: { xs: 15, md: 25 } }}>
+    <Box id="logs" sx={{ py: { xs: 6, md: 8 } }}>
       <Container maxWidth="xl">
         <Box
           className="glass-card"

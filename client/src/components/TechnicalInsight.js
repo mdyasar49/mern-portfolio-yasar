@@ -40,10 +40,10 @@ const TechnicalInsight = memo(({ profile }) => {
   if (!mounted) return null;
 
   return (
-    <Box id="insights" sx={{ py: { xs: 15, md: 25 }, position: 'relative' }}>
+    <Box id="insights" sx={{ py: { xs: 6, md: 8 }, position: 'relative' }}>
       <Container maxWidth="xl">
         {/* Header */}
-        <Box sx={{ mb: { xs: 10, md: 15 }, textAlign: 'center' }}>
+        <Box sx={{ mb: { xs: 4, md: 6 }, textAlign: 'center' }}>
           <Typography
             variant="overline"
             sx={{

@@ -119,15 +119,28 @@ const CareerCard = memo(({ job, index }) => {
                   </Typography>
                 </Stack>
 
-                <Typography
-                  sx={{
-                    color: '#94a3b8',
-                    fontSize: '0.9rem',
-                    lineHeight: 1.7,
-                  }}
-                >
-                  {job.description}
-                </Typography>
+                {Array.isArray(job.description) ? (
+                  <Stack spacing={1} sx={{ mb: 2 }}>
+                    {job.description.map((point, idx) => (
+                      <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+                        <Box sx={{ width: 5, height: 5, borderRadius: '50%', bgcolor: 'primary.main', mt: 1, flexShrink: 0 }} />
+                        <Typography sx={{ color: '#94a3b8', fontSize: '0.88rem', lineHeight: 1.6 }}>
+                          {point}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Stack>
+                ) : (
+                  <Typography
+                    sx={{
+                      color: '#94a3b8',
+                      fontSize: '0.9rem',
+                      lineHeight: 1.7,
+                    }}
+                  >
+                    {job.description}
+                  </Typography>
+                )}
 
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.2 }}>
                   {job.technologies?.map((tech) => (
@@ -166,9 +179,9 @@ const WorkExperience = memo(({ profile, experience }) => {
   if (!experience) return null;
 
   return (
-    <Box id="experience" sx={{ py: { xs: 15, md: 25 } }}>
+    <Box id="experience" sx={{ py: { xs: 6, md: 8 } }}>
       <Container maxWidth="xl">
-        <Box sx={{ mb: { xs: 10, md: 15 }, textAlign: 'center' }}>
+        <Box sx={{ mb: { xs: 4, md: 6 }, textAlign: 'center' }}>
           <Typography
             variant="overline"
             sx={{

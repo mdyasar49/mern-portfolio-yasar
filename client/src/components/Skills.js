@@ -110,9 +110,9 @@ const Skills = memo(({ profile, skills }) => {
   ];
 
   return (
-    <Box id="skills" sx={{ py: { xs: 15, md: 25 } }}>
+    <Box id="skills" sx={{ py: { xs: 6, md: 8 } }}>
       <Container maxWidth="xl">
-        <Box sx={{ mb: { xs: 10, md: 15 }, textAlign: 'center' }}>
+        <Box sx={{ mb: { xs: 4, md: 6 }, textAlign: 'center' }}>
           <Typography
             variant="overline"
             sx={{

@@ -178,10 +178,10 @@ const Projects = memo(({ profile, projects }) => {
   const displayCategories = ['All', ...new Set(projects.map(p => p.category || 'Web Development'))];
 
   return (
-    <Box id="projects" sx={{ py: { xs: 15, md: 25 } }}>
+    <Box id="projects" sx={{ py: { xs: 6, md: 8 } }}>
       <Container maxWidth="xl">
         {/* Header */}
-        <Box sx={{ mb: { xs: 10, md: 15 }, textAlign: 'center' }}>
+        <Box sx={{ mb: { xs: 4, md: 6 }, textAlign: 'center' }}>
           <Typography
             variant="overline"
             sx={{
@@ -208,7 +208,7 @@ const Projects = memo(({ profile, projects }) => {
         </Box>
 
         {/* Category Filters */}
-        <Box sx={{ mb: 10, display: 'flex', justifyContent: 'center' }}>
+        <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
           <Tabs
             value={filter}
             onChange={(e, v) => setFilter(v)}
