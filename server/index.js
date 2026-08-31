@@ -9,7 +9,6 @@ const connectDB = require('./config/db');
 const validateEnv = require('./config/envValidator');
 const http = require('http');
 const logger = require('./utils/logger');
-const portfolioController = require('./controllers/portfolioController');
 
 // Check environment variables
 validateEnv();
@@ -18,17 +17,18 @@ const PORT = process.env.PORT || 5001;
 // Create an HTTP server instance using the Express 'app'
 const server = http.createServer(app);
 
-// Initialize Socket.io
+// Initialize Socket.io with permissive CORS & dual transports
 const { Server } = require('socket.io');
-const { getAllowedOrigins } = require('./config/cors');
-const allowedOrigins = getAllowedOrigins();
 
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: true, // Allow all valid web & mobile origins dynamically
     methods: ['GET', 'POST'],
     credentials: true
   },
+  transports: ['websocket', 'polling'],
+  pingTimeout: 60000,
+  pingInterval: 25000,
 });
 
 // Attach io to app for access in controllers

@@ -270,13 +270,7 @@ const App = () => {
     });
 
     socket.on('disconnect', (reason) => {
-      if (reason === 'io server disconnect' || reason === 'transport close') {
-        toast.error('Real-time connection lost', {
-          style: { background: '#0f172a', color: '#e11d48', border: '1px solid #e11d4833' },
-          iconTheme: { primary: '#e11d48', secondary: '#0f172a' },
-          duration: 4000
-        });
-      }
+      console.log('Socket disconnected:', reason);
     });
 
     socket.on('connect_error', () => {
