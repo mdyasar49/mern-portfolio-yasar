@@ -10,7 +10,22 @@ export const fallbackProfile = {
   phone: "+91-9025943184",
   location: "Chennai, TN, India",
   summary: "Full Stack Engineer with 2.5+ years of experience building responsive web applications, real-time AI Voice portals, and RESTful APIs using React.js, Python (Django), Node.js, and Express.js. Proven expertise in integrating Twilio Voice & SMS services, WebSockets/SSE streaming, polymorphic databases, and automated deployment pipelines.",
-  availabilityStatus: "Open to New Opportunities",
+  availabilityStatus: "Immediate Joiner",
+  softSkills: [
+    "Twilio Telephony & Voice AI Integration",
+    "Server-Sent Events (SSE) & WebSockets Streaming",
+    "SonarQube Security & Performance Auditing",
+    "Automated Server Deployment (PowerShell / Bash)",
+    "AI Agent Workflows (Antigravity, Gemini, Cursor)",
+    "Problem Solving & Root Cause Isolation",
+    "Database Optimization (MySQL / SQLite WAL)"
+  ],
+  additionalInfo: {
+    availability: "Immediate Joiner",
+    workMode: "Work From Office | Rotational Shifts | Open to Relocation (Anywhere in Tamil Nadu)",
+    languages: ["English", "Tamil"],
+    softSkills: ["Problem Solving", "Analytical Thinking", "Communication", "Team Collaboration", "Adaptability"]
+  },
   heroTagline: "Architecting Real-Time Web & AI Systems",
   heroMetrics: [
     { label: "EXPERIENCE", val: "2.5+ Years", color: "#f97316" },
@@ -173,11 +188,6 @@ export const fallbackProfile = {
       achievements: ["Programming Excellence", "Web Development Project Lead"]
     }
   ],
-  additionalInfo: {
-    availability: "Immediate Joiner",
-    workPreference: "Work From Office | Rotational Shifts | Open to Relocation (Anywhere in Tamil Nadu)",
-    languages: ["English", "Tamil"]
-  },
   socials: {
     linkedin: "https://linkedin.com/in/mohamed-yasar-4674ba223",
     github: "https://github.com/mdyasar49"

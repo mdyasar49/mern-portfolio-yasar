@@ -14,8 +14,23 @@
     "AI Voice Systems & Twilio Telephony",
     "Immediate Availability"
   ],
-  "availabilityStatus": "Open to New Opportunities",
+  "availabilityStatus": "Immediate Joiner",
   "systemVersion": "v1.0",
+  "softSkills": [
+    "Twilio Telephony & Voice AI Integration",
+    "Server-Sent Events (SSE) & WebSockets Streaming",
+    "SonarQube Security & Performance Auditing",
+    "Automated Server Deployment (PowerShell / Bash)",
+    "AI Agent Workflows (Antigravity, Gemini, Cursor)",
+    "Problem Solving & Root Cause Isolation",
+    "Database Optimization (MySQL / SQLite WAL)"
+  ],
+  "additionalInfo": {
+    "availability": "Immediate Joiner",
+    "workMode": "Work From Office | Rotational Shifts | Open to Relocation (Anywhere in Tamil Nadu)",
+    "languages": ["English", "Tamil"],
+    "softSkills": ["Problem Solving", "Analytical Thinking", "Communication", "Team Collaboration", "Adaptability"]
+  },
   "heroTagline": "Architecting Real-Time Web & AI Systems",
   "heroMetrics": [
     { "label": "EXPERIENCE", "val": "2.5+ Years", "color": "#f97316" },
