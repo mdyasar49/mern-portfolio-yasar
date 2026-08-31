@@ -18,7 +18,7 @@ const About = memo(({ profile }) => {
     },
     {
       label: profile.customData?.experienceLabel || 'Experience',
-      value: profile.customData?.experienceValue || '2+ Years',
+      value: profile.customData?.experienceValue || '3 Yrs 1 Mo',
       icon: <Zap size={20} />,
     },
     {

@@ -1,29 +1,29 @@
 {
   "name": "A. MOHAMED YASAR",
-  "title": "Full Stack Engineer | React.js | Python & Django | AI Voice Systems",
+  "title": "Full Stack Developer | React.js | MERN Stack & REST APIs",
   "email": "mohamedyasar081786@gmail.com",
   "phone": "+91-9025943184",
   "location": "Chennai, TN, India",
-  "expertiseLevel": "Full Stack Engineer",
-  "summary": "Full Stack Engineer with 2.5+ years of experience building responsive web applications, real-time AI Voice portals, and RESTful APIs using React.js, Python (Django), Node.js, and Express.js. Proven expertise in integrating Twilio Voice & SMS services, WebSockets/SSE streaming, polymorphic databases, and automated deployment pipelines. Strong track record of optimizing application security and performance via SonarQube code quality audits and leveraging AI agent workflows (Antigravity, Gemini, Cursor) for rapid development and root-cause bug resolution.",
+  "expertiseLevel": "Full Stack Developer",
+  "summary": "Full Stack Developer with 3 Years 1 Month of experience specializing in React.js and the MERN stack. I build responsive web applications with solid backend support. I'm experienced in integrating REST APIs, working with SQL databases, and solving complex technical challenges to deliver high-quality products.",
   "careerStartDate": "2023-07-01",
-  "recruiterPitch": "I build scalable web apps, real-time AI voice portals, and telecom integrations using React.js, Python, and Node.js with a focus on performance, security, and clean code.",
+  "recruiterPitch": "I build responsive web applications with solid backend support. Experienced in integrating REST APIs, working with SQL databases, and solving complex technical challenges to deliver high-quality products.",
   "recruiterBullets": [
-    "Full Stack Engineer (React, Python, MERN)",
-    "2.5+ Years Experience",
-    "AI Voice Systems & Twilio Telephony",
+    "Full Stack Developer (React, MERN)",
+    "3 Years 1 Month Experience",
+    "REST APIs & SQL Databases",
     "Immediate Availability"
   ],
   "availabilityStatus": "Immediate Joiner",
   "systemVersion": "v1.0",
   "softSkills": [
+    "React.js & MERN Stack Development",
+    "REST APIs Integration & Backend Engineering",
+    "SQL & Database Query Optimization",
+    "Responsive Web Applications & UI Design",
+    "Complex Technical Problem Solving",
     "Twilio Telephony & Voice AI Integration",
-    "Server-Sent Events (SSE) & WebSockets Streaming",
-    "SonarQube Security & Performance Auditing",
-    "Automated Server Deployment (PowerShell / Bash)",
-    "AI Agent Workflows (Antigravity, Gemini, Cursor)",
-    "Problem Solving & Root Cause Isolation",
-    "Database Optimization (MySQL / SQLite WAL)"
+    "Server-Sent Events (SSE) & WebSockets Streaming"
   ],
   "additionalInfo": {
     "availability": "Immediate Joiner",
@@ -31,12 +31,12 @@
     "languages": ["English", "Tamil"],
     "softSkills": ["Problem Solving", "Analytical Thinking", "Communication", "Team Collaboration", "Adaptability"]
   },
-  "heroTagline": "Architecting Real-Time Web & AI Systems",
+  "heroTagline": "Building Responsive Web Apps & Solid Backend Systems",
   "heroMetrics": [
-    { "label": "EXPERIENCE", "val": "2.5+ Years", "color": "#f97316" },
-    { "label": "STACK", "val": "React / Python / MERN", "color": "#e11d48" },
+    { "label": "EXPERIENCE", "val": "3 Yrs 1 Mo", "color": "#f97316" },
+    { "label": "STACK", "val": "React / MERN / REST APIs", "color": "#e11d48" },
     { "label": "LOCATION", "val": "Chennai, TN", "color": "#00e5ff" },
-    { "label": "STATUS", "val": "Open to Work", "color": "#ec4899" }
+    { "label": "STATUS", "val": "Immediate Joiner", "color": "#ec4899" }
   ],
   "resumeConfig": {
     "version": "v4.2.0",
@@ -54,16 +54,16 @@
   },
   "customData": {
     "availabilityLabel": "AVAILABILITY",
-    "availabilityStatus": "OPEN TO WORK",
+    "availabilityStatus": "IMMEDIATE JOINER",
     "versionLabel": "VERSION",
     "versionValue": "v1.0.0",
     "heroOverline": "PROFESSIONAL PORTFOLIO",
     "heroActionLabel": "VIEW PROJECTS",
     "aboutOverline": "ABOUT ME",
-    "aboutHeadline": "Crafting High-Performance & AI-Powered Web Platforms",
+    "aboutHeadline": "Crafting Responsive Web Applications & Solid Backend Systems",
     "expertiseLabel": "Expertise",
     "experienceLabel": "Experience",
-    "experienceValue": "2.5+ Years",
+    "experienceValue": "3 Yrs 1 Mo",
     "portfolioLabel": "Portfolio",
     "competenciesTitle": "Technical Expertise",
     "navLabel": "NAVIGATION",
