@@ -5,20 +5,20 @@
 
 export const fallbackProfile = {
   name: "A. MOHAMED YASAR",
-  title: "Full Stack Developer | React.js | MERN Stack & REST APIs",
+  title: "Full Stack Engineer | React.js | Python & Django | AI Voice Systems | REST APIs",
   email: "mohamedyasar081786@gmail.com",
   phone: "+91-9025943184",
   location: "Chennai, TN, India",
-  summary: "Full Stack Developer with 3 Years 1 Month of experience specializing in React.js and the MERN stack. I build responsive web applications with solid backend support. I'm experienced in integrating REST APIs, working with SQL databases, and solving complex technical challenges to deliver high-quality products.",
+  summary: "Full Stack Developer with 3 Years 1 Month of experience specializing in React.js, Python (Django), and the MERN stack. Proven expertise in building responsive web applications with solid backend support, real-time AI Voice portals (Google Gemini Live API & WebSockets), Twilio Voice & SMS integrations, and RESTful APIs. Skilled in working with SQL databases (MySQL/SQLite WAL mode), SonarQube code quality audits, automated server deployment pipelines, and solving complex technical challenges to deliver high-quality production products.",
   availabilityStatus: "Immediate Joiner",
   softSkills: [
-    "React.js & MERN Stack Development",
-    "REST APIs Integration & Backend Engineering",
-    "SQL & Database Query Optimization",
-    "Responsive Web Applications & UI Design",
-    "Complex Technical Problem Solving",
+    "React.js, MERN Stack & Python (Django)",
     "Twilio Telephony & Voice AI Integration",
-    "Server-Sent Events (SSE) & WebSockets Streaming"
+    "Server-Sent Events (SSE) & WebSockets Streaming",
+    "SonarQube Security & Performance Auditing",
+    "Automated Server Deployment (PowerShell / Bash)",
+    "AI Agent Workflows (Antigravity, Gemini, Cursor)",
+    "Database Optimization (MySQL / SQLite WAL Mode)"
   ],
   additionalInfo: {
     availability: "Immediate Joiner",
@@ -26,10 +26,10 @@ export const fallbackProfile = {
     languages: ["English", "Tamil"],
     softSkills: ["Problem Solving", "Analytical Thinking", "Communication", "Team Collaboration", "Adaptability"]
   },
-  heroTagline: "Building Responsive Web Apps & Solid Backend Systems",
+  heroTagline: "Architecting Real-Time Web Apps, AI Voice Systems & Solid Backend Architectures",
   heroMetrics: [
     { label: "EXPERIENCE", val: "3 Yrs 1 Mo", color: "#f97316" },
-    { label: "STACK", val: "React / MERN / REST APIs", color: "#e11d48" },
+    { label: "STACK", val: "React / Python / MERN", color: "#e11d48" },
     { label: "LOCATION", val: "Chennai, TN", color: "#00e5ff" },
     { label: "STATUS", val: "Immediate Joiner", color: "#ec4899" }
   ],
