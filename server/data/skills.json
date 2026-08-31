@@ -6,50 +6,58 @@
       "JavaScript (ES6+)",
       "Material UI",
       "HTML5 & CSS3",
-      "Animations (Framer Motion / GSAP)"
+      "Glassmorphism & Responsive UI",
+      "Animations (Framer Motion / SVG)"
     ],
     "backend": [
       "Node.js & Express.js",
-      "Core Java & Spring Boot",
-      "Python",
+      "Python (Django / FastAPI)",
       "RESTful API Design",
-      "Server-Side Security (JWT / OAuth)",
+      "Core Java & Spring Boot",
+      "Server-Side Security (Helmet, Rate Limiting)",
       "Middleware & Error Handling"
     ],
     "database": [
       "MySQL & SQL Server",
       "MongoDB",
+      "SQLite (WAL Mode & Connection Safety)",
       "Query Optimization & Indexing",
-      "Data Normalization",
-      "Real-time Data Syncing"
+      "Real-time Data Syncing (Socket.io / SSE)"
+    ],
+    "telephonyAI": [
+      "Twilio API (Voice & SMS)",
+      "WebRTC & Twilio Device",
+      "Google Gemini Live API & WebSockets",
+      "Voice Activity Detection (VAD)",
+      "Zoho Deluge & Webhook Automations"
     ],
     "tools": [
       "Git & GitHub",
       "Postman",
-      "VS Code",
-      "CI/CD (Render / Vercel)",
-      "CLI (PowerShell / Bash)"
+      "CloudPanel & SSH",
+      "PowerShell & Bash Scripting",
+      "SonarQube Code Quality & Security",
+      "VS Code & Docker"
     ],
     "productivityTools": [
-      "AI-Assisted Development (ChatGPT, Claude, Copilot, Gemini, etc.)",
-      "Process Automation",
-      "Modern Workflow Optimization",
-      "Advanced Scripting",
+      "AI-Assisted Development (Antigravity AI, Gemini 3.6 Flash, Cursor)",
+      "Agentic AI Tooling",
+      "Process Automation & Scripting",
       "System Architecture Analysis"
     ],
     "other": [
+      "SonarQube Security Audit",
+      "Memory Leak Optimization",
       "Bug Investigation & Root Cause Analysis",
       "Technical Documentation",
-      "Agile / Distributed Scrum",
-      "System Architecture",
-      "Remote Workflow Optimization"
+      "Agile & Remote Workflow Optimization"
     ]
   },
   "softSkills": [
-    "Remote Team Coordination",
+    "Remote Team Leadership",
     "Asynchronous Communication",
-    "Problem Solving",
-    "Analytical Thinking",
-    "Adaptability"
+    "Problem Solving & Analytical Thinking",
+    "Adaptability & Quick Learning",
+    "Cross-Functional Collaboration"
   ]
 }

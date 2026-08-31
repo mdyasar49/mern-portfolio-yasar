@@ -1,5 +1,22 @@
 [
   {
+    "role": "Freelance Full Stack Developer",
+    "company": "Infogenx Pvt. Ltd.",
+    "companyUrl": "https://infogenx.com",
+    "companyLinkedIn": "https://www.linkedin.com/company/infogenx/",
+    "period": "May 2026 – Present",
+    "location": "Remote",
+    "technologies": ["Python (Django)", "React.js", "WebSockets", "Twilio API", "Node.js", "MySQL", "SQLite", "SonarQube", "Gemini 3.6 Flash"],
+    "description": [
+      "Architected and deployed the multimodal AI Voice Agent System ('Sarah') over low-latency WebSockets with Voice Activity Detection (VAD) and post-call QA scoring pushing to Zoho CRM.",
+      "Built the production Twilio Dialer & Communication Suite featuring dual-channel recording, click-to-dial, Zadarma SMS failover, and automated Zoho CRM/Books integrations.",
+      "Conducted SonarQube security and code quality audits—eliminating memory leaks (SQLite WAL mode), resolving complexity, and enforcing accessibility compliance.",
+      "Engineered and deployed the Blog Admin Portal (blogadmin.infogenx.com) with React.js frontend, Node.js API, dynamic Markdown guides, and automated image compression.",
+      "Developed corporate web portals (infogenx.com, infogenx.com.au, dev.infogenx.com) from scratch with 20+ responsive views, SVG network animations, and Zoho widgets.",
+      "Leveraged AI Agent workflows (Antigravity AI, Gemini, Cursor) to accelerate development and perform rapid root-cause isolation of critical bugs."
+    ]
+  },
+  {
     "role": "Software Engineer / Frontend Specialist",
     "company": "Bytes and Binaries Software Solutions",
     "companyUrl": "https://www.bytesandbinaries.com/",

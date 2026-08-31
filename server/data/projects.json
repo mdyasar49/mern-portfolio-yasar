@@ -1,5 +1,79 @@
 [
   {
+    "name": "Infogenx AI Voice & Multimodal Agent Platform",
+    "type": "Production AI System (Infogenx)",
+    "technologies": ["Python", "FastAPI", "Google Gemini Live API", "WebSockets", "Twilio Voice & SMS", "Zoho CRM", "Docker"],
+    "image": "https://images.unsplash.com/photo-1589254065878-42c9da997008?auto=format&fit=crop&q=80&w=800",
+    "link": "https://voice.infogenx.com/infogenx/dashboard",
+    "github": "#",
+    "description": [
+      "Architected and deployed multimodal AI Voice Agent ('Sarah') operating over low-latency PCM WebSockets with Voice Activity Detection (VAD).",
+      "Built automated post-call AI transcript evaluation (QA scoring 1-10, structured pain point extraction) pushing JSON payloads directly to Zoho CRM webhooks.",
+      "Integrated real-time audio streaming, fallback handling, and telemetry monitoring for enterprise voice operations."
+    ],
+    "highlights": ["Real-Time Voice AI", "Zoho CRM Integration", "WebSocket Engine"],
+    "stats": {
+      "Latency": "<200ms",
+      "QA Scoring": "Automated",
+      "Status": "Live Production"
+    }
+  },
+  {
+    "name": "Production Twilio Dialer & Multi-Channel Automation",
+    "type": "Communication Suite (Infogenx)",
+    "technologies": ["Python", "Django", "Twilio API", "Zadarma API", "Zoho Deluge", "MySQL", "SQLite WAL"],
+    "image": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800",
+    "link": "https://twilliodialer.infogenx.com/",
+    "github": "#",
+    "description": [
+      "Engineered production-grade Django web dialer featuring dual-channel call recording, click-to-dial, and Zadarma SMS failover.",
+      "Automated multi-channel performance digests aggregating leads from Google Apps Script, Zoho Campaigns, Zoho Books, and telephony logs.",
+      "Optimized database performance with SQLite WAL mode and SonarQube audit compliance."
+    ],
+    "highlights": ["Dual Channel Recording", "Zoho Integration", "Multi-Channel SMS"],
+    "stats": {
+      "Reliability": "99.9%",
+      "Failover": "Zadarma SMS",
+      "Status": "Live Production"
+    }
+  },
+  {
+    "name": "Infogenx Blog Admin Portal & CMS",
+    "type": "Full-Stack Web App (Infogenx)",
+    "technologies": ["React.js", "Node.js", "Express.js", "LocalStorage API", "Markdown", "Image Compression"],
+    "image": "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=800",
+    "link": "https://blogadmin.infogenx.com/dashboard",
+    "github": "#",
+    "description": [
+      "Built custom blog admin portal supporting dynamic CRUD actions, Markdown guides, and automatic table of contents generation.",
+      "Engineered automated image compression and lightweight JSON data structures for fast loading speeds."
+    ],
+    "highlights": ["Markdown CMS", "Fast Build", "Automated Assets"],
+    "stats": {
+      "Architecture": "Decoupled",
+      "Storage": "JSON & Storage API",
+      "Status": "Live Production"
+    }
+  },
+  {
+    "name": "Infogenx Corporate Portals & Design System",
+    "type": "Corporate Portals (Infogenx)",
+    "technologies": ["React.js", "Material UI", "CSS3", "SVG Network Animation", "Zoho CRM Widgets"],
+    "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800",
+    "link": "https://infogenx.com",
+    "github": "#",
+    "description": [
+      "Developed corporate websites from scratch: infogenx.com, infogenx.com.au, and dev.infogenx.com with 20+ responsive views.",
+      "Implemented floating capsule headers, dynamic SVG animations, and Zoho CRM contact widgets."
+    ],
+    "highlights": ["20+ Views", "SVG Animations", "Glassmorphic UI"],
+    "stats": {
+      "Performance": "95+",
+      "Design": "Modern Glassmorphism",
+      "Status": "Live Production"
+    }
+  },
+  {
     "name": "Job Planner Enterprise",
     "type": "Production Environment (Bytes and Binaries)",
     "technologies": ["React.js", "Redux", "Material UI", "REST APIs", "MySQL"],
@@ -9,9 +83,7 @@
     "description": [
       "Full Stack Contributor to a high-traffic Job Management System, focusing on modular UI development and efficient data rendering.",
       "Integrated backend APIs with robust validation logic, ensuring reliable data flow across thousands of records.",
-      "Investigated and resolved complex cross-layer issues spanning the UI, API middleware, and SQL stored procedures.",
-      "Contributed UI/UX modernizations and workflow improvements that significantly enhanced operational efficiency for enterprise clients.",
-      "Collaborated within a distributed team environment using Git and Postman for efficient remote coordination."
+      "Investigated and resolved complex cross-layer issues spanning the UI, API middleware, and SQL stored procedures."
     ],
     "highlights": ["Remote Collaboration", "Modular Components", "API Integration"],
     "stats": {
@@ -21,31 +93,22 @@
     }
   },
   {
-    "name": "Full-Stack Portfolio System",
+    "name": "Full-Stack MERN Portfolio System",
     "type": "Full-Stack Portfolio",
-    "technologies": [
-      "Modular Data Architecture",
-      "Dynamic Content Logic",
-      "React.js",
-      "Node.js",
-      "Real-time Updates",
-      "Framer Motion"
-    ],
+    "technologies": ["MongoDB", "Express.js", "React.js", "Node.js", "Socket.io", "Framer Motion"],
     "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800",
     "link": "https://mern-portfolio-yasar-1.onrender.com",
-    "github": "https://github.com/mdyasar49/mern-portfolio-yasar",
+    "github": "https://github.com/mdyasar49/portfolio-yasar",
     "description": [
-      "Developed a modular, data-driven portfolio framework powered by a JSON-based backend with MongoDB integration.",
-      "Implemented dynamic logic that automatically computes professional tenure and experience dates.",
-      "Ensured production security with best practices including CSP, Rate Limiting, and data validation.",
-      "Designed a modern, responsive UI system using Material UI and Framer Motion for an engaging user experience.",
-      "Engineered for global accessibility with high-performance assets and remote-friendly architecture."
+      "Developed a modular, data-driven portfolio framework powered by Node.js, Express REST API, and React frontend.",
+      "Implemented live visitor tracking and inquiry alerts with Socket.io, plus fallback local JSON storage.",
+      "Secured with CSP, Rate Limiting, Helmet, and response compression."
     ],
-    "highlights": ["Global Reach", "Atomic Architecture", "Dynamic Logic"],
+    "highlights": ["Real-Time Socket.io", "Decoupled Architecture", "Dynamic Data"],
     "stats": {
       "Data": "100% Dynamic",
       "Security": "Hardened",
-      "Downtime": "0%"
+      "Status": "Live Production"
     }
   }
 ]
